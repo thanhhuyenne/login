@@ -1,5 +1,5 @@
 git pull
 
 git add .
-git commit -m "mô tả thay đổi"
+git commit -m "thêm file README"
 git push

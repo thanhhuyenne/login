@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Chart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar span {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .navbar span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f4f4f4;
+            padding: 15px;
+        }
+
+        .sidebar div {
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            transition: background 0.3s;
+        }
+
+        .sidebar div:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-container label {
+            font-size: 14px;
+        }
+
+        select, input, button {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+
+        .chart-container {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            display: none;
+        }
+
+        #alarmChart {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .error-message {
+            display: none;
+            font-size: 24px;
+            color: red;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'" class="active">ALARMS</span>
+        <span onclick="window.location.href='Report.html'">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+        <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="active">1 - CẢNH BÁO QUÁ DÒNG</div>
+            <div onclick="window.location.href='Alarm_voltage.html'">2 - CẢNH BÁO SỤT ÁP</div>
+            <div onclick="window.location.href='Alarm_mkn.html'">3 - CẢNH BÁO MẤT KẾT NỐI</div>
+        </div>
+
+        <div class="content">
+            <h2>Biểu đồ số lần lỗi theo thiết bị</h2>
+
+            <div class="filter-container">
+                <label for="timeFilter">Bộ lọc thời gian:</label>
+                <select id="timeFilter">
+                    <option value="last7days">7 ngày gần nhất</option>
+                    <option value="today">Hôm nay</option>
+                    <option value="thismonth">Tháng này</option>
+                </select>
+                <button id="filterButton" onclick="fetchAlarmData('filter')">Xem</button>
+
+                <label for="monthPicker">Chọn tháng:</label>
+                <input type="month" id="monthPicker">
+                <button id="monthButton" onclick="fetchAlarmData('month')">Xem</button>
+
+                <button onclick="window.location.href='Alarm.html'">Quay lại</button>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+            <div class="chart-container" id="chartContainer">
+                <canvas id="alarmChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let chartInstance;
+        const FIXED_LABELS = ['1-1', '1-2', '1-3', '2-1', '2-2', '2-3', '3-1', '3-2', '3-3', '4-1', '4-2', '4-3'];
+        let isFetching = false;
+
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        async function fetchAlarmData(type) {
+            if (isFetching) return;
+
+            const errorMessage = document.getElementById('errorMessage');
+            const chartContainer = document.getElementById('chartContainer');
+            const filterButton = document.getElementById('filterButton');
+            const monthButton = document.getElementById('monthButton');
+
+            isFetching = true;
+            filterButton.disabled = true;
+            monthButton.disabled = true;
+            errorMessage.style.display = 'none';
+            chartContainer.style.display = 'none';
+
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+
+            let url;
+            if (type === 'filter') {
+                const timeFilter = document.getElementById('timeFilter').value;
+                url = `http://localhost:3000/api/alarm-stats?filter=${timeFilter}`;
+                console.log(`📢 Gửi yêu cầu lấy dữ liệu theo filter: ${timeFilter}`);
+            } else {
+                const month = document.getElementById('monthPicker').value;
+                if (!month) {
+                    errorMessage.textContent = 'Vui lòng chọn tháng!';
+                    errorMessage.style.display = 'flex';
+                    isFetching = false;
+                    filterButton.disabled = false;
+                    monthButton.disabled = false;
+                    return;
+                }
+                url = `http://localhost:3000/api/alarm-stats?filter=month=${month}`;
+                console.log(`📢 Gửi yêu cầu lấy dữ liệu theo tháng: ${month}`);
+            }
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Lỗi khi lấy dữ liệu từ API');
+                }
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    errorMessage.textContent = 'Không có dữ liệu để hiển thị';
+                    errorMessage.style.display = 'flex';
+                    return;
+                }
+
+                drawAlarmChart(data);
+                chartContainer.style.display = 'block';
+            } catch (error) {
+                console.error('❌ Lỗi:', error);
+                errorMessage.textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+                errorMessage.style.display = 'flex';
+            } finally {
+                isFetching = false;
+                filterButton.disabled = false;
+                monthButton.disabled = false;
+            }
+        }
+
+        function drawAlarmChart(data) {
+            const lightData = new Array(FIXED_LABELS.length).fill(0);
+            const seriousData = new Array(FIXED_LABELS.length).fill(0);
+            const emergencyData = new Array(FIXED_LABELS.length).fill(0);
+
+            data.forEach(item => {
+                const index = FIXED_LABELS.indexOf(item.device);
+                if (index !== -1) {
+                    lightData[index] = item.light || 0;
+                    seriousData[index] = item.serious || 0;
+                    emergencyData[index] = item.emergency || 0;
+                }
+            });
+
+            const ctx = document.getElementById('alarmChart').getContext('2d');
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: FIXED_LABELS,
+                    datasets: [
+                        {
+                            label: '🟡 Nhẹ',
+                            backgroundColor: 'yellow',
+                            data: lightData,
+                            stack: 'stack1'
+                        },
+                        {
+                            label: '🟠 Nghiêm trọng',
+                            backgroundColor: 'orange',
+                            data: seriousData,
+                            stack: 'stack1'
+                        },
+                        {
+                            label: '🔴 Khẩn cấp',
+                            backgroundColor: 'red',
+                            data: emergencyData,
+                            stack: 'stack1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Thống kê lỗi theo thiết bị'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.9,
+                            title: {
+                                display: true,
+                                text: '127.0.0.x-x',
+                                font: { size: 14 },
+                                color: '#000'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Số lần',
+                                font: { size: 14 },
+                                color: '#000'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('filterButton').onclick = debounce(() => fetchAlarmData('filter'), 300);
+        document.getElementById('monthButton').onclick = debounce(() => fetchAlarmData('month'), 300);
+
+        window.onload = () => fetchAlarmData('filter');
+    </script>
+</body>
+</html>

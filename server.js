@@ -6,6 +6,7 @@ const mysql = require("mysql2/promise"); ;
 const ping = require('ping');
 const app = express();
 const bcrypt = require('bcrypt');
+const os = require('os');
 const MySQLStore = require('express-mysql-session')(session);
 
 
@@ -22,12 +23,20 @@ let lastFetchTime = 0;
 const FETCH_INTERVAL = 10000; // 10 giây
 const MODBUS_PORT = 502;
 
+// Xác định mật khẩu dựa trên hostname
+const hostname = os.hostname();
+let mysqlPassword;
+if (hostname === 'LAPTOP-DABVF4H5') { // Thay bằng hostname của bạn
+    mysqlPassword = "";
+} else {
+    mysqlPassword = "tranvanvinh"; // Mặc định cho máy đồng đội
+}
+
 // Kết nối MySQL
 const pool = mysql.createPool({
     host: "localhost",
     user: "root",
-//    password: "tranvanvinh",
-    password: "",
+    password: mysqlPassword,
     database: "modbus_database"
 });
 
@@ -35,7 +44,7 @@ const pool = mysql.createPool({
 const poolManager = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "",
+    password: mysqlPassword,
     database: "modbus_manager"
 });
 
@@ -47,7 +56,7 @@ const sessionStore = new MySQLStore({
     connectionLimit: 1,
     host: "localhost",
     user: "root",
-    password: "", // hoặc mật khẩu nếu có
+    password: mysqlPassword, // hoặc mật khẩu nếu có
     database: "modbus_manager"
 });
 app.use(session({
@@ -86,6 +95,16 @@ const defaultDeviceConfig = [
     { ip: '127.0.0.4', slave_id: 2, rated_current: 21.0 },
     { ip: '127.0.0.4', slave_id: 3, rated_current: 41.0 }
 ];
+
+clearSessionsTable();
+// Xóa bảng sessions khi server khởi động
+async function clearSessionsTable() {
+    try {
+        await poolManager.query("DELETE FROM sessions");
+    } catch (error) {
+        console.error('Lỗi khi xóa bảng sessions:', error);
+    }
+}
 
 function isAdmin(req, res, next) {
     console.log("Session hiện tại:", req.session); // Thêm dòng này để kiểm tra
@@ -197,6 +216,21 @@ app.get('/check-role', (req, res) => {
     }
 
     return res.status(200).json({ role: req.session.user.role });
+});
+
+// API /is-logged-in (API mới thay cho /check-session)
+app.get("/is-logged-in", (req, res) => {
+    console.log('Kiểm tra đăng nhập:', req.session);
+    if (req.session.user) {
+        return res.status(200).json({
+            loggedIn: true,
+            role: req.session.user.role
+        });
+    } else {
+        return res.status(200).json({
+            loggedIn: false
+        });
+    }
 });
 
 // API tạo tài khoản mới
@@ -1932,6 +1966,62 @@ app.get("/get-disconnect-summary", async (req, res) => {
         res.status(500).json({ error: "Lỗi server" });
     }
 });
+
+app.get('/api/alarm-stats', async (req, res) => {
+    const { filter } = req.query;
+    let whereClause = '';
+    const params = [];
+
+    if (filter === 'today') {
+        whereClause = `event_date = CURDATE()`;
+    } else if (filter === 'last7days') {
+        whereClause = `event_date >= CURDATE() - INTERVAL 7 DAY`;
+    } else if (filter === 'thismonth') {
+        whereClause = `MONTH(event_date) = MONTH(CURDATE()) AND YEAR(event_date) = YEAR(CURDATE())`;
+    } else if (filter?.startsWith('month=')) {
+        const [year, month] = filter.split('=')[1].split('-');
+        whereClause = `MONTH(event_date) = ? AND YEAR(event_date) = ?`;
+        params.push(parseInt(month), parseInt(year));
+    } else {
+        return res.status(400).json({ error: 'Invalid filter' });
+    }
+
+    const query = `
+        SELECT 
+            location,
+            severity,
+            COUNT(*) as count
+        FROM Alarm
+        WHERE ${whereClause}
+        GROUP BY location, severity
+    `;
+
+    try {
+        const [rows] = await pool.query(query, params);
+
+        const result = {};
+
+        for (let row of rows) {
+            // Lấy phần cuối IP và ID từ location: modbus_data_127_0_0_1_1 → 1-1
+            const parts = row.location.split('_'); // [modbus, data, 127, 0, 0, 1, 1]
+            const ipLast = parts[5]; // '1'
+            const slaveId = parts[6]; // '1'
+            const key = `${ipLast}-${slaveId}`; // eg: "1-1"
+        
+            if (!result[key]) {
+                result[key] = { device: key, light: 0, serious: 0, emergency: 0 };
+            }
+        
+            result[key][row.severity] = row.count;
+        }        
+
+        res.json(Object.values(result));
+    } catch (err) {
+        console.error('❌ Error fetching alarm stats:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 app.listen(3000, () => {
     console.log("🚀 Server đang chạy trên http://localhost:3000");

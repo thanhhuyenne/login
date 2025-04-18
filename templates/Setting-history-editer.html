@@ -80,21 +80,21 @@
             font-size: 14px;
         }
         .navbar span.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
+            font-weight: bold;
+            color: rgb(254, 174, 0);
         }
         .sidebar div.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
+            font-weight: bold;
+            color: rgb(254, 174, 0);
         }
         h2 {
             font-size: 30px;
             font-weight: bold;
             text-align: center;
             background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
-            -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
-            background-clip: text; /* Thuộc tính chuẩn */
-            color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             -webkit-text-fill-color: transparent;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
@@ -145,7 +145,7 @@
             text-align: center;
             margin-top: 20px;
         }
-        button[type="submit"] {
+        button {
             background-color: #4CAF50;
             color: white;
             padding: 8px 16px;
@@ -153,9 +153,10 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            margin: 0 10px;
             transition: background-color 0.3s;
         }
-        button[type="submit"]:hover {
+        button:hover {
             background-color: #45a049;
         }
         #message {
@@ -182,10 +183,10 @@
         <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
         <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
         <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'" >ALARMS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
-        <span onclick="window.location.href='index.html'">LOG OUT</span>
+        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
     </div>
 
     <div class="container">
@@ -214,15 +215,20 @@
                 </thead>
                 <tbody id="historyTableBody"></tbody>
             </table>
-            <div class="button-container" onclick="loadEditHistory()">
-                <button type="submit">UpdateTable</button>
+            <div class="button-container">
+                <button onclick="loadEditHistory()">UpdateTable</button>
+                <button onclick="exportToExcel()">Xuất Excel</button>
+                <button onclick="exportToPDF()">Xuất PDF</button>
             </div>
             <div id="message"></div>
         </div>
     </div>
 
+    <script src="/static/lib-js/exceljs.min.js"></script>
+    <script src="/static/lib-js/FileSaver.min.js"></script>
+    <script src="/static/lib-js/html2canvas.min.js"></script>
+    <script src="/static/lib-js/jspdf.umd.min.js"></script>
     <script>
-
         // Hàm định dạng ngày giờ
         function formatDateTime(dateTime) {
             const date = new Date(dateTime);
@@ -289,11 +295,151 @@
             }
         }
 
+        // Hàm xuất Excel
+        async function exportToExcel() {
+            const table = document.getElementById('historyTable');
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Lịch sử chỉnh sửa');
+
+            // Thêm tiêu đề từ <h2> và gộp ô A1:G1
+                const title = document.querySelector('h2').textContent;
+            worksheet.mergeCells('A1:F1');
+            const titleCell = worksheet.getCell('A1');
+            titleCell.value = title;
+            titleCell.font = { bold: true, size: 16 };
+            titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+            worksheet.addRow([]); // Dòng trống
+
+            // Thêm tiêu đề bảng
+            const headerRow = table.querySelector('thead tr');
+            const headerCells = Array.from(headerRow.cells).map(cell => cell.textContent);
+            const excelHeaderRow = worksheet.addRow(headerCells);
+            excelHeaderRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } };
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                cell.font = { bold: true, color: { argb: 'FF333333' } };
+                cell.alignment = { horizontal: 'center' };
+            });
+
+            // Thêm dữ liệu bảng
+            const bodyRows = table.querySelectorAll('tbody tr');
+            bodyRows.forEach(row => {
+                const cells = Array.from(row.cells).map(cell => cell.textContent);
+                const excelRow = worksheet.addRow(cells);
+                excelRow.eachCell(cell => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    cell.font = { color: { argb: 'FF555555' } };
+                    cell.alignment = { horizontal: 'center' };
+                });
+            });
+
+            // Tự động giãn cột
+            worksheet.columns.forEach(column => {
+                let maxLength = 10;
+                column.eachCell({ includeEmpty: true }, cell => {
+                    const length = cell.value ? cell.value.toString().length : 0;
+                    if (length > maxLength) maxLength = length;
+                });
+                column.width = maxLength + 2;
+            });
+
+            // Xuất file
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'LichSuChinhSua.xlsx');
+        }
+
+        // Hàm xuất PDF
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const table = document.getElementById('historyTable');
+            const title = 'HISTORY EDITOR';
+
+            // Chụp ảnh bảng
+            const canvas = await html2canvas(table, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape', // Chuyển sang landscape để bảng rộng hơn
+                unit: 'mm',
+                format: 'a4'
+            });
+            // Thêm font hỗ trợ Unicode 
+            pdf.setFont('times', 'normal');
+            // Thêm tiêu đề
+            pdf.setFontSize(16);
+            pdf.text(title, 148.5, 15, { align: 'center' }); // Căn giữa trên trang landscape (297mm / 2)
+            // Tính toán kích thước ảnh
+            const imgWidth = 277; // Tăng chiều rộng để phù hợp trang landscape
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            const pageHeight = pdf.internal.pageSize.height;
+            let heightLeft = imgHeight;
+            let position = 25; // Bảng bắt đầu thấp hơn để tránh chồng lấn tiêu đề
+
+            // Thêm ảnh vào PDF
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - 30);
+            while (heightLeft > 0) {
+                pdf.addPage();
+                position = heightLeft - imgHeight;
+                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            // Xuất file
+            pdf.save('LichSuChinhSua.pdf');
+        }
+
         // Tự động tải dữ liệu khi vào trang
         window.onload = function() {
             loadEditHistory();
         };
+        // Kiểm tra đăng nhập khi tải trang
+        async function isLoggedIn() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/is-logged-in', {
+                    credentials: 'include' // Gửi cookie
+                });
+                const data = await response.json();
+                if (!data.loggedIn) {
+                    window.location.href = 'index.html';
+                }
+                return data;
+            } catch (error) {
+                console.error('Lỗi kiểm tra đăng nhập:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        function handleLogout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        logout().then(() => {
+            window.location.href = 'index.html';
+        }).catch(error => {
+            console.error('Lỗi khi đăng xuất:', error);
+            alert('Đăng xuất thất bại. Vui lòng thử lại.');
+        });
+    }
+}
+async function logout() {
+    try {
+        const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
+        });
+        const data = await response.json();
+        console.log('Phản hồi từ server:', data.message);
+
+        // Xóa role khỏi localStorage
+        localStorage.removeItem('role');
+        return data; // Trả về để xử lý trong then
+    } catch (error) {
+        throw error; // Ném lỗi để catch bên ngoài xử lý
+    }
+}
+
+        isLoggedIn();
+
     </script>
-    
 </body>
 </html>

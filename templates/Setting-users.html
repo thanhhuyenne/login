@@ -352,7 +352,8 @@ async function logout() {
     try {
         const response = await fetch('http://127.0.0.1:3000/logout', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
         });
         const data = await response.json();
         console.log('Phản hồi từ server:', data.message);
