@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        .navbar span {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .navbar span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 40px);
+        }
+        .sidebar {
+            width: 250px;
+            background: #f4f4f4;
+            padding: 15px;
+        }
+        .sidebar div {
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }
+        .sidebar div:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background: #fff;
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        .report-table th {
+            background: #4CAF50;
+            color: white;
+        }
+        select, input {
+            padding: 5px;
+            font-size: 14px;
+        }
+        .navbar span.active {
+        font-weight: bold; /* Làm đậm chữ */
+        color: rgb(254, 174, 0); /* Đổi màu chữ */
+        }
+        .sidebar div.active {
+        font-weight: bold; /* Làm đậm chữ */
+        color: rgb(254, 174, 0); /* Đổi màu chữ */
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'" class="active">ALARMS</span>
+        <span onclick="window.location.href='Report.html'">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+        <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="active">1 - CẢNH BÁO QUÁ DÒNG</div>
+            <div onclick="window.location.href='Alarm_voltage.html'">2 - CẢNH BÁO SỤT ÁP</div>
+            <div onclick="window.location.href='Alarm_mkn.html'">3 - CẢNH BÁO MẤT KẾT NỐI</div>
+        </div>
+
+        <div class="content">
+            <h2>Alarm Report</h2>
+
+            <div class="filter-container">
+                <label for="timeFilter">Bộ lọc thời gian:</label>
+                <select id="timeFilter">
+                    <option value="last7days">7 ngày gần nhất</option>
+                    <option value="today">Hôm nay</option>
+                    <option value="thismonth">Tháng này</option>
+                </select>
+                <button onclick="fetchAlarmDataByFilter()">Xem</button>
+
+                <label for="monthPicker">Chọn tháng:</label>
+                <input type="month" id="monthPicker">
+                <button onclick="fetchAlarmDataByMonth()">Xem</button>
+            </div>
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>Duration Time</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody id="alarm-data">
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Chưa có dữ liệu</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAlarmDataByFilter() {
+            const timeFilter = document.getElementById("timeFilter").value;
+            console.log(`📢 Gửi yêu cầu lấy dữ liệu theo: ${timeFilter}`);
+    
+            try {
+                const response = await fetch(`http://localhost:3000/api/getAlarmData?filter=${timeFilter}&type=current`);
+                const data = await response.json();
+                updateTable(data);
+            } catch (error) {
+                console.error("❌ Lỗi khi lấy dữ liệu:", error);
+                showNoDataMessage();
+            }
+        }
+    
+        async function fetchAlarmDataByMonth() {
+            const monthPicker = document.getElementById("monthPicker").value;
+            if (!monthPicker) {
+                console.warn("⚠️ Bạn chưa chọn tháng!");
+                return;
+            }
+    
+            console.log(`📢 Gửi yêu cầu lấy dữ liệu theo: Tháng ${monthPicker}`);
+    
+            try {
+                const response = await fetch(`http://localhost:3000/api/getAlarmData?month=${monthPicker}&type=current`);
+                const data = await response.json();
+                updateTable(data);
+            } catch (error) {
+                console.error("❌ Lỗi khi lấy dữ liệu:", error);
+                showNoDataMessage();
+            }
+        }
+    
+        function updateTable(data) {
+            let tableBody = document.getElementById("alarm-data");
+            if (!data || data.length === 0) {
+                showNoDataMessage();
+                return;
+            }
+    
+            let tableRows = data.map(row => `
+                <tr>
+                    <td>${row.location}</td>
+                    <td>${row.date}</td>
+                    <td>${row.start_time}</td>
+                    <td>${formatDuration(row.duration_seconds)}</td>
+                    <td>${formatSeverity(row.severity)}</td>
+                </tr>
+            `).join("");
+    
+            tableBody.innerHTML = tableRows;
+        }
+    
+        function showNoDataMessage() {
+            document.getElementById("alarm-data").innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center;">Chưa có dữ liệu</td>
+                </tr>
+            `;
+        }
+    
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hours > 0 ? hours + " giờ " : ""}${minutes > 0 ? minutes + " phút " : ""}${secs > 0 ? secs + " giây" : ""}`.trim();
+        }
+
+        function formatSeverity(sev) {
+        if (sev === "light") return "🟡 Nhẹ";
+        if (sev === "serious") return "🟠 Nghiêm trọng";
+        if (sev === "emergency") return "🔴 Khẩn cấp";
+        return "Không xác định";
+        }
+
+    </script>    
+    
+</body>
+</html>

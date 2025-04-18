@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        .navbar span {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .navbar span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 40px);
+        }
+        .sidebar {
+            width: 250px;
+            background: #f4f4f4;
+            padding: 15px;
+        }
+        .sidebar div {
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }
+        .sidebar div:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background: #fff;
+        }
+        .report-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .filter-container {
+            margin-bottom: 10px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center; /* Căn giữa nội dung trong bảng */
+        }
+        .report-table th {
+            background: #4CAF50;
+            color: white;
+        }
+        .navbar span.active {
+        font-weight: bold; /* Làm đậm chữ */
+        color: rgb(254, 174, 0); /* Đổi màu chữ */
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+        <span onclick="window.location.href='Report.html'" class="active">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+        <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div>1 - ĐIỆN NĂNG THEO NGÀY</div>
+            <div>2 - ĐIỆN NĂNG THEO TUẦN</div>
+            <div>3 - ĐIỆN NĂNG THEO THÁNG</div>
+            <div>4 - DỮ LIỆU ĐỒNG HỒ</div>
+        </div>
+        <div class="content">
+            <div class="report-header">ĐIỆN NĂNG TIÊU THỤ THEO NGÀY</div>
+            <div class="filter-container">
+                <label for="month">Chọn tháng:</label>
+                <input type="month" id="month" value="2025-03">
+                <button onclick="fetchReport()">Xem báo cáo</button>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Period</th>
+                        <th>Total (kWh)</th>
+                        <th>Start Value</th>
+                        <th>End Value</th>
+                    </tr>
+                </thead>
+                <tbody id="report-data">
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Chọn tháng để hiển thị dữ liệu</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function fetchReport() {
+        const dateValue = document.getElementById("month").value; // "2025-03"
+        if (!dateValue) return;
+
+        const [year, month] = dateValue.split("-"); // Tách thành '2025' và '03'
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/getMonthlyData?month=${month}&year=${year}`);
+            const data = await response.json();
+
+            let tableRows = "";
+            if (data.length > 0) {
+                data.forEach(row => {
+                    tableRows += `<tr>
+                        <td>${row.source}</td>
+                        <td>${row.period}</td>
+                        <td>${row.total.toFixed(2)}</td>
+                        <td>${row.start_value.toFixed(2)}</td>
+                        <td>${row.end_value.toFixed(2)}</td>
+                    </tr>`;
+                });
+            } else {
+                tableRows = `<tr><td colspan="5" style="text-align: center;">Không có dữ liệu</td></tr>`;
+            }
+
+            document.getElementById("report-data").innerHTML = tableRows;
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+            document.getElementById("report-data").innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Lỗi khi lấy dữ liệu</td></tr>`;
+        }
+    }
+    </script>
+</body>
+</html>

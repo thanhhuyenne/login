@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modbus Data Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="/plot.js"></script>
+</head>
+<body>
+    <h2>Modbus Data Visualization</h2>
+
+    <label for="deviceIp">Chọn IP thiết bị:</label>
+    <select id="deviceIp">
+        <option value="127.0.0.1">127.0.0.1</option>
+        <option value="127.0.0.2">127.0.0.2</option>
+        <option value="127.0.0.3">127.0.0.3</option>
+    </select>
+    <label for="deviceId">Chọn ID thiết bị:</label>
+    <select id="deviceId">
+        <option value="1">Slave id 1</option>
+        <option value="2">Slave id 2</option>
+        <option value="3">Slave id 3</option>
+    </select>
+
+    <label for="timeRange">Chọn khoảng thời gian:</label>
+    <select id="timeRange">
+        <option value="5p">5 phút</option>
+        <option value="10p">10 phút</option>
+        <option value="15p">15 phút</option>
+    </select>
+
+    <button onclick="fetchData()">Cập nhật</button>
+
+    <div id="chartsContainer">
+        <h3>Điện áp pha</h3>
+        <canvas id="chartVoltage" style="display: none;"></canvas>
+    
+        <h3>Dòng điện</h3>
+        <canvas id="chartCurrent" style="display: none;"></canvas>
+    
+        <h3>Công suất</h3>
+        <canvas id="chartPower" style="display: none;"></canvas>
+    
+        <h3>Sóng hài</h3>
+        <canvas id="chartHarmonic" style="display: none;"></canvas>
+    
+        <h3>Hệ số công suất</h3>
+        <canvas id="chartPowerFactor" style="display: none;"></canvas>
+    </div>
+    
+</body>
+</html>

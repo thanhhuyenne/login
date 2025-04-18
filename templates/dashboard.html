@@ -1,0 +1,96 @@
+<button id="logout">Log out</button>
+
+<div id="modbus-data">
+    <div id="val1">Loading...</div>
+    <div id="val2">Loading...</div>
+    <div id="val3">Loading...</div>
+    <div id="val4">Loading...</div>
+    <div id="val5">Loading...</div>
+</div>
+
+<div>
+    <input type="text" id="deviceIp" placeholder="Nhập IP thiết bị (VD: 192.168.0.101)">
+    <input type="number" id="slaveId" placeholder="Nhập Slave ID (VD: 1)">
+    <button onclick="fetchModbusData()">Lấy Dữ Liệu</button>
+</div>
+
+<div id="status"></div>
+
+<div>
+    <input type="number" id="register" placeholder="Nhập thanh ghi (VD: 3)">
+    <input type="number" id="value" placeholder="Nhập giá trị (VD: 1)">
+    <button onclick="writeModbus()">Ghi Dữ Liệu</button>
+    <button onclick="viewDetails('127.0.0.1', 1)">Xem chi tiết</button>
+</div>
+
+<div id="status"></div>
+
+<!-- Khu vực hiển thị JSON trả về -->
+<pre id="json-output" style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd;"></pre>
+
+<script>
+    async function writeModbus() {
+        let register = document.getElementById("register").value;
+        let value = document.getElementById("value").value;
+
+        if (register === "" || value === "") {
+            alert("Vui lòng nhập thanh ghi và giá trị!");
+            return;
+        }
+
+        try {
+            let response = await fetch("http://localhost:3000/write-modbus", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ register: parseInt(register), value: parseInt(value) })
+            });
+
+            let result = await response.json();
+            document.getElementById("status").innerText = result.message || "Ghi thành công!";
+        } catch (error) {
+            document.getElementById("status").innerText = "Lỗi ghi dữ liệu: " + error.message;
+        }
+    }
+
+    async function fetchModbusData() {
+        let deviceIp = document.getElementById("deviceIp").value;
+        let slaveId = document.getElementById("slaveId").value;
+
+        try {
+            let response = await fetch("http://localhost:3000/read-modbus");
+            if (!response.ok) throw new Error("Lỗi kết nối: " + response.status);
+
+            let data = await response.json();
+            console.log("📡 Dữ liệu nhận được:", data);
+
+            // Hiển thị JSON trên giao diện
+            document.getElementById("json-output").textContent = JSON.stringify(data, null, 2);
+
+            // Tìm dữ liệu theo IP + Slave ID
+            let deviceData = data.find(device => device.ip === deviceIp && device.slaveId == slaveId);
+
+            if (deviceData) {
+                document.getElementById("val1").innerText = deviceData.values[0].toFixed(2);
+                document.getElementById("val2").innerText = deviceData.values[1].toFixed(2);
+                document.getElementById("val3").innerText = deviceData.values[2].toFixed(2);
+                document.getElementById("val4").innerText = deviceData.values[3].toFixed(2);
+                document.getElementById("val5").innerText = deviceData.values[4].toFixed(2);
+            } else {
+                document.getElementById("modbus-data").innerText = "Không tìm thấy thiết bị với IP và Slave ID này.";
+            }
+
+        } catch (error) {
+            console.error("❌ Lỗi khi đọc Modbus:", error);
+            document.getElementById("modbus-data").innerText = "Lỗi khi đọc dữ liệu từ Modbus.";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("logout").addEventListener("click", function () {
+            window.location.href = "index.html"; // Quay lại trang đăng nhập
+        });
+    });
+    function viewDetails(ip, slaveId) {
+        window.location.href = `OTT1.html?ip=${ip}&slaveId=${slaveId}`;
+    }
+</script>

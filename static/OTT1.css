@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    /*overflow: hidden;  Ẩn thanh cuộn */
+}
+
+.container {
+    position: relative;
+    width: 1411px; /* Kích thước gốc của ảnh */
+    height: 650px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.background {
+    width: 75%;
+    height: auto;
+}
+
+#backButton {
+    position: absolute;
+    top: 55px;
+    left: 920px;
+    padding: 3px 30px;
+    font-size: 16px;
+    background-color: #ddd;
+    color: rgba(0, 0, 0, 0.943);
+    border: 1px solid rgb(0, 0, 0);;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+#backButton:hover {
+    background-color: #ffffff;
+}
+
+.data-box {
+    position: absolute;
+    width: 6%; /* Điều chỉnh theo kích thước ảnh */
+    height: 5%;
+    background-color: rgba(255, 255, 255, 0);
+    border: 1px solid rgba(0, 0, 0, 0);
+    text-align: center;
+    line-height: 30px;
+    font-weight: bold;
+}
+
+/* Định vị từng ô chữ nhật dựa trên ảnh */
+#volts_ii { top: 205px; left: 192px; }
+#volts_2 { top: 158px; left: 272px; }
+#volts_3 { top: 255px; left: 272px; }
+#volts_4 { top: 393px; left: 612px; }
+#volts_5 { top: 393px; left: 700px; }
+#volts_6 { top: 393px; left: 786px; }
+#current1 { top: 112px; left: 372px; }
+#current2 { top: 205px; left: 372px; }
+#current3 { top: 293px; left: 372px; }
+#power1 { top: 112px; left: 499px; }
+#power2 { top: 205px; left: 499px; }
+#power3 { top: 293px; left: 499px; }
+#v2ave { top: 351px; left: 247px; }
+#iave { top: 351px; left: 372px; }
+#kWtotal { top: 351px; left: 497px; }
+#kVArtotal { top: 405px; left: 500px; }
+#kVAtotal { top: 455px; left: 500px; }
+#frequency { top: 112px; left: 882px; }
+#power_factor_total { top: 170px; left: 881px; }
+#power_factor_1 { top: 215px; left: 881px; }
+#power_factor_2 { top: 260px; left: 881px; }
+#power_factor_3 { top: 310px; left: 881px; }
+#kwh_import { top: 545px; left: 307px; }
+#kwh_export { top: 545px; left: 427px; }
+#kvarh { top: 545px; left: 557px; }
+#kvah { top: 545px; left: 682px; }
+#hdia { top: 128px; left: 1092px; }
+#hdib { top: 175px; left: 1092px; }
+#hdic { top: 222px; left: 1092px; }
+#hdvab { top: 275px; left: 1092px; }
+#hdvbc { top: 325px; left: 1092px; }
+#hdvca { top: 369px; left: 1092px; }
+#vinave { top: 393px; left: 878px; }

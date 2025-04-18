@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/OTT1.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Ảnh nền -->
+        <img src="/pictures/ottt1.png" alt="Dashboard" class="background">
+        <button id="backButton">Back</button>
+        
+        <!-- Các ô hiển thị dữ liệu -->
+        <div class="data-box" id="volts_ii"> V</div>
+        <div class="data-box" id="volts_2"> V</div>
+        <div class="data-box" id="volts_3"> V</div>
+        <div class="data-box" id="volts_4"> V</div>
+        <div class="data-box" id="volts_5"> V</div>
+        <div class="data-box" id="volts_6"> V</div>
+        <div class="data-box" id="current1"> A</div>
+        <div class="data-box" id="current2"> A</div>
+        <div class="data-box" id="current3"> A</div>
+        <div class="data-box" id="power1"> kW</div>
+        <div class="data-box" id="power2"> kW</div>
+        <div class="data-box" id="power3"> kW</div>
+        <div class="data-box" id="v2ave"> V</div>
+        <div class="data-box" id="iave"> A</div>
+        <div class="data-box" id="kWtotal"> kW</div>
+        <div class="data-box" id="kVArtotal"> kVAr</div>
+        <div class="data-box" id="kVAtotal"> kVA</div>
+        <div class="data-box" id="frequency"> Hz</div>
+        <div class="data-box" id="power_factor_total"></div>
+        <div class="data-box" id="power_factor_1"></div>
+        <div class="data-box" id="power_factor_2"></div>
+        <div class="data-box" id="power_factor_3"></div>
+        <div class="data-box" id="kwh_import"></div>
+        <div class="data-box" id="kwh_export"></div>
+        <div class="data-box" id="kvarh"></div>
+        <div class="data-box" id="kvah"></div>
+        <div class="data-box" id="hdia"> %</div>
+        <div class="data-box" id="hdib"> %</div>
+        <div class="data-box" id="hdic"> %</div>
+        <div class="data-box" id="hdvab"> %</div>
+        <div class="data-box" id="hdvbc"> %</div>
+        <div class="data-box" id="hdvca"> %</div>
+        <div class="data-box" id="vinave"> V</div>
+    </div>
+    <input type="hidden" id="deviceIp">
+    <input type="hidden" id="slaveId">
+    
+    <script>
+        function getQueryParams() {
+        let params = new URLSearchParams(window.location.search);
+        let ip = params.get("ip");
+        let slaveId = params.get("slaveId");
+
+        if (ip && slaveId) {
+            document.getElementById("deviceIp").value = ip;
+            document.getElementById("slaveId").value = slaveId;
+        }
+    }
+        async function fetchModbusData() {
+        let deviceIp = document.getElementById("deviceIp").value;
+        let slaveId = document.getElementById("slaveId").value;
+
+        try {
+            let response = await fetch("http://localhost:3000/read-modbus");
+            if (!response.ok) throw new Error("Lỗi kết nối: " + response.status);
+
+            let data = await response.json();
+            console.log("📡 Dữ liệu nhận được:", data);
+
+            // Tìm dữ liệu theo IP + Slave ID
+            let deviceData = data.find(device => device.ip === deviceIp && device.slaveId == slaveId);
+
+            if (deviceData) {
+                document.getElementById("volts_ii").innerText = deviceData.values[0].toFixed(2) + " V";
+                document.getElementById("volts_2").innerText = deviceData.values[1].toFixed(2) + " V";
+                document.getElementById("volts_3").innerText = deviceData.values[2].toFixed(2) + " V";
+                document.getElementById("volts_4").innerText = deviceData.values[3].toFixed(2) + " V";
+                document.getElementById("volts_5").innerText = deviceData.values[4].toFixed(2) + " V";
+                document.getElementById("volts_6").innerText = deviceData.values[5].toFixed(2) + " V";
+                document.getElementById("current1").innerText = deviceData.values[6].toFixed(2) + " A";
+                document.getElementById("current2").innerText = deviceData.values[7].toFixed(2) + " A";
+                document.getElementById("current3").innerText = deviceData.values[8].toFixed(2) + " A";
+                document.getElementById("power1").innerText = deviceData.values[9].toFixed(2) + " kW";
+                document.getElementById("power2").innerText = deviceData.values[10].toFixed(2) + " kW";
+                document.getElementById("power3").innerText = deviceData.values[11].toFixed(2) + " kW";
+                document.getElementById("v2ave").innerText = deviceData.values[12].toFixed(2) + " V";
+                document.getElementById("iave").innerText = deviceData.values[13].toFixed(2) + " A";
+                document.getElementById("kWtotal").innerText = deviceData.values[14].toFixed(2) + " kW";
+                document.getElementById("kVArtotal").innerText = deviceData.values[15].toFixed(2) + " kVAr";
+                document.getElementById("kVAtotal").innerText = deviceData.values[16].toFixed(2) + " kVA";
+                document.getElementById("frequency").innerText = deviceData.values[17].toFixed(2) + " Hz";
+                document.getElementById("power_factor_total").innerText = deviceData.values[18].toFixed(2);
+                document.getElementById("power_factor_1").innerText = deviceData.values[19].toFixed(2);
+                document.getElementById("power_factor_2").innerText = deviceData.values[20].toFixed(2);
+                document.getElementById("power_factor_3").innerText = deviceData.values[21].toFixed(2);
+                document.getElementById("kwh_import").innerText = deviceData.values[22].toFixed(2);
+                document.getElementById("kwh_export").innerText = deviceData.values[23].toFixed(2);
+                document.getElementById("kvarh").innerText = deviceData.values[24].toFixed(2);
+                document.getElementById("kvah").innerText = deviceData.values[25].toFixed(2) + " %";
+                document.getElementById("hdia").innerText = deviceData.values[26].toFixed(2) + " %";
+                document.getElementById("hdib").innerText = deviceData.values[27].toFixed(2) + " %";
+                document.getElementById("hdic").innerText = deviceData.values[28].toFixed(2) + " %";
+                document.getElementById("hdvab").innerText = deviceData.values[29].toFixed(2) + " %";
+                document.getElementById("hdvbc").innerText = deviceData.values[30].toFixed(2) + " %";
+                document.getElementById("hdvca").innerText = deviceData.values[31].toFixed(2) + " %";
+                document.getElementById("vinave").innerText = deviceData.values[32].toFixed(2) + " %";
+            } 
+
+        } catch (error) {
+            console.error("❌ Lỗi khi đọc Modbus:", error);
+            document.getElementById("modbus-data").innerText = "Lỗi khi đọc dữ liệu từ Modbus.";
+        }
+    }
+    window.onload = function () {
+        getQueryParams();
+        fetchModbusData(); // Gọi hàm lấy dữ liệu ngay khi vào trang
+    };
+    document.getElementById("backButton").addEventListener("click", function () {
+    window.history.back();
+});
+
+    setInterval(fetchModbusData, 3000);
+
+    </script>
+</body>
+</html>

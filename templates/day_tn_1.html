@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dãy tín hiệu 3</title>
+    <link rel="stylesheet" href="/static/day_tn_1.css">
+</head>
+<body>
+    <div class="container">
+        <img src="/pictures/day_th_1.png" class="background" alt="Dãy tín hiệu 3">
+        
+        <!-- Các ô số hiển thị dữ liệu -->
+        <!--<div class="data-box" id="meter1">123</div>-->
+        <!--<div class="data-box" id="meter2">456</div>-->
+
+        <!-- Cột nút chuyển đổi -->
+        <div class="navigation">
+            <button class="nav-btn active" id="btn-day1">Dãy 1</button>
+            <button class="nav-btn" id="btn-day2">Dãy 2</button>
+            <button class="nav-btn" id="btn-day3">Dãy 3</button>
+            <button class="nav-btn" id="btn-day4">Dãy 4</button>
+            <button class="nav-btn back-btn" id="btn-back">Quay về</button>
+        </div>
+
+        <!-- Nút vào chi tiết đồng hồ -->
+        <div class="meter-links">
+            <button class="meter-btn" id="btn-meter1" data-ip="127.0.0.1" data-id="1">1</button>
+            <button class="meter-btn" id="btn-meter2" data-ip="127.0.0.1" data-id="2">2</button>
+            <button class="meter-btn" id="btn-meter3" data-ip="127.0.0.1" data-id="3">3</button>
+        </div>
+
+        <img id="device-127_0_0_1-1-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 345px;">
+        <img id="device-127_0_0_1-1-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 345px; display: none;">
+    
+        <!-- Thiết bị 2 (127.0.0.1 - Slave 2) -->
+        <img id="device-127_0_0_1-2-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 430px;">
+        <img id="device-127_0_0_1-2-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 430px; display: none;">
+        <!-- Thiết bị 3 (127.0.0.1 - Slave 3) -->
+        <img id="device-127_0_0_1-3-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 498px;">
+        <img id="device-127_0_0_1-3-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 498px; display: none;">
+        <!-- Thiết bị 4 (127.0.0.1 - Slave 4) -->
+        <img id="device-127_0_0_1-4-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 565px;">
+        <img id="device-127_0_0_1-4-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 565px; display: none;">
+        <!-- Thiết bị 5  (127.0.0.1 - Slave 5) -->
+        <img id="device-127_0_0_1-5-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 633px;">
+        <img id="device-127_0_0_1-5-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 633px; display: none;">
+        <!-- Thiết bị  6 (127.0.0.1 - Slave 6) -->
+        <img id="device-127_0_0_1-6-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 702px;">
+        <img id="device-127_0_0_1-6-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 702px; display: none;">
+        <!-- Thiết bị  7 (127.0.0.1 - Slave 7) -->
+        <img id="device-127_0_0_1-7-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 140px; left: 775px;">
+        <img id="device-127_0_0_1-7-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 140px; left: 775px; display: none;">
+        <!-- Thiết bị 8 (127.0.0.1 - Slave 8) -->
+        <img id="device-127_0_0_1-8-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 376px;">
+        <img id="device-127_0_0_1-8-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 376px; display: none;">
+        <!-- Thiết bị 9 (127.0.0.1 - Slave 9) -->
+        <img id="device-127_0_0_1-9-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 448px;">
+        <img id="device-127_0_0_1-9-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 448px; display: none;">
+        <!-- Thiết bị 10 (127.0.0.1 - Slave 10) -->
+        <img id="device-127_0_0_1-10-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 520px;">
+        <img id="device-127_0_0_1-10-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 520px; display: none;">
+        <!-- Thiết bị 11 (127.0.0.1 - Slave 11) -->
+        <img id="device-127_0_0_1-11-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 603px;">
+        <img id="device-127_0_0_1-11-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 603px; display: none;">
+        <!-- Thiết bị 12 (127.0.0.1 - Slave 12) -->
+        <img id="device-127_0_0_1-12-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 685px;">
+        <img id="device-127_0_0_1-12-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 685px; display: none;">
+        <!-- Thiết bị 13 (127.0.0.1 - Slave 13) -->
+        <img id="device-127_0_0_1-13-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 763px;">
+        <img id="device-127_0_0_1-13-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 763px; display: none;">
+        <!-- Thiết bị 14 (127.0.0.1 - Slave 14) -->
+        <img id="device-127_0_0_1-14-green" class="status-dot" 
+             src="/pictures/blue-icon.png" 
+             style="top: 418px; left: 842px;">
+        <img id="device-127_0_0_1-14-red" class="status-dot" 
+             src="/pictures/red-icon.png" 
+             style="top: 418px; left: 842px; display: none;">
+        
+    </div>
+    
+    
+</body>
+</html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    // Chuyển trang khi bấm nút
+    document.getElementById("btn-day1").addEventListener("click", function () {
+        window.location.href = "day_tn_1.html";
+    });
+
+    document.getElementById("btn-day2").addEventListener("click", function () {
+        window.location.href = "day_tn_2.html";
+    });
+
+    document.getElementById("btn-day3").addEventListener("click", function () {
+        window.location.href = "day_tn_3.html";
+    });
+
+    document.getElementById("btn-day4").addEventListener("click", function () {
+        window.location.href = "day_tn_4.html";
+    });
+
+    document.getElementById("btn-back").addEventListener("click", function () {
+    window.location.href = "monitor_main.html";  // Quay về trang login.html
+    });
+
+    document.querySelectorAll(".meter-btn").forEach(button => {
+    button.addEventListener("click", function () {
+        let ip = this.getAttribute("data-ip");
+        let id = parseInt(this.getAttribute("data-id")); // Chuyển thành số nguyên
+        viewDetails(ip, id);
+    });
+    });
+
+    function viewDetails(ip, id) {
+    window.location.href = `OTT1.html?ip=${ip}&slaveId=${id}`;
+    };
+});
+</script>
+<script>
+    async function updateGatewayStatus() { 
+    try {
+        // Gọi API để lấy trạng thái thiết bị thực tế
+        const response = await fetch("http://localhost:3000/status-modbus-device");
+        const statusData = await response.json();
+
+        // Nếu API trả về danh sách rỗng, giữ nguyên trạng thái hiện tại
+        if (!statusData || statusData.length === 0) {
+            console.warn("Không có dữ liệu thiết bị từ API, giữ trạng thái hiện tại.");
+            return;
+        }
+
+        // Duyệt qua danh sách thiết bị từ API và cập nhật trạng thái
+        statusData.forEach(device => {
+            const deviceId = `device-${device.ip.replace(/\./g, "_")}-${device.slaveId}`;
+            updateIndicator(deviceId, device.status === 1); // Nếu `status === 1` thì thiết bị online
+        });
+
+    } catch (error) {
+        console.error("Lỗi khi cập nhật trạng thái:", error);
+    }
+}
+
+function updateIndicator(deviceId, isConnected) {
+    const greenDot = document.getElementById(`${deviceId}-green`);
+    const redDot = document.getElementById(`${deviceId}-red`);
+    
+    if (!greenDot || !redDot) {
+        console.warn(`Không tìm thấy đèn tín hiệu cho ${deviceId}`);
+        return;
+    }
+
+    // Cập nhật trạng thái đèn
+    if (isConnected) {
+        greenDot.style.display = "block";
+        redDot.style.display = "none";
+    } else {
+        greenDot.style.display = "none";
+        redDot.style.display = "block";
+    }
+}
+
+// **Chỉ đặt tất cả đèn về đỏ khi trang load lần đầu**
+document.addEventListener("DOMContentLoaded", () => {
+    const allDevices = document.querySelectorAll("[id$='-green']");
+    allDevices.forEach(dot => {
+        const deviceId = dot.id.replace("-green", "");
+        updateIndicator(deviceId, false); // Đặt tất cả thành mất kết nối một lần
+    });
+
+    // Gọi API cập nhật ngay và sau đó cập nhật mỗi 5 giây
+    updateGatewayStatus();  
+    setInterval(updateGatewayStatus, 2000);
+});
+
+</script>

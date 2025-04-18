@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modbus Data Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script defer src="/plot.js"></script>
+    <link rel="stylesheet" href="/static/dashboard_linechart.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'" class="active">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+        <span onclick="window.location.href='Report.html'">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+        <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar với các tùy chọn checkbox -->
+        <div class="sidebar">
+            <label class="sidebar-item"><input type="checkbox" class="toggle-chart" data-target="chartVoltage"> Điện áp pha</label>
+            <label class="sidebar-item"><input type="checkbox" class="toggle-chart" data-target="chartCurrent"> Dòng điện</label>
+            <label class="sidebar-item"><input type="checkbox" class="toggle-chart" data-target="chartPower"> Công suất</label>
+            <label class="sidebar-item"><input type="checkbox" class="toggle-chart" data-target="chartHarmonic"> Sóng hài</label>
+            <label class="sidebar-item"><input type="checkbox" class="toggle-chart" data-target="chartPowerFactor"> Hệ số công suất</label>
+        </div>
+
+        <!-- Nội dung chính -->
+        <div class="main-content">
+            <h2 class="main-title">Modbus Data Visualization</h2>
+
+            <!-- Container cho dropdown và nút -->
+            <div class="controls-container">
+                <div class="control-group">
+                    <label for="deviceIp">Chọn IP thiết bị:</label>
+                    <select id="deviceIp">
+                        <option value="127.0.0.1">127.0.0.1</option>
+                        <option value="127.0.0.2">127.0.0.2</option>
+                        <option value="127.0.0.3">127.0.0.3</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="deviceId">Chọn ID thiết bị:</label>
+                    <select id="deviceId">
+                        <option value="1">Slave id 1</option>
+                        <option value="2">Slave id 2</option>
+                        <option value="3">Slave id 3</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="timeRange">Chọn khoảng thời gian:</label>
+                    <select id="timeRange">
+                        <option value="5p">5 phút</option>
+                        <option value="10p">10 phút</option>
+                        <option value="15p">15 phút</option>
+                    </select>
+                </div>
+                <button onclick="fetchData()" class="update-btn">Cập nhật</button>
+            </div>
+
+            <div id="chartsContainer">
+                <div class="chart-wrapper" id="chartVoltage-wrapper">
+                    <h3>Điện áp pha</h3>
+                    <div class="chart-controls">
+                        <button class="btn-zoom" data-target="chartVoltage"><i class="fa fa-search-plus"></i></button>
+                        <button class="btn-shrink" data-target="chartVoltage"><i class="fa fa-search-minus"></i></button>
+                        <button class="btn-download" data-target="chartVoltage">⬇️</button>
+                        <button class="btn-fullscreen" data-target="chartVoltage">⛶</button>
+                    </div>
+                    <canvas id="chartVoltage"></canvas>
+                </div>
+                
+                <div class="chart-wrapper" id="chartCurrent-wrapper">
+                    <h3>Dòng điện</h3>
+                    <div class="chart-controls">
+                        <button class="btn-zoom" data-target="chartCurrent"><i class="fa fa-search-plus"></i></button>
+                        <button class="btn-shrink" data-target="chartCurrent"><i class="fa fa-search-minus"></i></button>
+                        <button class="btn-download" data-target="chartCurrent">⬇️</button>
+                        <button class="btn-fullscreen" data-target="chartCurrent">⛶</button>
+                    </div>
+                    <canvas id="chartCurrent"></canvas>
+                </div>
+                
+                <div class="chart-wrapper" id="chartPower-wrapper">
+                    <h3>Công suất</h3>
+                    <div class="chart-controls">
+                        <button class="btn-zoom" data-target="chartPower"><i class="fa fa-search-plus"></i></button>
+                        <button class="btn-shrink" data-target="chartPower"><i class="fa fa-search-minus"></i></button>
+                        <button class="btn-download" data-target="chartPower">⬇️</button>
+                        <button class="btn-fullscreen" data-target="chartPower">⛶</button>
+                    </div>
+                    <canvas id="chartPower"></canvas>
+                </div>
+
+                <div class="chart-wrapper" id="chartHarmonic-wrapper">
+                    <h3>Sóng hài</h3>
+                    <div class="chart-controls">
+                        <button class="btn-zoom" data-target="chartHarmonic"><i class="fa fa-search-plus"></i></button>
+                        <button class="btn-shrink" data-target="chartHarmonic"><i class="fa fa-search-minus"></i></button>
+                        <button class="btn-download" data-target="chartHarmonic">⬇️</button>
+                        <button class="btn-fullscreen" data-target="chartHarmonic">⛶</button>
+                    </div>
+                    <canvas id="chartHarmonic"></canvas>
+                </div>
+
+                <div class="chart-wrapper" id="chartPowerFactor-wrapper">
+                    <h3>Hệ số công suất</h3>
+                    <div class="chart-controls">
+                        <button class="btn-zoom" data-target="chartPowerFactor"><i class="fa fa-search-plus"></i></button>
+                        <button class="btn-shrink" data-target="chartPowerFactor"><i class="fa fa-search-minus"></i></button>
+                        <button class="btn-download" data-target="chartPowerFactor">⬇️</button>
+                        <button class="btn-fullscreen" data-target="chartPowerFactor">⛶</button>
+                    </div>
+                    <canvas id="chartPowerFactor"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ẩn toàn bộ các biểu đồ khi load trang
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".chart-wrapper").forEach(chart => {
+                chart.style.display = "none";
+            });
+        });
+
+        // Xử lý phóng to, thu nhỏ, tải xuống, và fullscreen
+        document.addEventListener("DOMContentLoaded", function () {
+            // Phóng to trong phạm vi div
+            document.querySelectorAll(".btn-zoom").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    let chartDiv = document.getElementById(this.dataset.target).parentElement;
+                    chartDiv.style.transform = "scale(1.5)";
+                    chartDiv.style.zIndex = "1000";
+                    chartDiv.style.transition = "transform 0.3s";
+                });
+            });
+
+            // Thu nhỏ về kích thước cũ
+            document.querySelectorAll(".btn-shrink").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    let chartDiv = document.getElementById(this.dataset.target).parentElement;
+                    chartDiv.style.transform = "scale(1)";
+                    chartDiv.style.zIndex = "1";
+                });
+            });
+
+            // Tải xuống từng đồ thị
+            document.querySelectorAll(".btn-download").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    downloadChart(this.dataset.target);
+                });
+            });
+
+            // Chế độ toàn màn hình
+            document.querySelectorAll('.btn-fullscreen').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    let target = document.getElementById(this.dataset.target).parentElement;
+
+                    // Xóa chế độ fullscreen của tất cả biểu đồ trước khi mở cái mới
+                    document.querySelectorAll('.chart-wrapper').forEach(chart => {
+                        if (chart !== target) {
+                            chart.classList.remove('fullscreen-chart');
+                        }
+                    });
+
+                    // Chuyển đổi chế độ fullscreen
+                    target.classList.toggle('fullscreen-chart');
+
+                    // Cập nhật Chart.js sau khi thay đổi kích thước
+                    let chartInstance = Chart.getChart(this.dataset.target);
+                    if (chartInstance) {
+                        setTimeout(() => {
+                            chartInstance.resize();
+                            chartInstance.update();
+                        }, 300);
+                    }
+                });
+            });
+
+            // Hàm tải xuống một đồ thị
+            function downloadChart(chartId) {
+                let chartCanvas = document.getElementById(chartId);
+                if (chartCanvas) {
+                    let link = document.createElement("a");
+                    link.href = chartCanvas.toDataURL("image/png");
+                    link.download = chartId + ".png";
+                    link.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

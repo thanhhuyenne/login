@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/static/monitor_main.css">
+</head>
+<body>
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'" class="active">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+        <span onclick="window.location.href='Report.html'">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+        <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div>TỔNG HỢP</div>
+            <div onclick="window.location.href='day_tn_1.html'">CHI TIẾT</div>
+        </div>
+        <div class="main-content">
+            <img    id="device1-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 355px;">
+            <img    id="device1-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 355px; display: none;">
+
+            <img    id="device2-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 468px;">
+            <img    id="device2-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 468px; display: none;">
+
+            <img    id="device3-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 678px;">
+            <img    id="device3-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 678px; display: none;">
+
+            <img    id="device4-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 790px;">
+            <img    id="device4-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 790px; display: none;">
+        
+            </div>
+        </div>
+    </div>
+    <script>
+        async function updateGatawayStatus() {
+        try {
+            const response = await fetch("http://localhost:3000/api/gataway-status");
+            const statusData = await response.json();
+
+            updateIndicator("device1", statusData.device1);
+            updateIndicator("device2", statusData.device2);
+            updateIndicator("device3", statusData.device3);
+            updateIndicator("device4", statusData.device4);
+
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái:", error);
+        }
+    }
+
+    function updateIndicator(deviceId, isConnected) {
+        const greenDot = document.getElementById(`${deviceId}-green`);
+        const redDot = document.getElementById(`${deviceId}-red`);
+        if (isConnected) {
+            greenDot.style.display = "block";
+            redDot.style.display = "none";
+        } else {
+            greenDot.style.display = "none";
+            redDot.style.display = "block";
+        }
+    }
+
+    setInterval(updateGatawayStatus, 5000);
+    </script>
+</body>
+</html>

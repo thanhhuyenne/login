@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        .navbar span {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .navbar span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 40px);
+        }
+        .sidebar {
+            width: 250px;
+            background: #f4f4f4;
+            padding: 15px;
+        }
+        .sidebar div {
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }
+        .sidebar div:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background: #fff;
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        .report-table th {
+            background: #4CAF50;
+            color: white;
+        }
+        select, input {
+            padding: 5px;
+            font-size: 14px;
+        }
+        .navbar span.active {
+        font-weight: bold; /* Làm đậm chữ */
+        color: rgb(254, 174, 0); /* Đổi màu chữ */
+        }
+        .sidebar div.active {
+        font-weight: bold; /* Làm đậm chữ */
+        color: rgb(254, 174, 0); /* Đổi màu chữ */
+        }
+        h2 {
+            font-size: 30px;
+            font-weight: bold;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
+            -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
+            background-clip: text; /* Thuộc tính chuẩn */
+            color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            width: auto;
+            margin-left: 200px;
+            margin-right: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+        }
+        td {
+            color: #555;
+            text-align: center;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #deleteAccountForm {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #deleteAccountForm label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        #deleteAccountForm select,
+        #deleteAccountForm input[type="password"],
+        #deleteAccountForm input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .password-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .password-container input[type="checkbox"] {
+            margin-left: 10px;
+        }
+        .password-container label {
+            margin-left: 5px;
+            font-weight: normal;
+            color: #666;
+        }
+        #deleteAccountForm button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #deleteAccountForm button:hover {
+            background-color: #c0392b;
+        }
+        #roleAlert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8d7da;
+            color: #726c1c;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            font-size: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'" >ALARMS</span>
+        <span onclick="window.location.href='Report.html'">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+        <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+            <div onclick="window.location.href='Setting-line.html'" class="active">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
+            <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+            <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
+            <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>           
+            <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        </div>
+
+        <div class="content">
+            <h2>XÓA TÀI KHOẢN (Chỉ dùng cho Admin)</h2>
+            <form id="deleteAccountForm">
+                <label>Chọn tài khoản cần xóa:</label>
+                <select id="emailToDelete" required>
+                    <option value="">-- Chọn email --</option>
+                </select>
+                <label>Mật khẩu Admin:</label>
+                <div class="password-container">
+                    <input type="password" id="adminPassword" required>
+                    <input type="checkbox" id="showAdminPassword" onchange="togglePassword('adminPassword')">
+                    <label for="showAdminPassword">Hiện</label>
+                </div>
+                <button type="submit">Xóa tài khoản</button>
+            </form>
+            <div id="message"></div>
+    </form>
+        <div id="message"></div>
+            
+        </div>
+    </div>
+    <div id="roleAlert">
+        <p>Bạn không phải là admin. Bạn không dùng được tính năng này</p>
+        <p>Tự động quay lại sau <span id="countdown">5</span> giây...</p>
+    </div>
+
+    <script>
+
+// Hàm hiển thị/ẩn mật khẩu
+checkRole();
+// Kiểm tra role khi tải trang
+// Hàm đếm ngược và quay lại trang trước
+function startCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            let timeLeft = 5;
+
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    window.history.back();
+                }
+            }, 1000);
+        }
+
+        // Kiểm tra role khi tải trang
+        async function checkRole() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/check-role', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // ⚠️ PHẢI CÓ DÒNG NÀY
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.role !== 'admin') {
+                    const alertDiv = document.getElementById('roleAlert');
+                    alertDiv.style.display = 'block';
+                    startCountdown();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                const alertDiv = document.getElementById('roleAlert');
+                alertDiv.querySelector('p').textContent = `Lỗi khi kiểm tra vai trò: ${error.message}`;
+                alertDiv.style.display = 'block';
+                startCountdown();
+                return false;
+            }
+        }
+
+function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const checkbox = document.getElementById('showAdminPassword');
+            input.type = checkbox.checked ? 'text' : 'password';
+        }
+
+        // Tải danh sách email user khi vào trang
+        async function loadUsers() {
+            const select = document.getElementById('emailToDelete');
+            const messageDiv = document.getElementById('message');
+
+            try {
+                const response = await fetch('http://127.0.0.1:3000/get-users', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const users = await response.json();
+
+                if (users.length === 0) {
+                    select.innerHTML = '<option value="">Không có tài khoản user nào</option>';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.email;
+                    option.textContent = user.email;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'error';
+                messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy và endpoint /get-users hoạt động đúng.`;
+            }
+        }
+
+        // Xử lý form xóa tài khoản
+        document.getElementById('deleteAccountForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const emailToDelete = document.getElementById('emailToDelete').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+            const messageDiv = document.getElementById('message');
+
+            // Hiển thị hộp thoại xác nhận
+            const confirmed = confirm(`Bạn có chắc chắn muốn xóa tài khoản ${emailToDelete} không? Hành động này không thể hoàn tác.`);
+            if (!confirmed) {
+                return;
+            }
+
+            // Xóa thông báo cũ
+            messageDiv.style.display = 'none';
+            messageDiv.className = '';
+
+            try {
+                const response = await fetch('http://127.0.0.1:3000/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // ⚠️ PHẢI CÓ DÒNG NÀY
+                    body: JSON.stringify({ emailToDelete, adminPassword })
+                });
+
+                const result = await response.json();
+
+                messageDiv.style.display = 'block';
+                if (response.ok) {
+                    messageDiv.className = 'success';
+                    messageDiv.textContent = result.message;
+                    // Reset form và tải lại danh sách user
+                    document.getElementById('deleteAccountForm').reset();
+                    document.getElementById('emailToDelete').innerHTML = '<option value="">-- Chọn email --</option>';
+                    loadUsers();
+                } else {
+                    messageDiv.className = 'error';
+                    messageDiv.textContent = result.message;
+                }
+            } catch (error) {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'error';
+                messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /delete-account hoạt động đúng.`;
+            }
+        });
+
+        // Tự động tải danh sách user khi vào trang
+        window.onload = function() {
+            loadUsers();
+        };
+    </script>
+    
+</body>
+</html>
