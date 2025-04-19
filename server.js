@@ -1683,7 +1683,8 @@ app.get("/api/getMonthlyData", async (req, res) => {
         let tableNames = tables.map(row => Object.values(row)[0]); // Danh sách tên bảng
 
         tableNames = tableNames.filter(table => 
-            !["alarm", "modbus_disconnect_log", "modbus_disconnect_summary"].includes(table)
+            !["alarm", "modbus_disconnect_log", "modbus_disconnect_summary", "deviceconfig", "warning-current-1",
+                "warning-vol-line-1", "warning-vol-phase-1", "users"].includes(table)
         );
         
         
