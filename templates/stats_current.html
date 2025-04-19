@@ -149,7 +149,7 @@
         <span onclick="window.location.href='Alarm.html'" class="active">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'">SETTING</span>
-        <span onclick="window.location.href='index.html'">LOG OUT</span>
+        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
     </div>
 
     <div class="container">
@@ -344,6 +344,34 @@
         document.getElementById('monthButton').onclick = debounce(() => fetchAlarmData('month'), 300);
 
         window.onload = () => fetchAlarmData('filter');
+        
+        function handleLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
+        }
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+
+                // Xóa role khỏi localStorage
+                localStorage.removeItem('role');
+                return data; // Trả về để xử lý trong then
+            } catch (error) {
+                throw error; // Ném lỗi để catch bên ngoài xử lý
+            }
+        }
     </script>
 </body>
 </html>

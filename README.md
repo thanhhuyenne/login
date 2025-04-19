@@ -1,5 +1,5 @@
 git pull
 
 git add .
-git commit -m "thêm file README"
+git commit -m "thêm logout"
 git push
