@@ -1913,6 +1913,65 @@ async function handleStatusChange(device_ip, slave_id, newStatus, connection) {
     lastStatus[key] = newStatus;
 }
 
+app.get('/api/disconnect-stats', async (req, res) => {
+    const { filter } = req.query;
+    console.log('Filter nhận được:', filter);
+
+    if (!filter) {
+        console.log('Không có filter được cung cấp');
+        return res.status(400).json({ error: 'Filter is required' });
+    }
+
+    let whereClause = '';
+    const params = [];
+
+    if (filter === 'today') {
+        whereClause = `DATE(disconnect_time) = CURDATE()`;
+    } else if (filter === 'last7days') {
+        whereClause = `DATE(disconnect_time) >= CURDATE() - INTERVAL 7 DAY`;
+    } else if (filter === 'thismonth') {
+        whereClause = `MONTH(disconnect_time) = MONTH(CURDATE()) AND YEAR(disconnect_time) = YEAR(CURDATE())`;
+    } else if (filter.startsWith('month=')) {
+        const [year, month] = filter.split('=')[1].split('-');
+        if (!year || !month) {
+            console.log('Month filter không hợp lệ:', filter);
+            return res.status(400).json({ error: 'Invalid month format' });
+        }
+        whereClause = `MONTH(disconnect_time) = ? AND YEAR(disconnect_time) = ?`;
+        params.push(parseInt(month), parseInt(year));
+    } else {
+        console.log('Filter không hợp lệ:', filter);
+        return res.status(400).json({ error: 'Invalid filter' });
+    }
+
+    const query = `
+        SELECT 
+            device_ip,
+            slave_id,
+            COUNT(*) as count
+        FROM modbus_disconnect_summary
+        WHERE ${whereClause}
+        GROUP BY device_ip, slave_id
+    `;
+
+    try {
+        const [rows] = await pool.query(query, params);
+        console.log('Kết quả truy vấn:', rows);
+
+        const result = {};
+
+        for (let row of rows) {
+            const ipLast = row.device_ip.split('.').pop(); // Lấy phần cuối của IP, ví dụ: "127.0.0.1" → "1"
+            const key = `${ipLast}-${row.slave_id}`; // Ví dụ: "1-1"
+            result[key] = { device: key, count: row.count };
+        }
+
+        res.json(Object.values(result));
+    } catch (err) {
+        console.error('❌ Error fetching disconnect stats:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 // Gọi checkModbusStatus mỗi 5 giây
 setInterval(checkModbusStatus, 5000);
@@ -1969,10 +2028,17 @@ app.get("/get-disconnect-summary", async (req, res) => {
 });
 
 app.get('/api/alarm-stats', async (req, res) => {
-    const { filter } = req.query;
+    const { filter, type } = req.query;
+
+    // Kiểm tra type hợp lệ
+    if (!['current', 'voltage'].includes(type)) {
+        return res.status(400).json({ error: 'Invalid type. Must be "current" or "voltage"' });
+    }
+
     let whereClause = '';
     const params = [];
 
+    // Xử lý filter thời gian
     if (filter === 'today') {
         whereClause = `event_date = CURDATE()`;
     } else if (filter === 'last7days') {
@@ -1986,6 +2052,10 @@ app.get('/api/alarm-stats', async (req, res) => {
     } else {
         return res.status(400).json({ error: 'Invalid filter' });
     }
+
+    // Thêm điều kiện type
+    whereClause += ` AND type = ?`;
+    params.push(type);
 
     const query = `
         SELECT 
@@ -2004,17 +2074,17 @@ app.get('/api/alarm-stats', async (req, res) => {
 
         for (let row of rows) {
             // Lấy phần cuối IP và ID từ location: modbus_data_127_0_0_1_1 → 1-1
-            const parts = row.location.split('_'); // [modbus, data, 127, 0, 0, 1, 1]
-            const ipLast = parts[5]; // '1'
-            const slaveId = parts[6]; // '1'
-            const key = `${ipLast}-${slaveId}`; // eg: "1-1"
-        
+            const parts = row.location.split('_');
+            const ipLast = parts[5];
+            const slaveId = parts[6];
+            const key = `${ipLast}-${slaveId}`;
+
             if (!result[key]) {
                 result[key] = { device: key, light: 0, serious: 0, emergency: 0 };
             }
-        
+
             result[key][row.severity] = row.count;
-        }        
+        }
 
         res.json(Object.values(result));
     } catch (err) {
