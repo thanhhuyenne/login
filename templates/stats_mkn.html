@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alarm Chart</title>
+    <title>Alarm Chart - Mất Kết Nối</title>
     <style>
         * {
             margin: 0;
@@ -154,13 +154,13 @@
 
     <div class="container">
         <div class="sidebar">
-            <div class="active">1 - CẢNH BÁO QUÁ DÒNG</div>
+            <div onclick="window.location.href='Alarm.html'">1 - CẢNH BÁO QUÁ DÒNG</div>
             <div onclick="window.location.href='Alarm_voltage.html'">2 - CẢNH BÁO SỤT ÁP</div>
-            <div onclick="window.location.href='Alarm_mkn.html'">3 - CẢNH BÁO MẤT KẾT NỐI</div>
+            <div class="active">3 - CẢNH BÁO MẤT KẾT NỐI</div>
         </div>
 
         <div class="content">
-            <h2>BIỂU ĐỒ SỐ LẦN LỖI QUÁ DÒNG THEO THIẾT BỊ</h2>
+            <h2>BIỂU ĐỒ SỐ LẦN MẤT KẾT NỐI THEO THIẾT BỊ</h2>
 
             <div class="filter-container">
                 <label for="timeFilter">Bộ lọc thời gian:</label>
@@ -175,7 +175,7 @@
                 <input type="month" id="monthPicker">
                 <button id="monthButton" onclick="fetchAlarmData('month')">Xem</button>
 
-                <button onclick="window.location.href='Alarm.html'">Quay lại</button>
+                <button onclick="window.location.href='Alarm_mkn.html'">Quay lại</button>
             </div>
             <div class="error-message" id="errorMessage"></div>
             <div class="chart-container" id="chartContainer">
@@ -220,8 +220,8 @@
             let url;
             if (type === 'filter') {
                 const timeFilter = document.getElementById('timeFilter').value;
-                url = `http://localhost:3000/api/alarm-stats?filter=${timeFilter}&type=current`;
-                console.log(`📢 Gửi yêu cầu lấy dữ liệu theo filter: ${timeFilter}`);
+                url = `http://localhost:3000/api/disconnect-stats?filter=${timeFilter}`;
+                console.log(`📢 Gửi yêu cầu lấy dữ liệu mất kết nối theo filter: ${timeFilter}`);
             } else {
                 const month = document.getElementById('monthPicker').value;
                 if (!month) {
@@ -232,8 +232,8 @@
                     monthButton.disabled = false;
                     return;
                 }
-                url = `http://localhost:3000/api/alarm-stats?filter=month=${month}&type=current`;
-                console.log(`📢 Gửi yêu cầu lấy dữ liệu theo tháng: ${month}`);
+                url = `http://localhost:3000/api/disconnect-stats?filter=month=${month}`;
+                console.log(`📢 Gửi yêu cầu lấy dữ liệu mất kết nối theo tháng: ${month}`);
             }
 
             try {
@@ -264,16 +264,12 @@
         }
 
         function drawAlarmChart(data) {
-            const lightData = new Array(FIXED_LABELS.length).fill(0);
-            const seriousData = new Array(FIXED_LABELS.length).fill(0);
-            const emergencyData = new Array(FIXED_LABELS.length).fill(0);
+            const disconnectData = new Array(FIXED_LABELS.length).fill(0);
 
             data.forEach(item => {
                 const index = FIXED_LABELS.indexOf(item.device);
                 if (index !== -1) {
-                    lightData[index] = item.light || 0;
-                    seriousData[index] = item.serious || 0;
-                    emergencyData[index] = item.emergency || 0;
+                    disconnectData[index] = item.count || 0;
                 }
             });
 
@@ -285,22 +281,9 @@
                     labels: FIXED_LABELS,
                     datasets: [
                         {
-                            label: '🟡 Nhẹ',
-                            backgroundColor: 'yellow',
-                            data: lightData,
-                            stack: 'stack1'
-                        },
-                        {
-                            label: '🟠 Nghiêm trọng',
-                            backgroundColor: 'orange',
-                            data: seriousData,
-                            stack: 'stack1'
-                        },
-                        {
-                            label: '🔴 Khẩn cấp',
-                            backgroundColor: 'red',
-                            data: emergencyData,
-                            stack: 'stack1'
+                            label: 'Số lần mất kết nối',
+                            backgroundColor: '#2196F3', // Màu xanh lam
+                            data: disconnectData
                         }
                     ]
                 },
@@ -311,14 +294,11 @@
                         legend: { position: 'top' },
                         title: {
                             display: true,
-                            text: 'Thống kê lỗi quá dòng theo thiết bị'
+                            text: 'Thống kê số lần mất kết nối theo thiết bị'
                         }
                     },
                     scales: {
                         x: {
-                            stacked: true,
-                            barPercentage: 0.8,
-                            categoryPercentage: 0.9,
                             title: {
                                 display: true,
                                 text: '127.0.0.x-x',
@@ -327,13 +307,13 @@
                             }
                         },
                         y: {
-                            stacked: true,
                             title: {
                                 display: true,
                                 text: 'Số lần',
                                 font: { size: 14 },
                                 color: '#000'
-                            }
+                            },
+                            beginAtZero: true
                         }
                     }
                 }
@@ -359,16 +339,14 @@
                 const response = await fetch('http://127.0.0.1:3000/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
+                    credentials: 'include',
                 });
                 const data = await response.json();
                 console.log('Phản hồi từ server:', data.message);
-
-                // Xóa role khỏi localStorage
                 localStorage.removeItem('role');
-                return data; // Trả về để xử lý trong then
+                return data;
             } catch (error) {
-                throw error; // Ném lỗi để catch bên ngoài xử lý
+                throw error;
             }
         }
     </script>
