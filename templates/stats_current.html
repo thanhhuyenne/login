@@ -160,7 +160,7 @@
         </div>
 
         <div class="content">
-            <h2>Biểu đồ số lần lỗi theo thiết bị</h2>
+            <h2>BIỂU ĐỒ SỐ LẦN LỖI THEO THIẾT BỊ</h2>
 
             <div class="filter-container">
                 <label for="timeFilter">Bộ lọc thời gian:</label>
@@ -344,7 +344,6 @@
         document.getElementById('monthButton').onclick = debounce(() => fetchAlarmData('month'), 300);
 
         window.onload = () => fetchAlarmData('filter');
-        
         function handleLogout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 logout().then(() => {

@@ -10,9 +10,14 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
         .navbar {
             background-color: #4CAF50;
             color: white;
@@ -20,24 +25,34 @@
             display: flex;
             gap: 15px;
         }
+
         .navbar span {
             cursor: pointer;
             padding: 5px 10px;
             border-radius: 4px;
             transition: background 0.3s;
         }
+
         .navbar span:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
+
         .container {
             display: flex;
-            height: calc(100vh - 40px);
+            flex: 1;
         }
+
         .sidebar {
             width: 250px;
             background: #f4f4f4;
             padding: 15px;
         }
+
         .sidebar div {
             margin-bottom: 10px;
             cursor: pointer;
@@ -46,46 +61,96 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             background: white;
+            transition: background 0.3s;
         }
+
         .sidebar div:hover {
             background: rgba(0, 0, 0, 0.1);
         }
+
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
+
         .content {
-            flex-grow: 1;
+            flex: 1;
             padding: 20px;
             background: #fff;
+            display: flex;
+            flex-direction: column;
         }
+
         .filter-container {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
+
+        .filter-container label {
+            font-size: 14px;
+        }
+
+        select, input, button {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+
         .report-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .report-table th, .report-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
         }
+
         .report-table th {
             background: #4CAF50;
             color: white;
+            font-weight: bold;
         }
-        select, input {
-            padding: 5px;
-            font-size: 14px;
+
+        .report-table tr:nth-child(even) {
+            background: #f9f9f9;
         }
-        .navbar span.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
+
+        .report-table tr:hover {
+            background: #f1f1f1;
         }
-        .sidebar div.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
+
+        .error-message {
+            display: none;
+            font-size: 18px;
+            color: red;
+            text-align: center;
+            margin: 20px 0;
         }
     </style>
 </head>
@@ -108,7 +173,7 @@
         </div>
 
         <div class="content">
-            <h2>Alarm Report</h2>
+            <h2>CẢNH BÁO MẤT KẾT NỐI</h2>
 
             <div class="filter-container">
                 <label for="timeFilter">Bộ lọc thời gian:</label>
@@ -122,7 +187,11 @@
                 <label for="monthPicker">Chọn tháng:</label>
                 <input type="month" id="monthPicker">
                 <button onclick="fetchAlarmDataByMonth()">Xem</button>
+
+                <button onclick="window.location.href='test2.html'">Xem biểu đồ</button>
             </div>
+
+            <div class="error-message" id="errorMessage"></div>
 
             <table class="report-table">
                 <thead>
@@ -143,78 +212,90 @@
     </div>
 
     <script>
-async function fetchAlarmData(filter = null, month = null) {
-    try {
-        let url = "http://localhost:3000/get-disconnect-summary";
+        async function fetchAlarmData(filter = null, month = null) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
 
-        if (filter) {
-            url += `?filter=${filter}`;
-        } else if (month) {
-            url += `?month=${month}`;
+            try {
+                let url = "http://localhost:3000/get-disconnect-summary";
+
+                if (filter) {
+                    url += `?filter=${filter}`;
+                } else if (month) {
+                    url += `?month=${month}`;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Lỗi khi lấy dữ liệu từ API');
+                }
+                const data = await response.json();
+
+                const tableBody = document.getElementById("alarm-data");
+                tableBody.innerHTML = "";
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Chưa có dữ liệu</td></tr>`;
+                    return;
+                }
+
+                data.forEach(row => {
+                    const date = new Date(row.disconnect_time);
+                    const formattedDate = date.toLocaleDateString("vi-VN");
+                    const formattedTime = date.toLocaleTimeString("vi-VN");
+                    const location = `${row.device_ip}_${row.slave_id}`;
+                    const duration = formatDuration(row.duration_seconds);
+
+                    const newRow = `
+                        <tr>
+                            <td>${location}</td>
+                            <td>${formattedDate}</td>
+                            <td>${formattedTime}</td>
+                            <td>${duration}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += newRow;
+                });
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu:", error);
+                errorMessage.textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+                errorMessage.style.display = 'block';
+                document.getElementById("alarm-data").innerHTML = `<tr><td colspan="4" style="text-align: center;">Chưa có dữ liệu</td></tr>`;
+            }
         }
 
-        const response = await fetch(url);
-        const data = await response.json();
+        function formatDuration(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
 
-        const tableBody = document.getElementById("alarm-data");
-        tableBody.innerHTML = ""; // Xóa dữ liệu cũ
+            let result = "";
+            if (h > 0) result += `${h} giờ `;
+            if (m > 0) result += `${m} phút `;
+            if (s > 0) result += `${s} giây`;
 
-        if (data.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Chưa có dữ liệu</td></tr>`;
-            return;
+            return result.trim() || "0 giây";
         }
 
-        data.forEach(row => {
-            const date = new Date(row.disconnect_time);
-            const formattedDate = date.toLocaleDateString("vi-VN"); // Định dạng dd-mm-yyyy
-            const formattedTime = date.toLocaleTimeString("vi-VN"); // Lấy hh:mm:ss
-            const location = `${row.device_ip}_${row.slave_id}`;
-            const duration = formatDuration(row.duration_seconds); // Định dạng thời gian
+        function fetchAlarmDataByFilter() {
+            const filter = document.getElementById("timeFilter").value;
+            fetchAlarmData(filter);
+        }
 
-            const newRow = `
-                <tr>
-                    <td>${location}</td>
-                    <td>${formattedDate}</td>
-                    <td>${formattedTime}</td>
-                    <td>${duration}</td>
-                </tr>
-            `;
-            tableBody.innerHTML += newRow;
-        });
-    } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu:", error);
-    }
-}
+        function fetchAlarmDataByMonth() {
+            const month = document.getElementById("monthPicker").value;
+            if (!month) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Vui lòng chọn tháng!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            fetchAlarmData(null, month);
+        }
 
-// Chuyển đổi thời gian từ giây sang giờ, phút, giây
-function formatDuration(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-
-    let result = "";
-    if (h > 0) result += `${h} giờ `;
-    if (m > 0) result += `${m} phút `;
-    if (s > 0) result += `${s} giây`;
-
-    return result.trim();
-}
-
-// Sự kiện khi nhấn vào bộ lọc thời gian
-function fetchAlarmDataByFilter() {
-    const filter = document.getElementById("timeFilter").value;
-    fetchAlarmData(filter);
-}
-
-// Sự kiện khi nhấn vào chọn tháng
-function fetchAlarmDataByMonth() {
-    const month = document.getElementById("monthPicker").value;
-    fetchAlarmData(null, month);
-}
-
-// Mặc định tải dữ liệu khi vào trang
-fetchAlarmData("last7days");
-
+        //fetchAlarmData("last7days");
 function handleLogout() {
     if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
         logout().then(() => {
@@ -242,8 +323,6 @@ async function logout() {
         throw error; // Ném lỗi để catch bên ngoài xử lý
     }
 }
-
     </script>
-    
 </body>
 </html>
