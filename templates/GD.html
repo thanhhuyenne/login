@@ -14,57 +14,75 @@
         }
         body {
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
             background-color: #4CAF50;
             color: white;
             padding: 10px;
-            text-align: left;
+            display: flex;
+            gap: 15px;
         }
         .navbar span {
-            margin: 0 10px;
             cursor: pointer;
-            padding: 5px;
-            transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            padding: 5px 10px;
             border-radius: 4px;
+            transition: background 0.3s;
         }
         .navbar span:hover {
             background: rgba(255, 255, 255, 0.2);
-            opacity: 0.7;
+        }
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
         }
         .container {
             display: flex;
-            height: calc(100vh - 40px);
-            overflow: hidden;
+            flex: 1;
         }
         .sidebar {
-            width: 10%;
+            width: 250px;
             background: #f4f4f4;
-            padding: 10px;
+            padding: 15px;
         }
         .sidebar div {
             margin-bottom: 10px;
             cursor: pointer;
             font-size: 14px;
             padding: 10px;
-            transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
             border: 1px solid #ccc;
             border-radius: 4px;
             background: white;
+            transition: background 0.3s;
         }
         .sidebar div:hover {
             background: rgba(0, 0, 0, 0.1);
-            opacity: 0.7;
+        }
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
         }
         .main-content {
-            width: 90%;
+            flex: 1;
+            padding: 20px;
+            background: #fff;
             display: flex;
             flex-direction: column;
+        }
+        h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
         }
         .top-section {
             display: flex;
             height: 50%;
             flex-grow: 1;
+            gap: 20px;
         }
         .bottom-section {
             height: 50%;
@@ -74,32 +92,34 @@
             justify-content: flex-end;
         }
         .box {
-            flex-grow: 1;
+            flex: 1; /* Đảm bảo các ô có kích thước bằng nhau */
             padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
         .pie-chart {
             background: white;
             width: 100%;
-            height: 100%; 
+            height: 100%;
             padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 5px #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             position: relative;
         }
         .bar-chart {
             background: white;
             width: 100%;
-            height: 100%; 
+            height: 100%;
             padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 5px #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             position: relative;
         }
@@ -108,20 +128,23 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
+            margin-bottom: 10px;
+        }
+        .chart-header h3 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
         }
         .chart-header input {
             border: 1px solid #ccc;
-            padding: 3px;
+            padding: 8px;
             border-radius: 4px;
+            font-size: 14px;
             cursor: pointer;
         }
         canvas {
             max-width: 100%;
             height: auto;
-        }
-        .navbar span.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
         }
     </style>
 </head>
@@ -142,6 +165,7 @@
             <div>NHÀ KHO</div>
         </div>
         <div class="main-content">
+            <h2>BIỂU ĐỒ TỔNG QUAN ĐIỆN NĂNG TIÊU THỤ</h2>
             <div class="top-section">
                 <div class="box">
                     <div class="pie-chart">
@@ -185,114 +209,89 @@
         let chartDay = null;
         let chartMonth = null;
         Chart.register(ChartDataLabels);
-
         async function fetchSumPieChartData(chartId) {
-        try {
-            const response = await fetch("http://localhost:3000/api/getWeeklyEnergy");
-            const chartData = await response.json();
-
-            if (!chartData || !chartData.data || chartData.data.length === 0) {
-                console.error("⛔ Không có dữ liệu để vẽ biểu đồ!");
-                return;
-            }
-
-            // Xóa biểu đồ cũ trước khi vẽ mới
-            if (window.myChart2) window.myChart2.destroy();
-
-            // Vẽ biểu đồ tròn
-            window.myChart2 = new Chart(document.getElementById(chartId), {
-                type: 'pie',
-                data: {
-                    labels: chartData.labels, // ["Val1", "Val2", "Val3", "Val4", "Val5"]
-                    datasets: [{
-                        data: chartData.data, // Tổng từng val trong 7 ngày gần nhất
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9966FF']
-                    }]
-                },
-                options: {
-                    plugins: {
-                        datalabels: {
-                            color: 'white',
-                            font: { weight: 'bold', size: 14 },
-                            formatter: (value, ctx) => {
-                                let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                return ((value / sum) * 100).toFixed(1) + "%"; // Hiển thị % chứ không làm tròn giá trị gốc
-                            }
-                        }
-                    }
-                }
-            });
-
-        } catch (error) {
-            console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
-        }
-    }
-
-        async function fetchValuePieChartData(chartId, date) {
-        if (!date) return;
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/getDayValue?date=${date}`);
-            if (!response.ok) throw new Error("Lỗi khi gọi API!");
-
-            const chartData = await response.json();
-
-            if (!chartData || !chartData.data || chartData.data.length === 0) {
-                console.error("⛔ Không có dữ liệu để vẽ biểu đồ!");
-                return;
-            }
-
-            // Xóa biểu đồ cũ trước khi vẽ mới
-            if (chartDay) chartDay.destroy();
-
-            // Vẽ biểu đồ mới
-            chartDay = new Chart(document.getElementById(chartId), {
-                type: 'pie',
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        data: chartData.data,
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9966FF']
-                    }]
-                },
-                options: {
-                    plugins: {
-                        datalabels: {
-                            color: 'white',
-                            font: { weight: 'bold', size: 14 },
-                            formatter: (value, ctx) => {
-                                let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                return ((value / sum) * 100).toFixed(1) + "%";
-                            }
-                        }
-                    }
-                }
-            });
-
-        } catch (error) {
-            console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
-        }
-    }
-
-        // Hàm vẽ biểu đồ theo tháng
-        async function fetchMonthPieChartData(chartId, month) {
-            if (!month) return;
-
             try {
-                const response = await fetch(`http://localhost:3000/api/getMonthValue?month=${month}`);
-                if (!response.ok) throw new Error("Lỗi khi gọi API!");
-
+                const response = await fetch("http://localhost:3000/api/getWeeklyEnergy");
                 const chartData = await response.json();
-
                 if (!chartData || !chartData.data || chartData.data.length === 0) {
                     console.error("⛔ Không có dữ liệu để vẽ biểu đồ!");
                     return;
                 }
-
-                // Xóa biểu đồ cũ trước khi vẽ mới
+                if (window.myChart2) window.myChart2.destroy();
+                window.myChart2 = new Chart(document.getElementById(chartId), {
+                    type: 'pie',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            data: chartData.data,
+                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9966FF']
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            datalabels: {
+                                color: 'white',
+                                font: { weight: 'bold', size: 14 },
+                                formatter: (value, ctx) => {
+                                    let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    return ((value / sum) * 100).toFixed(1) + "%";
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
+            }
+        }
+        async function fetchValuePieChartData(chartId, date) {
+            if (!date) return;
+            try {
+                const response = await fetch(`http://localhost:3000/api/getDayValue?date=${date}`);
+                if (!response.ok) throw new Error("Lỗi khi gọi API!");
+                const chartData = await response.json();
+                if (!chartData || !chartData.data || chartData.data.length === 0) {
+                    console.error("⛔ Không có dữ liệu để vẽ biểu đồ!");
+                    return;
+                }
+                if (chartDay) chartDay.destroy();
+                chartDay = new Chart(document.getElementById(chartId), {
+                    type: 'pie',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            data: chartData.data,
+                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9966FF']
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            datalabels: {
+                                color: 'white',
+                                font: { weight: 'bold', size: 14 },
+                                formatter: (value, ctx) => {
+                                    let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    return ((value / sum) * 100).toFixed(1) + "%";
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
+            }
+        }
+        async function fetchMonthPieChartData(chartId, month) {
+            if (!month) return;
+            try {
+                const response = await fetch(`http://localhost:3000/api/getMonthValue?month=${month}`);
+                if (!response.ok) throw new Error("Lỗi khi gọi API!");
+                const chartData = await response.json();
+                if (!chartData || !chartData.data || chartData.data.length === 0) {
+                    console.error("⛔ Không có dữ liệu để vẽ biểu đồ!");
+                    return;
+                }
                 if (chartMonth) chartMonth.destroy();
-
-                // Vẽ biểu đồ mới
                 chartMonth = new Chart(document.getElementById(chartId), {
                     type: 'pie',
                     data: {
@@ -315,96 +314,78 @@
                         }
                     }
                 });
-
             } catch (error) {
                 console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
             }
         }
-
         async function fetchBarChartData(chartId, month) {
-        if (!month) return; // Không gọi API nếu tháng rỗng
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/getMonthSummary?month=${month}`);
-            if (!response.ok) throw new Error("Lỗi khi gọi API!");
-
-            const chartData = await response.json();
-
-            // Kiểm tra nếu không có dữ liệu, không vẽ biểu đồ
-            if (!chartData || !chartData.data || chartData.data.length === 0) {
-                console.warn("⛔ Không có dữ liệu cho tháng này!");
-                return;
-            }
-
-            // Xóa biểu đồ cũ trước khi vẽ mới
-            if (window.myChart4) window.myChart4.destroy();
-
-            // Vẽ biểu đồ cột
-            window.myChart4 = new Chart(document.getElementById(chartId), {
-                type: 'bar',
-                data: {
-                    labels: chartData.labels, // Danh sách ngày 1-31
-                    datasets: [{
-                        label: 'Tổng điện năng tiêu thụ',
-                        data: chartData.data.map(value => parseFloat(value.toFixed(2))), // Làm tròn khi hiển thị
-                        backgroundColor: '#36A2EB'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+            if (!month) return;
+            try {
+                const response = await fetch(`http://localhost:3000/api/getMonthSummary?month=${month}`);
+                if (!response.ok) throw new Error("Lỗi khi gọi API!");
+                const chartData = await response.json();
+                if (!chartData || !chartData.data || chartData.data.length === 0) {
+                    console.warn("⛔ Không có dữ liệu cho tháng này!");
+                    return;
                 }
-            });
-
-        } catch (error) {
-            console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
+                if (window.myChart4) window.myChart4.destroy();
+                window.myChart4 = new Chart(document.getElementById(chartId), {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Tổng điện năng tiêu thụ',
+                            data: chartData.data.map(value => parseFloat(value.toFixed(2))),
+                            backgroundColor: '#36A2EB'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            } catch (error) {
+                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
+            }
         }
-    }
-
-        // Gọi API để lấy dữ liệu thực từ SQL
         document.getElementById("datePicker1").addEventListener("change", function() {
-        const selectedDate = this.value; // Lấy giá trị ngày
-        if (selectedDate) fetchValuePieChartData("chart1", selectedDate); // Gọi API nếu có ngày hợp lệ
+            const selectedDate = this.value;
+            if (selectedDate) fetchValuePieChartData("chart1", selectedDate);
         });
-
         fetchSumPieChartData('chart2');
-        
         document.getElementById("monthPicker").addEventListener("change", function () {
-            const selectedMonth = this.value; // Lấy giá trị tháng (YYYY-MM)
-            if (selectedMonth) fetchMonthPieChartData("chart3", selectedMonth); // Gọi API nếu có tháng hợp lệ
+            const selectedMonth = this.value;
+            if (selectedMonth) fetchMonthPieChartData("chart3", selectedMonth);
         });
-
         document.getElementById("monthPickerBar").addEventListener("change", function () {
-        const selectedMonth = this.value; // Lấy giá trị tháng (YYYY-MM)
-        if (selectedMonth) fetchBarChartData("chart4", selectedMonth); // Gọi API nếu có tháng hợp lệ
+            const selectedMonth = this.value;
+            if (selectedMonth) fetchBarChartData("chart4", selectedMonth);
         });
         function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        logout().then(() => {
-            window.location.href = 'index.html';
-        }).catch(error => {
-            console.error('Lỗi khi đăng xuất:', error);
-            alert('Đăng xuất thất bại. Vui lòng thử lại.');
-        });
-    }
-}
-async function logout() {
-    try {
-        const response = await fetch('http://127.0.0.1:3000/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
-        });
-        const data = await response.json();
-        console.log('Phản hồi từ server:', data.message);
-
-        // Xóa role khỏi localStorage
-        localStorage.removeItem('role');
-        return data; // Trả về để xử lý trong then
-    } catch (error) {
-        throw error; // Ném lỗi để catch bên ngoài xử lý
-    }
-}
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
+        }
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+                localStorage.removeItem('role');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
     </script>
 </body>
 </html>
