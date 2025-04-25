@@ -12,6 +12,9 @@
         }
         body {
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
             background-color: #4CAF50;
@@ -29,9 +32,13 @@
         .navbar span:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .container {
             display: flex;
-            height: calc(100vh - 40px);
+            flex: 1;
         }
         .sidebar {
             width: 250px;
@@ -46,40 +53,86 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             background: white;
+            transition: background 0.3s;
         }
         .sidebar div:hover {
             background: rgba(0, 0, 0, 0.1);
         }
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .content {
-            flex-grow: 1;
+            flex: 1;
             padding: 20px;
             background: #fff;
+            display: flex;
+            flex-direction: column;
         }
         .report-header {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         .filter-container {
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-container label {
+            font-size: 14px;
+        }
+        select, input, button {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #45a049;
         }
         .report-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .report-table th, .report-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center; /* Căn giữa nội dung trong bảng */
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
         }
         .report-table th {
             background: #4CAF50;
             color: white;
+            font-weight: bold;
         }
-        .navbar span.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
+        .report-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .report-table tr:hover {
+            background: #f1f1f1;
+        }
+        .error-message {
+            display: none;
+            font-size: 18px;
+            color: red;
+            text-align: center;
+            margin: 20px 0;
         }
     </style>
 </head>
@@ -95,13 +148,13 @@
     </div>
     <div class="container">
         <div class="sidebar">
-            <div>1 - ĐIỆN NĂNG THEO NGÀY</div>
+            <div class="active">1 - ĐIỆN NĂNG THEO NGÀY</div>
             <div>2 - ĐIỆN NĂNG THEO TUẦN</div>
             <div>3 - ĐIỆN NĂNG THEO THÁNG</div>
             <div>4 - DỮ LIỆU ĐỒNG HỒ</div>
         </div>
         <div class="content">
-            <div class="report-header">ĐIỆN NĂNG TIÊU THỤ THEO NGÀY</div>
+            <h2>ĐIỆN NĂNG TIÊU THỤ THEO NGÀY</h2>
             <div class="filter-container">
                 <label for="month">Chọn tháng:</label>
                 <input type="month" id="month" value="2025-03">
@@ -128,63 +181,61 @@
 
     <script>
         async function fetchReport() {
-        const dateValue = document.getElementById("month").value; // "2025-03"
-        if (!dateValue) return;
+            const dateValue = document.getElementById("month").value;
+            if (!dateValue) return;
 
-        const [year, month] = dateValue.split("-"); // Tách thành '2025' và '03'
+            const [year, month] = dateValue.split("-");
 
-        try {
-            const response = await fetch(`http://localhost:3000/api/getMonthlyData?month=${month}&year=${year}`);
-            const data = await response.json();
+            try {
+                const response = await fetch(`http://localhost:3000/api/getMonthlyData?month=${month}&year=${year}`);
+                const data = await response.json();
 
-            let tableRows = "";
-            if (data.length > 0) {
-                data.forEach(row => {
-                    tableRows += `<tr>
-                        <td>${row.source}</td>
-                        <td>${row.period}</td>
-                        <td>${row.total.toFixed(2)}</td>
-                        <td>${row.start_value.toFixed(2)}</td>
-                        <td>${row.end_value.toFixed(2)}</td>
-                    </tr>`;
-                });
-            } else {
-                tableRows = `<tr><td colspan="5" style="text-align: center;">Không có dữ liệu</td></tr>`;
+                let tableRows = "";
+                if (data.length > 0) {
+                    data.forEach(row => {
+                        tableRows += `<tr>
+                            <td>${row.source}</td>
+                            <td>${row.period}</td>
+                            <td>${row.total.toFixed(2)}</td>
+                            <td>${row.start_value.toFixed(2)}</td>
+                            <td>${row.end_value.toFixed(2)}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tableRows = `<tr><td colspan="5" style="text-align: center;">Không có dữ liệu</td></tr>`;
+                }
+
+                document.getElementById("report-data").innerHTML = tableRows;
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu:", error);
+                document.getElementById("report-data").innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Lỗi khi lấy dữ liệu</td></tr>`;
             }
-
-            document.getElementById("report-data").innerHTML = tableRows;
-        } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu:", error);
-            document.getElementById("report-data").innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Lỗi khi lấy dữ liệu</td></tr>`;
         }
-    }
-    function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        logout().then(() => {
-            window.location.href = 'index.html';
-        }).catch(error => {
-            console.error('Lỗi khi đăng xuất:', error);
-            alert('Đăng xuất thất bại. Vui lòng thử lại.');
-        });
-    }
-}
-async function logout() {
-    try {
-        const response = await fetch('http://127.0.0.1:3000/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
-        });
-        const data = await response.json();
-        console.log('Phản hồi từ server:', data.message);
-
-        // Xóa role khỏi localStorage
-        localStorage.removeItem('role');
-        return data; // Trả về để xử lý trong then
-    } catch (error) {
-        throw error; // Ném lỗi để catch bên ngoài xử lý
-    }
-}
+        function handleLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
+        }
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+                localStorage.removeItem('role');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
     </script>
 </body>
 </html>

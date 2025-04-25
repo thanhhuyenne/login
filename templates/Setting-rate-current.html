@@ -12,6 +12,9 @@
         }
         body {
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
             background-color: #4CAF50;
@@ -29,9 +32,13 @@
         .navbar span:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .container {
             display: flex;
-            height: calc(100vh - 40px);
+            flex: 1;
         }
         .sidebar {
             width: 250px;
@@ -46,109 +53,41 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             background: white;
+            transition: background 0.3s;
         }
         .sidebar div:hover {
             background: rgba(0, 0, 0, 0.1);
-        }
-        .content {
-            flex-grow: 1;
-            padding: 20px;
-            background: #fff;
-        }
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
-        }
-        select, input {
-            padding: 5px;
-            font-size: 14px;
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
         }
         .sidebar div.active {
             font-weight: bold;
             color: rgb(254, 174, 0);
         }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
         h2 {
-            font-size: 30px;
+            font-size: 24px;
             font-weight: bold;
-            text-align: center;
-            background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            display: inline-block;
-            width: auto;
-            margin-left: 200px;
-            margin-right: auto;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        select, input {
+            padding: 8px;
             font-size: 14px;
-        }
-        th {
-            background-color: #f0f0f0;
-            color: #333;
-            font-weight: bold;
-            text-align: center;
-        }
-        td {
-            color: #555;
-            text-align: center;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
         }
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px; /* Khoảng cách giữa các nút */
-        }
-        button[type="submit"], button[type="button"] {
+        button {
             background-color: #4CAF50;
             color: white;
             padding: 8px 16px;
@@ -156,16 +95,57 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            transition: background-color 0.3s;
+            transition: background 0.3s;
         }
         button[type="button"] {
-            background-color: #f44336; /* Màu đỏ cho nút Reset */
+            background-color: #f44336;
         }
-        button[type="submit"]:hover {
+        button:hover:not(:disabled) {
             background-color: #45a049;
         }
         button[type="button"]:hover {
-            background-color: #d32f2f; /* Màu đỏ đậm hơn khi hover */
+            background-color: #d32f2f;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .report-table th {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        .report-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .report-table tr:hover {
+            background: #f1f1f1;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
         }
         #message {
             margin-top: 10px;
@@ -204,13 +184,15 @@
             <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
             <div onclick="window.location.href='Setting-rate-current.html'" class="active">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
             <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>           
-            <div onclick="window.location.href='Setting-users.html'" >6 - THÊM TÀI KHOẢN MỚI</div>
+            <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+            <div onclick="window.location.href='Setting-cpass.html'">7 - THAY ĐỔI MẬT KHẨU</div>  
+            <div onclick="window.location.href='Setting-delete.html'">8 - XÓA TÀI KHOẢN</div>
         </div>
 
         <div class="content">
-            <h2>Cài đặt dòng điện định mức</h2>
+            <h2>CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</h2>
             <form id="deviceConfigForm">
-                <table>
+                <table class="report-table">
                     <thead>
                         <tr>
                             <th>IP</th>
@@ -220,12 +202,11 @@
                         </tr>
                     </thead>
                     <tbody id="deviceConfigTable">
-                        <!-- Dữ liệu sẽ được load động từ server -->
                     </tbody>
                 </table>
                 <div class="button-container">
                     <button type="submit">Save</button>
-                    <button type="button" id="resetButton">Reset</button> <!-- Thêm nút Reset -->
+                    <button type="button" id="resetButton">Reset</button>
                 </div>
             </form>
             <div id="message"></div>
@@ -233,7 +214,6 @@
     </div>
 
     <script>
-        // Hàm lấy và hiển thị dữ liệu từ server
         async function loadDeviceConfig() {
             try {
                 const response = await fetch('http://127.0.0.1:3000/get-device-config');
@@ -241,10 +221,8 @@
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const devices = await response.json();
-
                 const tbody = document.getElementById('deviceConfigTable');
-                tbody.innerHTML = ''; // Xóa dữ liệu cũ
-
+                tbody.innerHTML = '';
                 devices.forEach(device => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -266,153 +244,130 @@
                 document.getElementById('message').textContent = `Lỗi: ${error.message}`;
             }
         }
-
-        // Load dữ liệu khi trang được tải
         document.addEventListener('DOMContentLoaded', () => {
-            loadDeviceConfig(); // Gọi hàm loadDeviceConfig khi DOM được tải
-
+            loadDeviceConfig();
             const form = document.getElementById('deviceConfigForm');
             if (form) {
                 form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Hiển thị thông báo xác nhận
-    const confirmed = window.confirm('Confirm edit?');
-    if (!confirmed) {
-        return; // Nếu người dùng nhấn "Cancel", dừng lại
-    }
-
-    const formData = new FormData(e.target);
-    const data = [];
-
-    // Lấy dữ liệu từ form
-    formData.forEach((value, key) => {
-        if (key.startsWith('rated_current_')) {
-            const parts = key.split('_');
-            if (parts.length >= 3) {
-                const ip = key.split('_').slice(2, -1).join('.');
-                const slave_id = parts[parts.length - 1];
-                data.push({
-                    ip: ip,
-                    slave_id: parseInt(slave_id),
-                    rated_current: parseFloat(value)
+                    e.preventDefault();
+                    const confirmed = window.confirm('Confirm edit?');
+                    if (!confirmed) {
+                        return;
+                    }
+                    const formData = new FormData(e.target);
+                    const data = [];
+                    formData.forEach((value, key) => {
+                        if (key.startsWith('rated_current_')) {
+                            const parts = key.split('_');
+                            if (parts.length >= 3) {
+                                const ip = key.split('_').slice(2, -1).join('.');
+                                const slave_id = parts[parts.length - 1];
+                                data.push({
+                                    ip: ip,
+                                    slave_id: parseInt(slave_id),
+                                    rated_current: parseFloat(value)
+                                });
+                            }
+                        }
+                    });
+                    console.log('Dữ liệu gửi lên server:', data);
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.style.display = 'block';
+                    try {
+                        const response = await fetch('http://127.0.0.1:3000/save-device-config', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify(data)
+                        });
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            throw new Error('Phản hồi từ server không phải JSON');
+                        }
+                        const result = await response.json();
+                        if (result.status === "success") {
+                            messageDiv.className = 'success';
+                            messageDiv.textContent = `Lưu thành công!`;
+                            loadDeviceConfig();
+                        } else {
+                            messageDiv.className = 'error';
+                            messageDiv.textContent = `Lỗi: ${result.message}`;
+                        }
+                    } catch (error) {
+                        messageDiv.className = 'error';
+                        messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /save-device-config hoạt động đúng.`;
+                    }
                 });
-            }
-        }
-    });
-
-    console.log('Dữ liệu gửi lên server:', data);
-
-    const messageDiv = document.getElementById('message');
-    messageDiv.style.display = 'block';
-
-    try {
-        const response = await fetch('http://127.0.0.1:3000/save-device-config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include', // ⚠️ PHẢI CÓ DÒNG NÀY
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Phản hồi từ server không phải JSON');
-        }
-        const result = await response.json();
-
-        if (result.status === "success") {
-            messageDiv.className = 'success';
-            messageDiv.textContent = `Lưu thành công!`;
-            loadDeviceConfig();
-        } else {
-            messageDiv.className = 'error';
-            messageDiv.textContent = `Lỗi: ${result.message}`;
-        }
-    } catch (error) {
-        messageDiv.className = 'error';
-        messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /save-device-config hoạt động đúng.`;
-    }
-});
             } else {
                 console.error("Không tìm thấy form với id='deviceConfigForm'");
             }
             resetButton.addEventListener('click', async () => {
-    // Hiển thị thông báo xác nhận
-    const confirmed = window.confirm('Confirm edit?');
-    if (!confirmed) {
-        return; // Nếu người dùng nhấn "Cancel", dừng lại
-    }
-
-    const messageDiv = document.getElementById('message');
-    messageDiv.style.display = 'block';
-
-    try {
-        const response = await fetch('http://127.0.0.1:3000/reset-device-config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include', // ⚠️ PHẢI CÓ DÒNG NÀY
+                const confirmed = window.confirm('Confirm edit?');
+                if (!confirmed) {
+                    return;
+                }
+                const messageDiv = document.getElementById('message');
+                messageDiv.style.display = 'block';
+                try {
+                    const response = await fetch('http://127.0.0.1:3000/reset-device-config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Phản hồi từ server không phải JSON');
+                    }
+                    const result = await response.json();
+                    if (result.status === "success") {
+                        messageDiv.className = 'success';
+                        messageDiv.textContent = `Đặt lại thành công!`;
+                        loadDeviceConfig();
+                    } else {
+                        messageDiv.className = 'error';
+                        messageDiv.textContent = `Lỗi: ${result.message}`;
+                    }
+                } catch (error) {
+                    messageDiv.className = 'error';
+                    messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /reset-device-config hoạt động đúng.`;
+                }
+            });
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Phản hồi từ server không phải JSON');
-        }
-        const result = await response.json();
-
-        if (result.status === "success") {
-            messageDiv.className = 'success';
-            messageDiv.textContent = `Đặt lại thành công!`;
-            loadDeviceConfig();
-        } else {
-            messageDiv.className = 'error';
-            messageDiv.textContent = `Lỗi: ${result.message}`;
-        }
-    } catch (error) {
-        messageDiv.className = 'error';
-        messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /reset-device-config hoạt động đúng.`;
-    }
-});
-
-
-        });
-
         function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        logout().then(() => {
-            window.location.href = 'index.html';
-        }).catch(error => {
-            console.error('Lỗi khi đăng xuất:', error);
-            alert('Đăng xuất thất bại. Vui lòng thử lại.');
-        });
-    }
-}
-async function logout() {
-    try {
-        const response = await fetch('http://127.0.0.1:3000/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
-        });
-        const data = await response.json();
-        console.log('Phản hồi từ server:', data.message);
-
-        // Xóa role khỏi localStorage
-        localStorage.removeItem('role');
-        return data; // Trả về để xử lý trong then
-    } catch (error) {
-        throw error; // Ném lỗi để catch bên ngoài xử lý
-    }
-}
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
+        }
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+                localStorage.removeItem('role');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
     </script>
 </body>
 </html>
