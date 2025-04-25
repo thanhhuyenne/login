@@ -12,6 +12,9 @@
         }
         body {
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
             background-color: #4CAF50;
@@ -29,9 +32,13 @@
         .navbar span:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .container {
             display: flex;
-            height: calc(100vh - 40px);
+            flex: 1;
         }
         .sidebar {
             width: 250px;
@@ -46,106 +53,41 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             background: white;
+            transition: background 0.3s;
         }
         .sidebar div:hover {
             background: rgba(0, 0, 0, 0.1);
         }
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .content {
-            flex-grow: 1;
+            flex: 1;
             padding: 20px;
             background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
         .filter-container {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         select, input {
-            padding: 5px;
+            padding: 8px;
             font-size: 14px;
-        }
-        .navbar span.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
-        }
-        .sidebar div.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
-        }
-        h2 {
-            font-size: 30px;
-            font-weight: bold;
-            text-align: center;
-            background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
-            -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
-            background-clip: text; /* Thuộc tính chuẩn */
-            color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            display: inline-block;
-            width: auto;
-            margin-left: 200px;
-            margin-right: auto;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f0f0f0;
-            color: #333;
-            font-weight: bold;
-            text-align: center;
-        }
-        td {
-            color: #555;
-            text-align: center;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
         }
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        button[type="submit"] {
+        button {
             background-color: #4CAF50;
             color: white;
             padding: 8px 16px;
@@ -153,10 +95,48 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            transition: background-color 0.3s;
+            transition: background 0.3s;
         }
-        button[type="submit"]:hover {
+        button:hover:not(:disabled) {
             background-color: #45a049;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .report-table th {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        .report-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .report-table tr:hover {
+            background: #f1f1f1;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
         }
         #message {
             margin-top: 10px;
@@ -182,7 +162,7 @@
         <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
         <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
         <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'" >ALARMS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
         <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
@@ -196,12 +176,14 @@
             <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
             <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>           
             <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+            <div onclick="window.location.href='Setting-cpass.html'">7 - THAY ĐỔI MẬT KHẨU</div>  
+            <div onclick="window.location.href='Setting-delete.html'">8 - XÓA TÀI KHOẢN</div>
         </div>
 
         <div class="content">
-            <h2>CÀI ĐẶT CẢNH BÁO SỤT ÁP - Khu vực 1</h2>
+            <h2>CÀI ĐẶT CẢNH BÁO SỤT ÁP DÂY - Khu vực 1</h2>
             <form id="voltageForm">
-                <table>
+                <table class="report-table">
                     <thead>
                         <tr>
                             <th>Khu vực</th>
@@ -211,7 +193,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dòng 1: Emergency -->
                         <tr>
                             <td>1</td>
                             <td><span id="currentEmergency">Loading...</span> V</td>
@@ -221,7 +202,6 @@
                                 <span> V</span>
                             </td>
                         </tr>
-                        <!-- Dòng 2: Serious -->
                         <tr>
                             <td>1</td>
                             <td><span id="currentSerious">Loading...</span> V</td>
@@ -231,7 +211,6 @@
                                 <span> V</span>
                             </td>
                         </tr>
-                        <!-- Dòng 3: Light -->
                         <tr>
                             <td>1</td>
                             <td><span id="currentLight">Loading...</span> V</td>
@@ -248,14 +227,10 @@
                 </div>
             </form>
             <div id="message"></div>
-    </form>
-        <div id="message"></div>
-            
         </div>
     </div>
 
     <script>
-
         updateCurrentSettings();
         async function updateCurrentSettings() {
             try {
@@ -264,12 +239,9 @@
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const settings = await response.json();
-
-                // Cập nhật giá trị vào bảng
                 document.getElementById('currentEmergency').textContent = settings.emergencyLevel;
                 document.getElementById('currentSerious').textContent = settings.seriousLevel;
                 document.getElementById('currentLight').textContent = settings.lightLevel;
-                // Cập nhật giá trị cho các ô nhập liệu
                 document.getElementById('inputEmergency').value = settings.emergencyLevel;
                 document.getElementById('inputSerious').value = settings.seriousLevel;
                 document.getElementById('inputLight').value = settings.lightLevel;
@@ -280,13 +252,11 @@
                 document.getElementById('currentLight').textContent = 'Error';
             }
         }
-
         document.getElementById('voltageForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Hiển thị thông báo xác nhận
             const confirmed = window.confirm('Confirm edit?');
             if (!confirmed) {
-                return; // Nếu người dùng nhấn "Cancel", dừng lại
+                return;
             }
             const formData = new FormData(e.target);
             const data = {
@@ -294,26 +264,21 @@
                 seriousLevel: parseFloat(formData.get('seriousLevel')),
                 lightLevel: parseFloat(formData.get('lightLevel'))
             };
-
             const messageDiv = document.getElementById('message');
             messageDiv.style.display = 'block';
-
             try {
                 const response = await fetch('http://127.0.0.1:3000/save-settings-vol-line-1', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    credentials: 'include', // ⚠️ PHẢI CÓ DÒNG NÀY
+                    credentials: 'include',
                     body: JSON.stringify(data)
                 });
-
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
                 const result = await response.json();
-
                 if (result.status === "success") {
                     messageDiv.className = 'success';
                     messageDiv.textContent = `Lưu thành công! Giá trị: Emergency: ${result.settings.emergencyLevel} V, Serious: ${result.settings.seriousLevel} V, Light: ${result.settings.lightLevel} V`;
@@ -328,33 +293,30 @@
             updateCurrentSettings();
         });
         function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        logout().then(() => {
-            window.location.href = 'index.html';
-        }).catch(error => {
-            console.error('Lỗi khi đăng xuất:', error);
-            alert('Đăng xuất thất bại. Vui lòng thử lại.');
-        });
-    }
-}
-async function logout() {
-    try {
-        const response = await fetch('http://127.0.0.1:3000/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
-        });
-        const data = await response.json();
-        console.log('Phản hồi từ server:', data.message);
-
-        // Xóa role khỏi localStorage
-        localStorage.removeItem('role');
-        return data; // Trả về để xử lý trong then
-    } catch (error) {
-        throw error; // Ném lỗi để catch bên ngoài xử lý
-    }
-}
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
+        }
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+                localStorage.removeItem('role');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
     </script>
-    
 </body>
 </html>
