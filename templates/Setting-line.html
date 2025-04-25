@@ -1,322 +1,381 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alarm Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        select, input {
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        button:hover:not(:disabled) {
-            background-color: #45a049;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        .report-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .report-table tr:hover {
-            background: #f1f1f1;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
-        }
-        input[type="number"]:focus {
-            border-color: #4CAF50;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        #message {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            display: none;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      select,
+      input {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .report-table th,
+      .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+      }
+      .report-table th {
+        background: #4caf50;
+        color: white;
+        font-weight: bold;
+      }
+      .report-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .report-table tr:hover {
+        background: #f1f1f1;
+      }
+      input[type='number'] {
+        width: 80px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+      }
+      input[type='number']:focus {
+        border-color: #4caf50;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 20px;
+      }
+      #message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: none;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-        <span onclick="window.location.href='Report.html'">REPORTS</span>
-        <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
-        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
     </div>
 
     <div class="container">
-        <div class="sidebar">
-            <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
-            <div onclick="window.location.href='Setting-line.html'" class="active">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
-            <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-            <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-            <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>           
-            <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-            <div onclick="window.location.href='Setting-cpass.html'">7 - THAY ĐỔI MẬT KHẨU</div>  
-            <div onclick="window.location.href='Setting-delete.html'">8 - XÓA TÀI KHOẢN</div>
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'" class="active">
+          2 - CÀI ĐẶT SỤT ÁP DÂY
         </div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-cpass.html'">7 - THAY ĐỔI MẬT KHẨU</div>
+        <div onclick="window.location.href='Setting-delete.html'">8 - XÓA TÀI KHOẢN</div>
+      </div>
 
-        <div class="content">
-            <h2>CÀI ĐẶT CẢNH BÁO SỤT ÁP DÂY - Khu vực 1</h2>
-            <form id="voltageForm">
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>Khu vực</th>
-                            <th>Giá trị cảnh báo hiện tại</th>
-                            <th>Mức cảnh báo</th>
-                            <th>Giá trị cảnh báo mới</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td><span id="currentEmergency">Loading...</span> V</td>
-                            <td>Emergency</td>
-                            <td>
-                                <input type="number" name="emergencyLevel" id="inputEmergency" required placeholder="Nhập giá trị">
-                                <span> V</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><span id="currentSerious">Loading...</span> V</td>
-                            <td>Serious</td>
-                            <td>
-                                <input type="number" name="seriousLevel" id="inputSerious" required placeholder="Nhập giá trị">
-                                <span> V</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td><span id="currentLight">Loading...</span> V</td>
-                            <td>Light</td>
-                            <td>
-                                <input type="number" name="lightLevel" id="inputLight" required placeholder="Nhập giá trị">
-                                <span> V</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="button-container">
-                    <button type="submit">Save</button>
-                </div>
-            </form>
-            <div id="message"></div>
-        </div>
+      <div class="content">
+        <h2>CÀI ĐẶT CẢNH BÁO SỤT ÁP DÂY - Khu vực 1</h2>
+        <form id="voltageForm">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Khu vực</th>
+                <th>Giá trị cảnh báo hiện tại</th>
+                <th>Mức cảnh báo</th>
+                <th>Giá trị cảnh báo mới</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span id="currentEmergency">Loading...</span> V</td>
+                <td>Emergency</td>
+                <td>
+                  <input
+                    type="number"
+                    name="emergencyLevel"
+                    id="inputEmergency"
+                    required
+                    placeholder="Nhập giá trị"
+                  />
+                  <span> V</span>
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td><span id="currentSerious">Loading...</span> V</td>
+                <td>Serious</td>
+                <td>
+                  <input
+                    type="number"
+                    name="seriousLevel"
+                    id="inputSerious"
+                    required
+                    placeholder="Nhập giá trị"
+                  />
+                  <span> V</span>
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td><span id="currentLight">Loading...</span> V</td>
+                <td>Light</td>
+                <td>
+                  <input
+                    type="number"
+                    name="lightLevel"
+                    id="inputLight"
+                    required
+                    placeholder="Nhập giá trị"
+                  />
+                  <span> V</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="button-container">
+            <button type="submit">Save</button>
+          </div>
+        </form>
+        <div id="message"></div>
+      </div>
     </div>
 
     <script>
+      updateCurrentSettings();
+      async function updateCurrentSettings() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-settings-vol-line-1');
+          if (!response.ok) {
+            // Lấy thông điệp lỗi từ server
+            const errorData = await response.json();
+            const errorMessage = errorData.error || `HTTP error! Status: ${response.status}`;
+            throw new Error(errorMessage);
+          }
+
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi từ server không phải JSON');
+          }
+
+          const settings = await response.json();
+          document.getElementById('currentEmergency').textContent = settings.emergencyLevel;
+          document.getElementById('currentSerious').textContent = settings.seriousLevel;
+          document.getElementById('currentLight').textContent = settings.lightLevel;
+          document.getElementById('inputEmergency').value = settings.emergencyLevel;
+          document.getElementById('inputSerious').value = settings.seriousLevel;
+          document.getElementById('inputLight').value = settings.lightLevel;
+        } catch (error) {
+          console.error('Lỗi khi lấy giá trị dòng điện từ server:', error);
+          // Hiển thị thông báo lỗi cho người dùng
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          if (error.message.includes('Failed to fetch')) {
+            messageDiv.textContent =
+              'Server không phản hồi, vui lòng kiểm tra kết nối hoặc đảm bảo server đang chạy.';
+          } else {
+            messageDiv.textContent = `Lỗi: ${error.message}`;
+          }
+          // Giữ logic hiện tại: đặt giá trị "Error" và làm rỗng input
+          document.getElementById('currentEmergency').textContent = 'Error';
+          document.getElementById('currentSerious').textContent = 'Error';
+          document.getElementById('currentLight').textContent = 'Error';
+          document.getElementById('inputEmergency').value = '';
+          document.getElementById('inputSerious').value = '';
+          document.getElementById('inputLight').value = '';
+        }
+      }
+      document.getElementById('voltageForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const confirmed = window.confirm('Confirm edit?');
+        if (!confirmed) {
+          return;
+        }
+        const formData = new FormData(e.target);
+        const data = {
+          emergencyLevel: parseFloat(formData.get('emergencyLevel')),
+          seriousLevel: parseFloat(formData.get('seriousLevel')),
+          lightLevel: parseFloat(formData.get('lightLevel'))
+        };
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'block';
+        try {
+          const response = await fetch('http://127.0.0.1:3000/save-settings-vol-line-1', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+          }
+          const result = await response.json();
+          if (result.status === 'success') {
+            messageDiv.className = 'success';
+            messageDiv.textContent = `Lưu thành công! Giá trị: Emergency: ${result.settings.emergencyLevel} A, Serious: ${result.settings.seriousLevel} A, Light: ${result.settings.lightLevel} A`;
+          } else {
+            messageDiv.className = 'error';
+            messageDiv.textContent = `Lỗi 1: ${result.message}`;
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy giá trị dòng điện từ server:', error);
+          // Hiển thị thông báo lỗi cho người dùng
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          if (error.message.includes('Failed to fetch')) {
+            messageDiv.textContent =
+              'Server không phản hồi, vui lòng kiểm tra kết nối hoặc đảm bảo server đang chạy.';
+          } else {
+            messageDiv.textContent = `Lỗi: ${error.message}`;
+          }
+        }
         updateCurrentSettings();
-        async function updateCurrentSettings() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/get-settings-vol-line-1');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const settings = await response.json();
-                document.getElementById('currentEmergency').textContent = settings.emergencyLevel;
-                document.getElementById('currentSerious').textContent = settings.seriousLevel;
-                document.getElementById('currentLight').textContent = settings.lightLevel;
-                document.getElementById('inputEmergency').value = settings.emergencyLevel;
-                document.getElementById('inputSerious').value = settings.seriousLevel;
-                document.getElementById('inputLight').value = settings.lightLevel;
-            } catch (error) {
-                console.error('Lỗi khi lấy giá trị dòng điện từ server:', error);
-                document.getElementById('currentEmergency').textContent = 'Error';
-                document.getElementById('currentSerious').textContent = 'Error';
-                document.getElementById('currentLight').textContent = 'Error';
-            }
+      });
+      function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
+            });
         }
-        document.getElementById('voltageForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const confirmed = window.confirm('Confirm edit?');
-            if (!confirmed) {
-                return;
-            }
-            const formData = new FormData(e.target);
-            const data = {
-                emergencyLevel: parseFloat(formData.get('emergencyLevel')),
-                seriousLevel: parseFloat(formData.get('seriousLevel')),
-                lightLevel: parseFloat(formData.get('lightLevel'))
-            };
-            const messageDiv = document.getElementById('message');
-            messageDiv.style.display = 'block';
-            try {
-                const response = await fetch('http://127.0.0.1:3000/save-settings-vol-line-1', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const result = await response.json();
-                if (result.status === "success") {
-                    messageDiv.className = 'success';
-                    messageDiv.textContent = `Lưu thành công! Giá trị: Emergency: ${result.settings.emergencyLevel} V, Serious: ${result.settings.seriousLevel} V, Light: ${result.settings.lightLevel} V`;
-                } else {
-                    messageDiv.className = 'error';
-                    messageDiv.textContent = `Lỗi: ${result.message}`;
-                }
-            } catch (error) {
-                messageDiv.className = 'error';
-                messageDiv.textContent = `Lỗi kết nối: ${error.message}`;
-            }
-            updateCurrentSettings();
-        });
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                logout().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Lỗi khi đăng xuất:', error);
-                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
-                });
-            }
+      }
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
         }
-        async function logout() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                console.log('Phản hồi từ server:', data.message);
-                localStorage.removeItem('role');
-                return data;
-            } catch (error) {
-                throw error;
-            }
-        }
+      }
     </script>
-</body>
+  </body>
 </html>
