@@ -12,6 +12,9 @@
         }
         body {
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
             background-color: #4CAF50;
@@ -29,9 +32,13 @@
         .navbar span:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .container {
             display: flex;
-            height: calc(100vh - 40px);
+            flex: 1;
         }
         .sidebar {
             width: 250px;
@@ -46,116 +53,84 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             background: white;
+            transition: background 0.3s;
         }
         .sidebar div:hover {
             background: rgba(0, 0, 0, 0.1);
         }
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
         .content {
-            flex-grow: 1;
+            flex: 1;
             padding: 20px;
             background: #fff;
-        }
-        .filter-container {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
-        }
-        select, input {
-            padding: 5px;
-            font-size: 14px;
-        }
-        .navbar span.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
-        }
-        .sidebar div.active {
-        font-weight: bold; /* Làm đậm chữ */
-        color: rgb(254, 174, 0); /* Đổi màu chữ */
+            flex-direction: column;
         }
         h2 {
-            font-size: 30px;
+            font-size: 24px;
             font-weight: bold;
-            text-align: center;
-            background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
-            -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
-            background-clip: text; /* Thuộc tính chuẩn */
-            color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            display: inline-block;
-            width: auto;
-            margin-left: 200px;
-            margin-right: auto;
         }
-        table {
-            border-collapse: collapse;
+        #createAccountForm {
+            max-width: 600px;
             width: 100%;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            margin: 0 auto 40px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f0f0f0;
-            color: #333;
+        #createAccountForm label {
+            display: block;
+            margin-bottom: 10px;
             font-weight: bold;
-            text-align: center;
+            color: #333;
+            font-size: 16px;
         }
-        td {
-            color: #555;
-            text-align: center;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 5px;
+        #createAccountForm input[type="email"],
+        #createAccountForm input[type="password"],
+        #createAccountForm input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 16px;
+        }
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-container input[type="password"],
+        .password-container input[type="text"] {
+            flex: 1;
+            padding-right: 40px;
+        }
+        .password-container input[type="checkbox"] {
+            margin-left: 10px;
+            width: auto;
+        }
+        .password-container label {
+            margin-left: 5px;
+            font-weight: normal;
             font-size: 14px;
-            text-align: center;
         }
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        button[type="submit"] {
+        #createAccountForm button {
+            width: 100%;
+            padding: 12px;
             background-color: #4CAF50;
             color: white;
-            padding: 8px 16px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
+            font-size: 16px;
+            transition: background 0.3s;
         }
-        button[type="submit"]:hover {
+        #createAccountForm button:hover {
             background-color: #45a049;
         }
         #message {
@@ -164,6 +139,9 @@
             border-radius: 4px;
             font-size: 14px;
             display: none;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
         }
         .success {
             background-color: #d4edda;
@@ -175,61 +153,6 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        #createAccountForm {
-            max-width: 400px;
-            margin: 0 auto 40px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        #createAccountForm label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        #createAccountForm input[type="email"],
-        #createAccountForm input[type="password"],
-        #createAccountForm input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .password-container {
-            position: relative;
-        }
-        .password-container input {
-            padding-right: 40px;
-        }
-        .password-container .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #666;
-            font-size: 14px;
-        }
-        .password-container input[type="checkbox"] {
-            margin-right: 100px;
-        }
-        #createAccountForm button {
-            width: 100%;
-            padding: 10px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        #createAccountForm button:hover {
-            background-color: #27ae60;
-        }
     </style>
 </head>
 <body>
@@ -237,7 +160,7 @@
         <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
         <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
         <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'" >ALARMS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
         <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
@@ -251,12 +174,12 @@
             <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
             <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>           
             <div onclick="window.location.href='Setting-users.html'" class="active">6 - THÊM TÀI KHOẢN MỚI</div>
-            <div onclick="window.location.href='Setting-cpass.html'">5 - THAY ĐỔI MẬT KHẨU</div>  
-            <div onclick="window.location.href='Setting-delete.html'">5 - XÓA TÀI KHOẢN</div>
+            <div onclick="window.location.href='Setting-cpass.html'">7 - THAY ĐỔI MẬT KHẨU</div>  
+            <div onclick="window.location.href='Setting-delete.html'">8 - XÓA TÀI KHOẢN</div>
         </div>
 
         <div class="content">
-            <h2>Tạo tài khoản mới (Chỉ dành cho Admin)</h2>
+            <h2>TẠO TÀI KHOẢN MỚI (Chỉ dành cho Admin)</h2>
             <form id="createAccountForm">
                 <label>Mật khẩu Admin:</label>
                 <div class="password-container">
@@ -275,97 +198,85 @@
                 <button type="submit">Tạo tài khoản</button>
             </form>
             <p id="message"></p>
-        
-<script>
+        </div>
+    </div>
 
-// Hàm hiển thị/ẩn mật khẩu
-function togglePassword(inputId) {
+    <script>
+        function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const checkbox = document.getElementById(inputId === 'adminPassword' ? 'showAdminPassword' : 'showNewPassword');
             input.type = checkbox.checked ? 'text' : 'password';
         }
-
-// Kiểm tra trạng thái đăng nhập khi vào trang
-async function checkSession() {
-    try {
-        const response = await fetch('http://127.0.0.1:3000/check-session');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Lỗi kiểm tra session:', error);
-        return { loggedIn: false };
-    }
-}
-
-// Xử lý form tạo tài khoản
-document.getElementById('createAccountForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const adminPassword = document.getElementById('adminPassword').value;
-    const newEmail = document.getElementById('newEmail').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const message = document.getElementById('message');
-
-                // Hiển thị hộp thoại xác nhận
-                const confirmed = confirm(`Bạn có chắc chắn muốn tạo tài khoản ${newEmail} không? `);
+        async function checkSession() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/check-session');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Lỗi kiểm tra session:', error);
+                return { loggedIn: false };
+            }
+        }
+        document.getElementById('createAccountForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const adminPassword = document.getElementById('adminPassword').value;
+            const newEmail = document.getElementById('newEmail').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const message = document.getElementById('message');
+            const confirmed = confirm(`Bạn có chắc chắn muốn tạo tài khoản ${newEmail} không? `);
             if (!confirmed) {
                 return;
             }
-
-    try {
-        const response = await fetch('http://127.0.0.1:3000/create-account', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
-            body: JSON.stringify({ adminPassword, newEmail, newPassword })
+            try {
+                const response = await fetch('http://127.0.0.1:3000/create-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ adminPassword, newEmail, newPassword })
+                });
+                const data = await response.json();
+                message.textContent = data.message;
+                message.style.display = 'block';
+                if (response.status === 200) {
+                    message.classList.remove('error');
+                    message.classList.add('success');
+                    document.getElementById('createAccountForm').reset();
+                } else {
+                    message.classList.remove('success');
+                    message.classList.add('error');
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                message.textContent = 'Lỗi: ' + error.message;
+                message.classList.remove('success');
+                message.classList.add('error');
+            }
         });
-        const data = await response.json();
-        message.textContent = data.message;
-        message.style.display = 'block'; // <== thêm dòng này để đảm bảo nó hiện ra
-
-        if (response.status === 200) {
-            message.classList.remove('error');
-            message.classList.add('success');
-            document.getElementById('createAccountForm').reset();
-        } else {
-            message.classList.remove('success');
-            message.classList.add('error');
+        function handleLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
         }
-    } catch (error) {
-        console.error('Lỗi:', error);
-        message.textContent = 'Lỗi: ' + error.message;
-        message.classList.remove('success');
-        message.classList.add('error');
-    }
-});
-
-function handleLogout() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        logout().then(() => {
-            window.location.href = 'index.html';
-        }).catch(error => {
-            console.error('Lỗi khi đăng xuất:', error);
-            alert('Đăng xuất thất bại. Vui lòng thử lại.');
-        });
-    }
-}
-async function logout() {
-    try {
-        const response = await fetch('http://127.0.0.1:3000/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
-        });
-        const data = await response.json();
-        console.log('Phản hồi từ server:', data.message);
-
-        // Xóa role khỏi localStorage
-        localStorage.removeItem('role');
-        return data; // Trả về để xử lý trong then
-    } catch (error) {
-        throw error; // Ném lỗi để catch bên ngoài xử lý
-    }
-}
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+                localStorage.removeItem('role');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
     </script>
-    
 </body>
 </html>
