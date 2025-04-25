@@ -10,5 +10,5 @@ git checkout feature/my-work
 git merge main
 
 git add .
-git commit -m "hoàn thành alarm"
+git commit -m "hoàn thành hết giao diện"
 git push origin feature/my-work
