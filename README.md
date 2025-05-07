@@ -1,7 +1,7 @@
 git pull
 
 git add .
-git commit -m "thêm logout"
+git commit -m "shift"
 git push
 
 git checkout main

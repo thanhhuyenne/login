@@ -126,6 +126,55 @@ function isAdmin(req, res, next) {
   }
 }
 
+function isLogin(req, res, next) {
+  console.log('Session hiện tại:', req.session); // Thêm dòng này để kiểm tra
+  if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'user')) {
+    next(); // Cho phép tiếp tục nếu là admin
+  } else {
+    res.status(403).json({
+      status: 'error',
+      message: 'Bạn cần đăng nhập để dùng tính năng này.'
+    });
+  }
+}
+
+// Hàm tạo bảng nếu chưa tồn tại (sử dụng trong API)
+async function createWorkScheduleTable() {
+  const createTable = `
+      CREATE TABLE IF NOT EXISTS work_schedule (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          day INT NOT NULL CHECK (day BETWEEN 2 AND 8),
+          shift VARCHAR(10) NOT NULL,
+          start_time TIME,
+          end_time TIME,
+          INDEX idx_day_shift (day, shift)
+      );
+  `;
+  await poolManager.execute(createTable);
+
+  // Kiểm tra xem bảng có dữ liệu không
+  const [rows] = await poolManager.execute('SELECT COUNT(*) as count FROM work_schedule');
+  const count = rows[0].count;
+
+  // Nếu bảng rỗng, chèn dữ liệu ban đầu (21 bản ghi: 3 ca x 7 ngày)
+  if (count === 0) {
+    const shifts = ['Ca 1', 'Ca 2', 'Ca 3'];
+    const days = [2, 3, 4, 5, 6, 7, 8]; // Thứ 2 đến Chủ nhật
+    const insertData = [];
+
+    for (const day of days) {
+      for (const shift of shifts) {
+        insertData.push([day, shift, null, null]);
+      }
+    }
+
+    await poolManager.query(
+      'INSERT INTO work_schedule (day, shift, start_time, end_time) VALUES ?',
+      [insertData]
+    );
+  }
+}
+
 // Tạo schema modbus_manager và bảng EditHistory
 async function initializeEditHistoryTable() {
   try {
@@ -227,6 +276,46 @@ app.get('/check-role', (req, res) => {
   }
 
   return res.status(200).json({ role: req.session.user.role });
+});
+
+// Lấy lịch làm việc
+app.get('/get-work-schedule', async (req, res) => {
+  try {
+    // Tạo bảng nếu chưa tồn tại
+    await createWorkScheduleTable();
+
+    const [rows] = await poolManager.execute('SELECT * FROM work_schedule');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi server khi lấy lịch làm việc' });
+  }
+});
+
+// Cập nhật lịch làm việc
+app.post('/update-work-schedule', async (req, res) => {
+  try {
+    // Tạo bảng nếu chưa tồn tại
+    await createWorkScheduleTable();
+
+    const schedule = req.body;
+    for (const item of schedule) {
+      const { id, day, shift, start_time, end_time } = item;
+      if (id) {
+        await poolManager.execute(
+          'UPDATE work_schedule SET start_time = ?, end_time = ? WHERE id = ?',
+          [start_time || null, end_time || null, id]
+        );
+      } else {
+        await poolManager.execute(
+          'INSERT INTO work_schedule (day, shift, start_time, end_time) VALUES (?, ?, ?, ?)',
+          [day, shift, start_time || null, end_time || null]
+        );
+      }
+    }
+    res.json({ message: 'Cập nhật lịch làm việc thành công' });
+  } catch (error) {
+    res.status(500).json({ error: 'Lỗi khi lưu lịch làm việc' });
+  }
 });
 
 // API /is-logged-in (API mới thay cho /check-session)
