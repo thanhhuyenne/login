@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch Làm Việc</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 30px;
+        font-weight: bold;
+        text-align: center;
+        background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
+        -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
+        background-clip: text; /* Thuộc tính chuẩn */
+        color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
+        -webkit-text-fill-color: transparent;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 8px;
+        display: inline-block;
+        width: auto;
+        margin-left: 200px;
+        margin-right: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        font-size: 14px;
+      }
+      th {
+        background-color: #f0f0f0;
+        color: #333;
+        font-weight: bold;
+      }
+      td {
+        position: relative;
+      }
+      .time-input {
+        width: 45px;
+        padding: 2px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .time-label {
+        font-size: 12px;
+        margin-left: 2px;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 20px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 0 10px;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: none;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+
+    <div class="container">
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-work-schedule.html'" class="active">
+          7 - LỊCH LÀM VIỆC
+        </div>
+      </div>
+
+      <div class="content">
+        <h2>LỊCH LÀM VIỆC</h2>
+
+        <table id="scheduleTable">
+          <thead>
+            <tr>
+              <th>Giờ làm<br />Việc</th>
+              <th>Ngày</th>
+              <th>Thứ 2</th>
+              <th>Thứ 3</th>
+              <th>Thứ 4</th>
+              <th>Thứ 5</th>
+              <th>Thứ 6</th>
+              <th>Thứ 7</th>
+              <th>Chủ nhật</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleTableBody"></tbody>
+        </table>
+
+        <div class="button-container">
+          <button onclick="saveSchedule()">Lưu Lịch Làm Việc</button>
+        </div>
+        <div id="message"></div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+      // Dữ liệu mặc định nếu API trả về rỗng
+      let scheduleData = [
+        { id: 1, day: 2, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 2, day: 2, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 3, day: 2, shift: 'Ca 3', start_time: null, end_time: null },
+        { id: 4, day: 3, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 5, day: 3, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 6, day: 3, shift: 'Ca 3', start_time: null, end_time: null },
+        { id: 7, day: 4, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 8, day: 4, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 9, day: 4, shift: 'Ca 3', start_time: null, end_time: null },
+        { id: 10, day: 5, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 11, day: 5, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 12, day: 5, shift: 'Ca 3', start_time: null, end_time: null },
+        { id: 13, day: 6, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 14, day: 6, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 15, day: 6, shift: 'Ca 3', start_time: null, end_time: null },
+        { id: 16, day: 7, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 17, day: 7, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 18, day: 7, shift: 'Ca 3', start_time: null, end_time: null },
+        { id: 19, day: 8, shift: 'Ca 1', start_time: null, end_time: null },
+        { id: 20, day: 8, shift: 'Ca 2', start_time: null, end_time: null },
+        { id: 21, day: 8, shift: 'Ca 3', start_time: null, end_time: null }
+      ];
+
+      // Hàm tải dữ liệu lịch làm việc
+      async function loadSchedule() {
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'none';
+
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-work-schedule', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            const errorMessage = errorData.error || `HTTP error! Status: ${response.status}`;
+            throw new Error(errorMessage);
+          }
+
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi từ server không phải JSON');
+          }
+
+          const apiData = await response.json();
+
+          // Hợp nhất dữ liệu từ API với scheduleData mặc định
+          const mergedData = [];
+          scheduleData.forEach((defaultEntry) => {
+            const apiEntry = apiData.find(
+              (d) => d.day === defaultEntry.day && d.shift === defaultEntry.shift
+            );
+            if (apiEntry) {
+              mergedData.push({
+                id: apiEntry.id,
+                day: apiEntry.day,
+                shift: apiEntry.shift,
+                start_time: apiEntry.start_time,
+                end_time: apiEntry.end_time
+              });
+            } else {
+              mergedData.push(defaultEntry);
+            }
+          });
+          scheduleData = mergedData;
+
+          // Hiển thị bảng
+          displayTable();
+        } catch (error) {
+          console.error('Lỗi khi tải lịch làm việc:', error);
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          if (error.message.includes('Failed to fetch')) {
+            messageDiv.textContent =
+              'Server không phản hồi, vui lòng kiểm tra kết nối hoặc đảm bảo server đang chạy.';
+          } else {
+            messageDiv.textContent = `Lỗi: ${error.message}`;
+          }
+          // Hiển thị bảng với dữ liệu mặc định nếu có lỗi
+          displayTable();
+        }
+      }
+
+      // Hàm hiển thị bảng
+      function displayTable() {
+        const tableBody = document.getElementById('scheduleTableBody');
+        tableBody.innerHTML = '';
+
+        const days = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+        const shifts = ['Ca 1', 'Ca 2', 'Ca 3'];
+
+        shifts.forEach((shift) => {
+          const rowStart = document.createElement('tr');
+          rowStart.innerHTML = `<td rowspan="2">${shift}</td><td>Bắt đầu</td>`;
+          days.forEach((day, index) => {
+            const dayIndex = index + 2; // 2-8
+            const schedule = scheduleData.find((s) => s.day === dayIndex && s.shift === shift);
+            const startTime =
+              schedule && schedule.start_time ? schedule.start_time.split(':') : ['', '', ''];
+            const startHour = startTime[0] || '';
+            const startMinute = startTime[1] || '';
+            rowStart.innerHTML += `
+                        <td>
+                            <input type="number" class="time-input" min="0" max="23" value="${startHour}" onchange="updateTime(this, ${dayIndex}, '${shift}', 'start')">h
+                            <input type="number" class="time-input" min="0" max="59" value="${startMinute}" onchange="updateTime(this, ${dayIndex}, '${shift}', 'start')">m
+                        </td>
+                    `;
+          });
+          tableBody.appendChild(rowStart);
+
+          const rowEnd = document.createElement('tr');
+          rowEnd.innerHTML = `<td>Kết thúc</td>`;
+          days.forEach((day, index) => {
+            const dayIndex = index + 2;
+            const schedule = scheduleData.find((s) => s.day === dayIndex && s.shift === shift);
+            const endTime =
+              schedule && schedule.end_time ? schedule.end_time.split(':') : ['', '', ''];
+            const endHour = endTime[0] || '';
+            const endMinute = endTime[1] || '';
+            rowEnd.innerHTML += `
+                        <td>
+                            <input type="number" class="time-input" min="0" max="23" value="${endHour}" onchange="updateTime(this, ${dayIndex}, '${shift}', 'end')">h
+                            <input type="number" class="time-input" min="0" max="59" value="${endMinute}" onchange="updateTime(this, ${dayIndex}, '${shift}', 'end')">m
+                        </td>
+                    `;
+          });
+          tableBody.appendChild(rowEnd);
+        });
+      }
+
+      // Cập nhật thời gian khi thay đổi
+      function updateTime(input, day, shift, type) {
+        const row = input.closest('tr');
+        const inputs = row.querySelectorAll('.time-input');
+        const dayIndex = (day - 2) * 2; // Vị trí tương ứng với ngày
+        const hourInput = inputs[dayIndex];
+        const minuteInput = inputs[dayIndex + 1];
+        const hour = hourInput.value || null;
+        const minute = minuteInput.value || null;
+        const time = hour && minute ? `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}` : null;
+
+        const schedule = scheduleData.find((s) => s.day === day && s.shift === shift);
+        if (schedule) {
+          if (type === 'start') {
+            schedule.start_time = time;
+          } else {
+            schedule.end_time = time;
+          }
+        }
+      }
+
+      // Lưu lịch làm việc
+      async function saveSchedule() {
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'none';
+
+        try {
+          const response = await fetch('http://127.0.0.1:3000/update-work-schedule', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(scheduleData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            const errorMessage = errorData.error || `HTTP error! Status: ${response.status}`;
+            throw new Error(errorMessage);
+          }
+
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'success';
+          messageDiv.textContent = 'Lưu lịch làm việc thành công!';
+        } catch (error) {
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          if (error.message.includes('Failed to fetch')) {
+            messageDiv.textContent =
+              'Server không phản hồi, vui lòng kiểm tra kết nối hoặc đảm bảo server đang chạy.';
+          } else {
+            messageDiv.textContent = `Lỗi: ${error.message}`;
+          }
+        }
+      }
+
+      // Tải dữ liệu khi vào trang
+      window.onload = function () {
+        loadSchedule();
+      };
+    </script>
+  </body>
+</html>
