@@ -1234,10 +1234,11 @@ async function updateDeviceConfig(devices) {
 
 // Danh sách thiết bị Modbus
 const MODBUS_DEVICES = [
-  { ip: '127.0.0.1', slaveIds: [1, 2, 3] },
-  { ip: '127.0.0.2', slaveIds: [1, 2, 3] },
-  { ip: '127.0.0.3', slaveIds: [1, 2, 3] },
-  { ip: '127.0.0.4', slaveIds: [1, 2, 3] }
+  { ip: '127.0.0.1', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  { ip: '127.0.0.2', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  { ip: '127.0.0.3', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  { ip: '127.0.0.4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  { ip: '127.0.0.5'}
 ];
 
 // API Đọc dữ liệu từ Modbus
