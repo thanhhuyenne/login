@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Alarm Report</title>
     <style>
         * {
             margin: 0;
@@ -134,6 +134,13 @@
             text-align: center;
             margin: 20px 0;
         }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -160,7 +167,7 @@
                 <input type="month" id="month" value="2025-03">
                 <button onclick="fetchReport()">Xem báo cáo</button>
             </div>
-            <table class="report-table">
+            <table class="report-table" id="reportTable">
                 <thead>
                     <tr>
                         <th>Source</th>
@@ -176,9 +183,17 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="button-container">
+                <button onclick="exportToExcel()">Xuất Excel</button>
+                <button onclick="exportToPDF()">Xuất PDF</button>
+            </div>
         </div>
     </div>
 
+    <script src="/static/lib-js/exceljs.min.js"></script>
+    <script src="/static/lib-js/FileSaver.min.js"></script>
+    <script src="/static/lib-js/html2canvas.min.js"></script>
+    <script src="/static/lib-js/jspdf.umd.min.js"></script>
     <script>
         async function fetchReport() {
             const dateValue = document.getElementById("month").value;
@@ -211,6 +226,91 @@
                 document.getElementById("report-data").innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Lỗi khi lấy dữ liệu</td></tr>`;
             }
         }
+
+        function getFileNameSuffix() {
+            const dateValue = document.getElementById("month").value;
+            if (!dateValue) return "KhongXacDinh";
+            const [year, month] = dateValue.split("-");
+            const monthNames = [
+                "Mot", "Hai", "Ba", "Tu", "Nam", "Sau",
+                "Bay", "Tam", "Chin", "Muoi", "MuoiMot", "MuoiHai"
+            ];
+            return `Thang${monthNames[parseInt(month) - 1]}-${year}`;
+        }
+
+        async function exportToExcel() {
+            const table = document.getElementById('reportTable');
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Báo cáo điện năng');
+            const title = document.querySelector('h2').textContent;
+            worksheet.mergeCells('A1:E1');
+            const titleCell = worksheet.getCell('A1');
+            titleCell.value = title;
+            titleCell.font = { bold: true, size: 16 };
+            titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+            worksheet.addRow([]);
+            const headerRow = table.querySelector('thead tr');
+            const headerCells = Array.from(headerRow.cells).map(cell => cell.textContent);
+            const excelHeaderRow = worksheet.addRow(headerCells);
+            excelHeaderRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } };
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                cell.font = { bold: true, color: { argb: 'FF333333' } };
+                cell.alignment = { horizontal: 'center' };
+            });
+            const bodyRows = table.querySelectorAll('tbody tr');
+            bodyRows.forEach(row => {
+                const cells = Array.from(row.cells).map(cell => cell.textContent);
+                const excelRow = worksheet.addRow(cells);
+                excelRow.eachCell(cell => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    cell.font = { color: { argb: 'FF555555' } };
+                    cell.alignment = { horizontal: 'center' };
+                });
+            });
+            worksheet.columns.forEach(column => {
+                let maxLength = 10;
+                column.eachCell({ includeEmpty: true }, cell => {
+                    const length = cell.value ? cell.value.toString().length : 0;
+                    if (length > maxLength) maxLength = length;
+                });
+                column.width = maxLength + 2;
+            });
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, `BaoCaoDienNang-${getFileNameSuffix()}.xlsx`);
+        }
+
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const table = document.getElementById('reportTable');
+            const title = 'ELECTRICITY CONSUMPTION REPORT';
+            const canvas = await html2canvas(table, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+            pdf.setFont('times', 'normal');
+            pdf.setFontSize(16);
+            pdf.text(title, 148.5, 15, { align: 'center' });
+            const imgWidth = 277;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            const pageHeight = pdf.internal.pageSize.height;
+            let heightLeft = imgHeight;
+            let position = 25;
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - 30);
+            while (heightLeft > 0) {
+                pdf.addPage();
+                position = heightLeft - imgHeight;
+                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            pdf.save(`BaoCaoDienNang-${getFileNameSuffix()}.pdf`);
+        }
+
         function handleLogout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 logout().then(() => {
@@ -221,6 +321,7 @@
                 });
             }
         }
+
         async function logout() {
             try {
                 const response = await fetch('http://127.0.0.1:3000/logout', {
