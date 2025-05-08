@@ -175,6 +175,46 @@ async function createWorkScheduleTable() {
   }
 }
 
+// Hàm tạo bảng và chèn dữ liệu ban đầu nếu cần
+async function createAbnormalCurrentTable() {
+  try {
+    // Tạo bảng nếu chưa tồn tại
+    const createTable = `
+          CREATE TABLE IF NOT EXISTS abnormal_current (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              gateway VARCHAR(50) NOT NULL,
+              slaveid INT NOT NULL,
+              current FLOAT NOT NULL DEFAULT 1.1
+          );
+      `;
+    await poolManager.execute(createTable);
+
+    // Kiểm tra xem bảng có dữ liệu không
+    const [rows] = await poolManager.execute('SELECT COUNT(*) as count FROM abnormal_current');
+    const count = rows[0].count;
+
+    // Nếu bảng rỗng, chèn dữ liệu ban đầu (48 bản ghi: 4 Gateway x 12 SlaveID)
+    if (count === 0) {
+      const gateways = ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4'];
+      const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+      const insertData = [];
+
+      for (const gateway of gateways) {
+        for (const slaveid of slaveIds) {
+          insertData.push([gateway, slaveid, 1.1]);
+        }
+      }
+
+      await poolManager.query('INSERT INTO abnormal_current (gateway, slaveid, current) VALUES ?', [
+        insertData
+      ]);
+    }
+  } catch (error) {
+    console.error('Lỗi khi tạo bảng abnormal_current hoặc chèn dữ liệu:', error.message);
+    throw error;
+  }
+}
+
 // Tạo schema modbus_manager và bảng EditHistory
 async function initializeEditHistoryTable() {
   try {
@@ -288,6 +328,47 @@ app.get('/get-work-schedule', async (req, res) => {
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: 'Lỗi server khi lấy lịch làm việc' });
+  }
+});
+
+// Lấy tham số dòng điện bất thường
+app.get('/get-abnormal-current', async (req, res) => {
+  try {
+    await createAbnormalCurrentTable();
+    const [rows] = await poolManager.execute('SELECT * FROM abnormal_current');
+    console.log(`Đã lấy dữ liệu: ${rows.length} bản ghi từ abnormal_current.`);
+    res.json(rows);
+  } catch (error) {
+    console.error('Lỗi trong API /get-abnormal-current:', error.message);
+    res.status(500).json({ error: 'Lỗi server khi lấy tham số dòng điện' });
+  }
+});
+
+// Cập nhật tham số dòng điện bất thường
+app.post('/update-abnormal-current', async (req, res) => {
+  try {
+    await createAbnormalCurrentTable();
+    const data = req.body;
+
+    for (const item of data) {
+      const { id, gateway, slaveid, current } = item;
+      if (id) {
+        await poolManager.execute('UPDATE abnormal_current SET current = ? WHERE id = ?', [
+          current,
+          id
+        ]);
+      } else {
+        await poolManager.execute(
+          'INSERT INTO abnormal_current (gateway, slaveid, current) VALUES (?, ?, ?)',
+          [gateway, slaveid, current]
+        );
+      }
+    }
+    console.log('Đã cập nhật tham số dòng điện thành công.');
+    res.json({ message: 'Cập nhật tham số dòng điện thành công' });
+  } catch (error) {
+    console.error('Lỗi trong API /update-abnormal-current:', error.message);
+    res.status(500).json({ error: 'Lỗi khi lưu tham số dòng điện' });
   }
 });
 
@@ -1237,8 +1318,8 @@ const MODBUS_DEVICES = [
   { ip: '127.0.0.1', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
   { ip: '127.0.0.2', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
   { ip: '127.0.0.3', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-  { ip: '127.0.0.4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-  { ip: '127.0.0.5'}
+  { ip: '127.0.0.4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] } //,
+  //{ ip: '127.0.0.5' }
 ];
 
 // API Đọc dữ liệu từ Modbus
