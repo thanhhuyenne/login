@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cài Đặt Dòng Điện Bất Thường</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .container {
+        display: flex;
+        height: calc(100vh - 40px);
+        padding: 20px;
+      }
+      .sidebar {
+        width: 250px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: #f9f9f9;
+        transition: all 0.3s;
+      }
+      .sidebar div:hover {
+        background: #e0e0e0;
+      }
+      .sidebar .active {
+        background: #4caf50;
+        color: white;
+        border-color: #4caf50;
+      }
+      .content {
+        flex-grow: 1;
+        padding: 20px;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-left: 20px;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        font-size: 14px;
+      }
+      th {
+        background-color: #4caf50;
+        color: white;
+        font-weight: bold;
+      }
+      td {
+        background-color: #f9f9f9;
+      }
+      .current-input {
+        width: 80px;
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      .unit {
+        font-size: 12px;
+        margin-left: 5px;
+        color: #666;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 20px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+        display: none;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span onclick="window.location.href='index.html'">LOG OUT</span>
+    </div>
+
+    <div class="container">
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
+        <div onclick="window.location.href='Setting-abnormal-current.html'" class="active">
+          8 - DÒNG ĐIỆN BẤT THƯỜNG
+        </div>
+      </div>
+
+      <div class="content">
+        <h2>CÀI ĐẶT DÒNG ĐIỆN BẤT THƯỜNG NGOÀI GIỜ LÀM VIỆC</h2>
+
+        <table id="currentTable">
+          <thead>
+            <tr>
+              <th>SlaveID</th>
+              <th>127.0.0.1</th>
+              <th>127.0.0.2</th>
+              <th>127.0.0.3</th>
+              <th>127.0.0.4</th>
+            </tr>
+          </thead>
+          <tbody id="currentTableBody"></tbody>
+        </table>
+
+        <div class="button-container">
+          <button onclick="saveCurrent()">Lưu Tham Số Dòng Điện</button>
+        </div>
+        <div id="message"></div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+      // Dữ liệu mặc định nếu API trả về rỗng
+      let currentData = [];
+      const gateways = ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4'];
+      const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+      let idCounter = 1;
+      gateways.forEach((gateway) => {
+        slaveIds.forEach((slaveid) => {
+          currentData.push({ id: idCounter++, gateway: gateway, slaveid: slaveid, current: 1.1 });
+        });
+      });
+
+      // Hàm tải dữ liệu tham số dòng điện
+      async function loadCurrent() {
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'none';
+
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-abnormal-current', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            const errorMessage = errorData.error || `HTTP error! Status: ${response.status}`;
+            throw new Error(errorMessage);
+          }
+
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi từ server không phải JSON');
+          }
+
+          const apiData = await response.json();
+          console.log('Dữ liệu từ API:', apiData);
+
+          // Hợp nhất dữ liệu từ API với currentData mặc định
+          const mergedData = [];
+          currentData.forEach((defaultEntry) => {
+            const apiEntry = apiData.find(
+              (d) => d.gateway === defaultEntry.gateway && d.slaveid === defaultEntry.slaveid
+            );
+            if (apiEntry) {
+              mergedData.push({
+                id: apiEntry.id,
+                gateway: apiEntry.gateway,
+                slaveid: apiEntry.slaveid,
+                current: parseFloat(apiEntry.current.toFixed(2)) // Làm tròn xuống 2 chữ số
+              });
+            } else {
+              mergedData.push(defaultEntry);
+            }
+          });
+          currentData = mergedData;
+          console.log('Dữ liệu sau hợp nhất:', currentData);
+
+          // Hiển thị bảng
+          displayTable();
+        } catch (error) {
+          console.error('Lỗi khi tải tham số dòng điện:', error);
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          if (error.message.includes('Failed to fetch')) {
+            messageDiv.textContent =
+              'Server không phản hồi, vui lòng kiểm tra kết nối hoặc đảm bảo server đang chạy.';
+          } else {
+            messageDiv.textContent = `Lỗi: ${error.message}`;
+          }
+          // Hiển thị bảng với dữ liệu mặc định nếu có lỗi
+          displayTable();
+        }
+      }
+
+      // Hàm hiển thị bảng
+      function displayTable() {
+        const tableBody = document.getElementById('currentTableBody');
+        tableBody.innerHTML = '';
+
+        slaveIds.forEach((slaveid) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+                    <td>${slaveid}</td>
+                    ${gateways
+                      .map((gateway) => {
+                        const item = currentData.find(
+                          (d) => d.gateway === gateway && d.slaveid === slaveid
+                        );
+                        return `<td><input type="number" class="current-input" step="0.1" min="0" value="${
+                          item ? parseFloat(item.current.toFixed(2)) : 1.1
+                        }" onchange="updateCurrent(this, '${gateway}', ${slaveid})"> <span class="unit">A</span></td>`;
+                      })
+                      .join('')}
+                `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Cập nhật giá trị dòng điện khi thay đổi
+      function updateCurrent(input, gateway, slaveid) {
+        const current = parseFloat(input.value);
+        const item = currentData.find((d) => d.gateway === gateway && d.slaveid === slaveid);
+        if (item) {
+          item.current = isNaN(current) ? 1.1 : parseFloat(current.toFixed(2)); // Làm tròn xuống 2 chữ số
+        }
+      }
+
+      // Lưu tham số dòng điện
+      async function saveCurrent() {
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'none';
+
+        // Kiểm tra tất cả các ô có giá trị số không
+        const invalidEntry = currentData.find((item) => !item.current || isNaN(item.current));
+        if (invalidEntry) {
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          messageDiv.textContent = 'Vui lòng nhập đầy đủ giá trị số cho tất cả các ô dòng điện!';
+          return;
+        }
+
+        // Làm tròn tất cả current trước khi gửi
+        currentData = currentData.map((item) => ({
+          ...item,
+          current: parseFloat(item.current.toFixed(2))
+        }));
+
+        try {
+          const response = await fetch('http://127.0.0.1:3000/update-abnormal-current', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            const errorMessage = errorData.error || `HTTP error! Status: ${response.status}`;
+            throw new Error(errorMessage);
+          }
+
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'success';
+          messageDiv.textContent = 'Lưu tham số dòng điện thành công!';
+        } catch (error) {
+          console.error('Lỗi khi lưu tham số dòng điện:', error);
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          if (error.message.includes('Failed to fetch')) {
+            messageDiv.textContent =
+              'Server không phản hồi, vui lòng kiểm tra kết nối hoặc đảm bảo server đang chạy.';
+          } else {
+            messageDiv.textContent = `Lỗi: ${error.message}`;
+          }
+        }
+      }
+
+      // Tải dữ liệu khi vào trang
+      window.onload = function () {
+        loadCurrent();
+      };
+    </script>
+  </body>
+</html>
