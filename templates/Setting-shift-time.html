@@ -17,7 +17,7 @@
         flex-direction: column;
       }
       .navbar {
-        background-color: #4caf50;
+        background-color: #4CAF50;
         color: white;
         padding: 10px;
         display: flex;
@@ -70,44 +70,62 @@
         flex-direction: column;
       }
       h2 {
-        font-size: 30px;
+        font-size: 24px;
         font-weight: bold;
-        text-align: center;
-        background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
-        -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
-        background-clip: text; /* Thuộc tính chuẩn */
-        color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
-        -webkit-text-fill-color: transparent;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        margin-bottom: 20px;
-        padding: 10px;
-        border-radius: 8px;
-        display: inline-block;
-        width: auto;
-        margin-left: 200px;
-        margin-right: auto;
-      }
-      table {
-        border-collapse: collapse;
-        width: 100%;
-        background-color: #fff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
       }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
+      .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .filter-container label {
         font-size: 14px;
       }
-      th {
-        background-color: #f0f0f0;
-        color: #333;
+      select, input, button {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:disabled {
+        background-color: #a0a0a0;
+        cursor: not-allowed;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .report-table th, .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+      }
+      .report-table th {
+        background: #4CAF50;
+        color: white;
         font-weight: bold;
       }
-      td {
-        position: relative;
+      .report-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .report-table tr:hover {
+        background: #f1f1f1;
       }
       .time-input {
         width: 45px;
@@ -123,26 +141,23 @@
       .button-container {
         text-align: center;
         margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
       }
-      button {
-        background-color: #4caf50;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        margin: 0 10px;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: #45a049;
+      .error-message {
+        display: none;
+        font-size: 18px;
+        color: red;
+        text-align: center;
+        margin: 20px 0;
       }
       #message {
         margin-top: 10px;
         padding: 10px;
         border-radius: 4px;
         font-size: 14px;
+        text-align: center;
         display: none;
       }
       .success {
@@ -173,22 +188,19 @@
         <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
         <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
         <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">
-          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
-        </div>
-        <div onclick="window.location.href='Setting-history-editer.html'">
-          5 - LỊCH SỬ CHỈNH SỬA
-        </div>
+        <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
+        <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
         <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-        <div onclick="window.location.href='Setting-work-schedule.html'" class="active">
-          7 - LỊCH LÀM VIỆC
-        </div>
+        <div onclick="window.location.href='Setting-shift-time.html'" class="active">7 - LỊCH LÀM VIỆC</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
+        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
       </div>
 
       <div class="content">
         <h2>LỊCH LÀM VIỆC</h2>
 
-        <table id="scheduleTable">
+        <table id="scheduleTable" class="report-table">
           <thead>
             <tr>
               <th>Giờ làm<br />Việc</th>
@@ -214,7 +226,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-      // Dữ liệu mặc định nếu API trả về rỗng
       let scheduleData = [
         { id: 1, day: 2, shift: 'Ca 1', start_time: null, end_time: null },
         { id: 2, day: 2, shift: 'Ca 2', start_time: null, end_time: null },
@@ -239,7 +250,6 @@
         { id: 21, day: 8, shift: 'Ca 3', start_time: null, end_time: null }
       ];
 
-      // Hàm tải dữ liệu lịch làm việc
       async function loadSchedule() {
         const messageDiv = document.getElementById('message');
         messageDiv.style.display = 'none';
@@ -265,7 +275,6 @@
 
           const apiData = await response.json();
 
-          // Hợp nhất dữ liệu từ API với scheduleData mặc định
           const mergedData = [];
           scheduleData.forEach((defaultEntry) => {
             const apiEntry = apiData.find(
@@ -285,7 +294,6 @@
           });
           scheduleData = mergedData;
 
-          // Hiển thị bảng
           displayTable();
         } catch (error) {
           console.error('Lỗi khi tải lịch làm việc:', error);
@@ -297,12 +305,10 @@
           } else {
             messageDiv.textContent = `Lỗi: ${error.message}`;
           }
-          // Hiển thị bảng với dữ liệu mặc định nếu có lỗi
           displayTable();
         }
       }
 
-      // Hàm hiển thị bảng
       function displayTable() {
         const tableBody = document.getElementById('scheduleTableBody');
         tableBody.innerHTML = '';
@@ -314,7 +320,7 @@
           const rowStart = document.createElement('tr');
           rowStart.innerHTML = `<td rowspan="2">${shift}</td><td>Bắt đầu</td>`;
           days.forEach((day, index) => {
-            const dayIndex = index + 2; // 2-8
+            const dayIndex = index + 2;
             const schedule = scheduleData.find((s) => s.day === dayIndex && s.shift === shift);
             const startTime =
               schedule && schedule.start_time ? schedule.start_time.split(':') : ['', '', ''];
@@ -349,11 +355,10 @@
         });
       }
 
-      // Cập nhật thời gian khi thay đổi
       function updateTime(input, day, shift, type) {
         const row = input.closest('tr');
         const inputs = row.querySelectorAll('.time-input');
-        const dayIndex = (day - 2) * 2; // Vị trí tương ứng với ngày
+        const dayIndex = (day - 2) * 2;
         const hourInput = inputs[dayIndex];
         const minuteInput = inputs[dayIndex + 1];
         const hour = hourInput.value || null;
@@ -370,7 +375,6 @@
         }
       }
 
-      // Lưu lịch làm việc
       async function saveSchedule() {
         const messageDiv = document.getElementById('message');
         messageDiv.style.display = 'none';
@@ -405,7 +409,6 @@
         }
       }
 
-      // Tải dữ liệu khi vào trang
       window.onload = function () {
         loadSchedule();
       };

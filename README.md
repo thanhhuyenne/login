@@ -10,5 +10,5 @@ git checkout feature/my-work
 git merge main
 
 git add .
-git commit -m "alarm"
+git commit -m "setting"
 git push origin feature/my-work
