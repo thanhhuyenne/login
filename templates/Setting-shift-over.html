@@ -9,14 +9,15 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: Arial, sans-serif;
       }
       body {
-        background-color: #f4f4f4;
-        color: #333;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       .navbar {
-        background-color: #4caf50;
+        background-color: #4CAF50;
         color: white;
         padding: 10px;
         display: flex;
@@ -31,71 +32,100 @@
       .navbar span:hover {
         background: rgba(255, 255, 255, 0.2);
       }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
       .container {
         display: flex;
-        height: calc(100vh - 40px);
-        padding: 20px;
+        flex: 1;
       }
       .sidebar {
         width: 250px;
-        background: #fff;
+        background: #f4f4f4;
         padding: 15px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
       .sidebar div {
         margin-bottom: 10px;
         cursor: pointer;
         font-size: 14px;
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 1px solid #ccc;
         border-radius: 4px;
-        background: #f9f9f9;
-        transition: all 0.3s;
+        background: white;
+        transition: background 0.3s;
       }
       .sidebar div:hover {
-        background: #e0e0e0;
+        background: rgba(0, 0, 0, 0.1);
       }
-      .sidebar .active {
-        background: #4caf50;
-        color: white;
-        border-color: #4caf50;
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
       }
       .content {
-        flex-grow: 1;
+        flex: 1;
         padding: 20px;
         background: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
       }
       h2 {
         font-size: 24px;
         font-weight: bold;
-        text-align: center;
         margin-bottom: 20px;
-        color: #333;
       }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #fff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
       }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
+      .filter-container label {
         font-size: 14px;
       }
-      th {
-        background-color: #4caf50;
+      select, input, button {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:disabled {
+        background-color: #a0a0a0;
+        cursor: not-allowed;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .report-table th, .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+      }
+      .report-table th {
+        background: #4CAF50;
         color: white;
         font-weight: bold;
       }
-      td {
-        background-color: #f9f9f9;
+      .report-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .report-table tr:hover {
+        background: #f1f1f1;
       }
       .current-input {
         width: 80px;
@@ -113,19 +143,16 @@
       .button-container {
         text-align: center;
         margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
       }
-      button {
-        background-color: #4caf50;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: #45a049;
+      .error-message {
+        display: none;
+        font-size: 18px;
+        color: red;
+        text-align: center;
+        margin: 20px 0;
       }
       #message {
         margin-top: 10px;
@@ -163,23 +190,19 @@
         <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
         <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
         <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">
-          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
-        </div>
-        <div onclick="window.location.href='Setting-history-editer.html'">
-          5 - LỊCH SỬ CHỈNH SỬA
-        </div>
+        <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
+        <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
         <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
         <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
-        <div onclick="window.location.href='Setting-abnormal-current.html'" class="active">
-          8 - DÒNG ĐIỆN BẤT THƯỜNG
-        </div>
+        <div onclick="window.location.href='Setting-shift-over.html'" class="active">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
+        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
       </div>
 
       <div class="content">
         <h2>CÀI ĐẶT DÒNG ĐIỆN BẤT THƯỜNG NGOÀI GIỜ LÀM VIỆC</h2>
 
-        <table id="currentTable">
+        <table id="currentTable" class="report-table">
           <thead>
             <tr>
               <th>SlaveID</th>
@@ -201,7 +224,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-      // Dữ liệu mặc định nếu API trả về rỗng
       let currentData = [];
       const gateways = ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4'];
       const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -212,7 +234,6 @@
         });
       });
 
-      // Hàm tải dữ liệu tham số dòng điện
       async function loadCurrent() {
         const messageDiv = document.getElementById('message');
         messageDiv.style.display = 'none';
@@ -239,7 +260,6 @@
           const apiData = await response.json();
           console.log('Dữ liệu từ API:', apiData);
 
-          // Hợp nhất dữ liệu từ API với currentData mặc định
           const mergedData = [];
           currentData.forEach((defaultEntry) => {
             const apiEntry = apiData.find(
@@ -250,7 +270,7 @@
                 id: apiEntry.id,
                 gateway: apiEntry.gateway,
                 slaveid: apiEntry.slaveid,
-                current: parseFloat(apiEntry.current.toFixed(2)) // Làm tròn xuống 2 chữ số
+                current: parseFloat(apiEntry.current.toFixed(2))
               });
             } else {
               mergedData.push(defaultEntry);
@@ -259,7 +279,6 @@
           currentData = mergedData;
           console.log('Dữ liệu sau hợp nhất:', currentData);
 
-          // Hiển thị bảng
           displayTable();
         } catch (error) {
           console.error('Lỗi khi tải tham số dòng điện:', error);
@@ -271,12 +290,10 @@
           } else {
             messageDiv.textContent = `Lỗi: ${error.message}`;
           }
-          // Hiển thị bảng với dữ liệu mặc định nếu có lỗi
           displayTable();
         }
       }
 
-      // Hàm hiển thị bảng
       function displayTable() {
         const tableBody = document.getElementById('currentTableBody');
         tableBody.innerHTML = '';
@@ -300,21 +317,18 @@
         });
       }
 
-      // Cập nhật giá trị dòng điện khi thay đổi
       function updateCurrent(input, gateway, slaveid) {
         const current = parseFloat(input.value);
         const item = currentData.find((d) => d.gateway === gateway && d.slaveid === slaveid);
         if (item) {
-          item.current = isNaN(current) ? 1.1 : parseFloat(current.toFixed(2)); // Làm tròn xuống 2 chữ số
+          item.current = isNaN(current) ? 1.1 : parseFloat(current.toFixed(2));
         }
       }
 
-      // Lưu tham số dòng điện
       async function saveCurrent() {
         const messageDiv = document.getElementById('message');
         messageDiv.style.display = 'none';
 
-        // Kiểm tra tất cả các ô có giá trị số không
         const invalidEntry = currentData.find((item) => !item.current || isNaN(item.current));
         if (invalidEntry) {
           messageDiv.style.display = 'block';
@@ -323,7 +337,6 @@
           return;
         }
 
-        // Làm tròn tất cả current trước khi gửi
         currentData = currentData.map((item) => ({
           ...item,
           current: parseFloat(item.current.toFixed(2))
@@ -360,7 +373,6 @@
         }
       }
 
-      // Tải dữ liệu khi vào trang
       window.onload = function () {
         loadCurrent();
       };
