@@ -93,15 +93,51 @@ const defaultDeviceConfig = [
   { ip: '127.0.0.1', slave_id: 1, rated_current: 11.0 },
   { ip: '127.0.0.1', slave_id: 2, rated_current: 14.5 },
   { ip: '127.0.0.1', slave_id: 3, rated_current: 21.0 },
+  { ip: '127.0.0.1', slave_id: 4, rated_current: 11.0 },
+  { ip: '127.0.0.1', slave_id: 5, rated_current: 14.5 },
+  { ip: '127.0.0.1', slave_id: 6, rated_current: 21.0 },
+  { ip: '127.0.0.1', slave_id: 7, rated_current: 11.0 },
+  { ip: '127.0.0.1', slave_id: 8, rated_current: 14.5 },
+  { ip: '127.0.0.1', slave_id: 9, rated_current: 21.0 },
+  { ip: '127.0.0.1', slave_id: 10, rated_current: 11.0 },
+  { ip: '127.0.0.1', slave_id: 11, rated_current: 14.5 },
+  { ip: '127.0.0.1', slave_id: 12, rated_current: 21.0 },
   { ip: '127.0.0.2', slave_id: 1, rated_current: 7.5 },
   { ip: '127.0.0.2', slave_id: 2, rated_current: 28.0 },
   { ip: '127.0.0.2', slave_id: 3, rated_current: 34.0 },
+  { ip: '127.0.0.2', slave_id: 4, rated_current: 11.0 },
+  { ip: '127.0.0.2', slave_id: 5, rated_current: 14.5 },
+  { ip: '127.0.0.2', slave_id: 6, rated_current: 21.0 },
+  { ip: '127.0.0.2', slave_id: 7, rated_current: 11.0 },
+  { ip: '127.0.0.2', slave_id: 8, rated_current: 14.5 },
+  { ip: '127.0.0.2', slave_id: 9, rated_current: 21.0 },
+  { ip: '127.0.0.2', slave_id: 10, rated_current: 11.0 },
+  { ip: '127.0.0.2', slave_id: 11, rated_current: 14.5 },
+  { ip: '127.0.0.2', slave_id: 12, rated_current: 21.0 },
   { ip: '127.0.0.3', slave_id: 1, rated_current: 11.0 },
   { ip: '127.0.0.3', slave_id: 2, rated_current: 14.5 },
   { ip: '127.0.0.3', slave_id: 3, rated_current: 7.5 },
+  { ip: '127.0.0.3', slave_id: 4, rated_current: 11.0 },
+  { ip: '127.0.0.3', slave_id: 5, rated_current: 14.5 },
+  { ip: '127.0.0.3', slave_id: 6, rated_current: 21.0 },
+  { ip: '127.0.0.3', slave_id: 7, rated_current: 11.0 },
+  { ip: '127.0.0.3', slave_id: 8, rated_current: 14.5 },
+  { ip: '127.0.0.3', slave_id: 9, rated_current: 21.0 },
+  { ip: '127.0.0.3', slave_id: 10, rated_current: 11.0 },
+  { ip: '127.0.0.3', slave_id: 11, rated_current: 14.5 },
+  { ip: '127.0.0.3', slave_id: 12, rated_current: 21.0 },
   { ip: '127.0.0.4', slave_id: 1, rated_current: 28.0 },
   { ip: '127.0.0.4', slave_id: 2, rated_current: 21.0 },
-  { ip: '127.0.0.4', slave_id: 3, rated_current: 41.0 }
+  { ip: '127.0.0.4', slave_id: 3, rated_current: 41.0 },
+  { ip: '127.0.0.4', slave_id: 4, rated_current: 11.0 },
+  { ip: '127.0.0.4', slave_id: 5, rated_current: 14.5 },
+  { ip: '127.0.0.4', slave_id: 6, rated_current: 21.0 },
+  { ip: '127.0.0.4', slave_id: 7, rated_current: 11.0 },
+  { ip: '127.0.0.4', slave_id: 8, rated_current: 14.5 },
+  { ip: '127.0.0.4', slave_id: 9, rated_current: 21.0 },
+  { ip: '127.0.0.4', slave_id: 10, rated_current: 11.0 },
+  { ip: '127.0.0.4', slave_id: 11, rated_current: 14.5 },
+  { ip: '127.0.0.4', slave_id: 12, rated_current: 21.0 }
 ];
 
 clearSessionsTable();
@@ -1028,15 +1064,51 @@ async function initializeDeviceConfigTable() {
                 ('127.0.0.1', 1, 11.0),
                 ('127.0.0.1', 2, 14.5),
                 ('127.0.0.1', 3, 21.0),
+                ('127.0.0.1', 4, 11.0 ),
+                ('127.0.0.1', 5, 14.5 ),
+                ('127.0.0.1', 6, 21.0 ),
+                ('127.0.0.1', 7, 11.0 ),
+                ('127.0.0.1', 8, 14.5 ),
+                ('127.0.0.1', 9, 21.0 ),
+                ('127.0.0.1', 10, 11.0 ),
+                ('127.0.0.1', 11, 14.5 ),
+                ('127.0.0.1', 12, 21.0 ),
                 ('127.0.0.2', 1, 7.5),
                 ('127.0.0.2', 2, 28.0),
                 ('127.0.0.2', 3, 34.0),
+                ('127.0.0.2', 4, 11.0 ),
+                ('127.0.0.2', 5, 14.5 ),
+                ('127.0.0.2', 6, 21.0 ),
+                ('127.0.0.2', 7, 11.0 ),
+                ('127.0.0.2', 8, 14.5 ),
+                ('127.0.0.2', 9, 21.0 ),
+                ('127.0.0.2', 10, 11.0 ),
+                ('127.0.0.2', 11, 14.5 ),
+                ('127.0.0.2', 12, 21.0 ),
                 ('127.0.0.3', 1, 11.0),
                 ('127.0.0.3', 2, 14.5),
                 ('127.0.0.3', 3, 7.5),
+                ('127.0.0.3', 4, 11.0 ),
+                ('127.0.0.3', 5, 14.5 ),
+                ('127.0.0.3', 6, 21.0 ),
+                ('127.0.0.3', 7, 11.0 ),
+                ('127.0.0.3', 8, 14.5 ),
+                ('127.0.0.3', 9, 21.0 ),
+                ('127.0.0.3', 10, 11.0 ),
+                ('127.0.0.3', 11, 14.5 ),
+                ('127.0.0.3', 12, 21.0 ),
                 ('127.0.0.4', 1, 28.0),
                 ('127.0.0.4', 2, 21.0),
-                ('127.0.0.4', 3, 41.0)
+                ('127.0.0.4', 3, 41.0),
+                ('127.0.0.4', 4, 11.0 ),
+                ('127.0.0.4', 5, 14.5 ),
+                ('127.0.0.4', 6, 21.0 ),
+                ('127.0.0.4', 7, 11.0 ),
+                ('127.0.0.4', 8, 14.5 ),
+                ('127.0.0.4', 9, 21.0 ),
+                ('127.0.0.4', 10, 11.0 ),
+                ('127.0.0.4', 11, 14.5 ),
+                ('127.0.0.4', 12, 21.0 )
             `);
       console.log('Đã tạo bảng DeviceConfig và chèn giá trị mặc định');
     }
@@ -1148,8 +1220,8 @@ const MODBUS_DEVICES = [
   { ip: '127.0.0.1', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
   { ip: '127.0.0.2', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
   { ip: '127.0.0.3', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-  { ip: '127.0.0.4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-  { ip: '127.0.0.5'}
+  { ip: '127.0.0.4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }
+  //{ ip: '127.0.0.5'}
 ];
 
 // API Đọc dữ liệu từ Modbus
@@ -1359,7 +1431,7 @@ async function saveModbusData(ip, slaveId, values) {
   );
 
   if (!deviceRows.length || !deviceRows[0].rated_current) {
-    console.warn(`⚠️ Không tìm thấy dòng định mức cho thiết bị ${deviceKey}`);
+    //console.warn(`⚠️ Không tìm thấy dòng định mức cho thiết bị ${deviceKey}`);
     return;
   }
 

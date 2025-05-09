@@ -224,8 +224,18 @@
 
             console.log(`📢 Gửi yêu cầu lấy dữ liệu theo: ${timeFilter}`);
 
+            let url;
+            if (timeFilter === 'thismonth') {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                url = `http://localhost:3000/api/getAlarmData?month=${year}-${month}&type=current`;
+            } else {
+                url = `http://localhost:3000/api/getAlarmData?filter=${timeFilter}&type=current`;
+            }
+
             try {
-                const response = await fetch(`http://localhost:3000/api/getAlarmData?filter=${timeFilter}&type=current`);
+                const response = await fetch(url);
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Lỗi khi lấy dữ liệu từ API');

@@ -146,7 +146,7 @@
         <span onclick="window.location.href='Alarm.html'" class="active">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'">SETTING</span>
-        <span onclick="window.location.href='index.html'">LOG OUT</span>
+        <span onclick="handleLogout()">LOG OUT</span>
     </div>
 
     <div class="container">
@@ -166,11 +166,11 @@
                     <option value="today">Hôm nay</option>
                     <option value="thismonth">Tháng này</option>
                 </select>
-                <button onclick="fetchAlarmDataByFilter()">Xem</button>
+                <button id="filterButton" onclick="fetchAlarmDataByFilter()">Xem</button>
 
                 <label for="monthPicker">Chọn tháng:</label>
                 <input type="month" id="monthPicker">
-                <button onclick="fetchAlarmDataByMonth()">Xem</button>
+                <button id="monthButton" onclick="fetchAlarmDataByMonth()">Xem</button>
 
                 <button onclick="window.location.href='stats_voltage.html'">Xem biểu đồ</button>
             </div>
@@ -206,16 +206,36 @@
     <script src="/static/lib-js/html2canvas.min.js"></script>
     <script src="/static/lib-js/jspdf.umd.min.js"></script>
     <script>
+        let isFetching = false;
+
         async function fetchAlarmDataByFilter() {
+            if (isFetching) return;
+
             const timeFilter = document.getElementById("timeFilter").value;
             const errorMessage = document.getElementById('errorMessage');
+            const filterButton = document.getElementById('filterButton');
+            const monthButton = document.getElementById('monthButton');
+
+            isFetching = true;
+            filterButton.disabled = true;
+            monthButton.disabled = true;
             errorMessage.style.display = 'none';
             errorMessage.textContent = '';
 
             console.log(`📢 Gửi yêu cầu lấy dữ liệu theo: ${timeFilter}`);
 
+            let url;
+            if (timeFilter === 'thismonth') {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                url = `http://localhost:3000/api/getAlarmData?month=${year}-${month}&type=voltage`;
+            } else {
+                url = `http://localhost:3000/api/getAlarmData?filter=${timeFilter}&type=voltage`;
+            }
+
             try {
-                const response = await fetch(`http://localhost:3000/api/getAlarmData?filter=${timeFilter}&type=voltage`);
+                const response = await fetch(url);
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Lỗi khi lấy dữ liệu từ API');
@@ -227,20 +247,32 @@
                 errorMessage.textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
                 errorMessage.style.display = 'block';
                 showNoDataMessage();
+            } finally {
+                isFetching = false;
+                filterButton.disabled = false;
+                monthButton.disabled = false;
             }
         }
 
         async function fetchAlarmDataByMonth() {
+            if (isFetching) return;
+
             const monthPicker = document.getElementById("monthPicker").value;
             const errorMessage = document.getElementById('errorMessage');
-            errorMessage.style.display = 'none';
-            errorMessage.textContent = '';
+            const filterButton = document.getElementById('filterButton');
+            const monthButton = document.getElementById('monthButton');
 
             if (!monthPicker) {
                 errorMessage.textContent = 'Vui lòng chọn tháng!';
                 errorMessage.style.display = 'block';
                 return;
             }
+
+            isFetching = true;
+            filterButton.disabled = true;
+            monthButton.disabled = true;
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
 
             console.log(`📢 Gửi yêu cầu lấy dữ liệu theo: Tháng ${monthPicker}`);
 
@@ -257,6 +289,10 @@
                 errorMessage.textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
                 errorMessage.style.display = 'block';
                 showNoDataMessage();
+            } finally {
+                isFetching = false;
+                filterButton.disabled = false;
+                monthButton.disabled = false;
             }
         }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alarm Chart</title>
+    <title>Alarm Chart - Quá Dòng</title>
     <style>
         * {
             margin: 0;
@@ -122,9 +122,17 @@
             position: relative;
             width: 100%;
             display: none;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        #alarmChart {
+        .chart-wrapper {
+            width: 100%;
+            height: 400px;
+            position: relative;
+        }
+
+        .chart-wrapper canvas {
             width: 100% !important;
             height: 100% !important;
         }
@@ -179,15 +187,32 @@
             </div>
             <div class="error-message" id="errorMessage"></div>
             <div class="chart-container" id="chartContainer">
-                <canvas id="alarmChart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart2"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart3"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart4"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let chartInstance;
-        const FIXED_LABELS = ['1-1', '1-2', '1-3', '2-1', '2-2', '2-3', '3-1', '3-2', '3-3', '4-1', '4-2', '4-3'];
+        let chartInstances = [];
+        const MODBUS_DEVICES = [
+            { ip: '127.0.0.1', ipLast: '1', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { ip: '127.0.0.2', ipLast: '2', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { ip: '127.0.0.3', ipLast: '3', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { ip: '127.0.0.4', ipLast: '4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }
+        ];
+        const FIXED_LABELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
         let isFetching = false;
 
         function debounce(func, wait) {
@@ -212,16 +237,14 @@
             errorMessage.style.display = 'none';
             chartContainer.style.display = 'none';
 
-            if (chartInstance) {
-                chartInstance.destroy();
-                chartInstance = null;
-            }
+            chartInstances.forEach(chart => chart?.destroy());
+            chartInstances = [];
 
             let url;
             if (type === 'filter') {
                 const timeFilter = document.getElementById('timeFilter').value;
                 url = `http://localhost:3000/api/alarm-stats?filter=${timeFilter}&type=current`;
-                console.log(`📢 Gửi yêu cầu lấy dữ liệu theo filter: ${timeFilter}`);
+                console.log(`📢 Gửi yêu cầu lấy dữ liệu quá dòng theo filter: ${timeFilter}`);
             } else {
                 const month = document.getElementById('monthPicker').value;
                 if (!month) {
@@ -233,7 +256,7 @@
                     return;
                 }
                 url = `http://localhost:3000/api/alarm-stats?filter=month=${month}&type=current`;
-                console.log(`📢 Gửi yêu cầu lấy dữ liệu theo tháng: ${month}`);
+                console.log(`📢 Gửi yêu cầu lấy dữ liệu quá dòng theo tháng: ${month}`);
             }
 
             try {
@@ -250,8 +273,8 @@
                     return;
                 }
 
-                drawAlarmChart(data);
-                chartContainer.style.display = 'block';
+                drawAlarmCharts(data);
+                chartContainer.style.display = 'flex';
             } catch (error) {
                 console.error('❌ Lỗi:', error);
                 errorMessage.textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
@@ -263,80 +286,86 @@
             }
         }
 
-        function drawAlarmChart(data) {
-            const lightData = new Array(FIXED_LABELS.length).fill(0);
-            const seriousData = new Array(FIXED_LABELS.length).fill(0);
-            const emergencyData = new Array(FIXED_LABELS.length).fill(0);
+        function drawAlarmCharts(data) {
+            const chartIds = ['chart1', 'chart2', 'chart3', 'chart4'];
 
-            data.forEach(item => {
-                const index = FIXED_LABELS.indexOf(item.device);
-                if (index !== -1) {
-                    lightData[index] = item.light || 0;
-                    seriousData[index] = item.serious || 0;
-                    emergencyData[index] = item.emergency || 0;
-                }
-            });
+            MODBUS_DEVICES.forEach((device, index) => {
+                const lightData = new Array(FIXED_LABELS.length).fill(0);
+                const seriousData = new Array(FIXED_LABELS.length).fill(0);
+                const emergencyData = new Array(FIXED_LABELS.length).fill(0);
 
-            const ctx = document.getElementById('alarmChart').getContext('2d');
+                data.forEach(item => {
+                    const [ipLast, slaveId] = item.device.split('-');
+                    if (ipLast === device.ipLast && FIXED_LABELS.includes(slaveId)) {
+                        const idx = FIXED_LABELS.indexOf(slaveId);
+                        lightData[idx] = item.light || 0;
+                        seriousData[idx] = item.serious || 0;
+                        emergencyData[idx] = item.emergency || 0;
+                    }
+                });
 
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: FIXED_LABELS,
-                    datasets: [
-                        {
-                            label: '🟡 Nhẹ',
-                            backgroundColor: 'yellow',
-                            data: lightData,
-                            stack: 'stack1'
-                        },
-                        {
-                            label: '🟠 Nghiêm trọng',
-                            backgroundColor: 'orange',
-                            data: seriousData,
-                            stack: 'stack1'
-                        },
-                        {
-                            label: '🔴 Khẩn cấp',
-                            backgroundColor: 'red',
-                            data: emergencyData,
-                            stack: 'stack1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' },
-                        title: {
-                            display: true,
-                            text: 'Thống kê lỗi quá dòng theo thiết bị'
-                        }
+                const ctx = document.getElementById(chartIds[index]).getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: FIXED_LABELS,
+                        datasets: [
+                            {
+                                label: '🟡 Nhẹ',
+                                backgroundColor: 'yellow',
+                                data: lightData,
+                                stack: 'stack1'
+                            },
+                            {
+                                label: '🟠 Nghiêm trọng',
+                                backgroundColor: 'orange',
+                                data: seriousData,
+                                stack: 'stack1'
+                            },
+                            {
+                                label: '🔴 Khẩn cấp',
+                                backgroundColor: 'red',
+                                data: emergencyData,
+                                stack: 'stack1'
+                            }
+                        ]
                     },
-                    scales: {
-                        x: {
-                            stacked: true,
-                            barPercentage: 0.8,
-                            categoryPercentage: 0.9,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
                             title: {
                                 display: true,
-                                text: '127.0.0.x-x',
-                                font: { size: 14 },
-                                color: '#000'
+                                text: `Thống kê lỗi quá dòng - ${device.ip}`,
+                                font: { size: 20 }
                             }
                         },
-                        y: {
-                            stacked: true,
-                            title: {
-                                display: true,
-                                text: 'Số lần',
-                                font: { size: 14 },
-                                color: '#000'
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Slave ID',
+                                    font: { size: 14 },
+                                    color: '#000'
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Số lần',
+                                    font: { size: 14 },
+                                    color: '#000'
+                                },
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
                             }
                         }
                     }
-                }
+                });
+                chartInstances.push(chart);
             });
         }
 
@@ -344,6 +373,7 @@
         document.getElementById('monthButton').onclick = debounce(() => fetchAlarmData('month'), 300);
 
         window.onload = () => fetchAlarmData('filter');
+
         function handleLogout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 logout().then(() => {
@@ -354,21 +384,20 @@
                 });
             }
         }
+
         async function logout() {
             try {
                 const response = await fetch('http://127.0.0.1:3000/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
+                    credentials: 'include'
                 });
                 const data = await response.json();
                 console.log('Phản hồi từ server:', data.message);
-
-                // Xóa role khỏi localStorage
                 localStorage.removeItem('role');
-                return data; // Trả về để xử lý trong then
+                return data;
             } catch (error) {
-                throw error; // Ném lỗi để catch bên ngoài xử lý
+                throw error;
             }
         }
     </script>
