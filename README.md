@@ -1,7 +1,7 @@
 git pull
 
 git add .
-git commit -m "thêm logout"
+git commit -m "shift"
 git push
 
 git checkout main
@@ -10,5 +10,5 @@ git checkout feature/my-work
 git merge main
 
 git add .
-git commit -m "hoàn thành hết giao diện"
+git commit -m "alarm"
 git push origin feature/my-work
