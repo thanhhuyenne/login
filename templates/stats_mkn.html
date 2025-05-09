@@ -122,9 +122,17 @@
             position: relative;
             width: 100%;
             display: none;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        #alarmChart {
+        .chart-wrapper {
+            width: 100%;
+            height: 400px; /* Giữ kích thước lớn như biểu đồ gốc */
+            position: relative;
+        }
+
+        .chart-wrapper canvas {
             width: 100% !important;
             height: 100% !important;
         }
@@ -179,15 +187,32 @@
             </div>
             <div class="error-message" id="errorMessage"></div>
             <div class="chart-container" id="chartContainer">
-                <canvas id="alarmChart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart2"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart3"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart4"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let chartInstance;
-        const FIXED_LABELS = ['1-1', '1-2', '1-3', '2-1', '2-2', '2-3', '3-1', '3-2', '3-3', '4-1', '4-2', '4-3'];
+        let chartInstances = [];
+        const MODBUS_DEVICES = [
+            { ip: '127.0.0.1', ipLast: '1', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { ip: '127.0.0.2', ipLast: '2', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { ip: '127.0.0.3', ipLast: '3', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { ip: '127.0.0.4', ipLast: '4', slaveIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }
+        ];
+        const FIXED_LABELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
         let isFetching = false;
 
         function debounce(func, wait) {
@@ -212,10 +237,8 @@
             errorMessage.style.display = 'none';
             chartContainer.style.display = 'none';
 
-            if (chartInstance) {
-                chartInstance.destroy();
-                chartInstance = null;
-            }
+            chartInstances.forEach(chart => chart?.destroy());
+            chartInstances = [];
 
             let url;
             if (type === 'filter') {
@@ -250,8 +273,8 @@
                     return;
                 }
 
-                drawAlarmChart(data);
-                chartContainer.style.display = 'block';
+                drawAlarmCharts(data);
+                chartContainer.style.display = 'flex';
             } catch (error) {
                 console.error('❌ Lỗi:', error);
                 errorMessage.textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
@@ -263,60 +286,69 @@
             }
         }
 
-        function drawAlarmChart(data) {
-            const disconnectData = new Array(FIXED_LABELS.length).fill(0);
+        function drawAlarmCharts(data) {
+            const chartIds = ['chart1', 'chart2', 'chart3', 'chart4'];
 
-            data.forEach(item => {
-                const index = FIXED_LABELS.indexOf(item.device);
-                if (index !== -1) {
-                    disconnectData[index] = item.count || 0;
-                }
-            });
+            MODBUS_DEVICES.forEach((device, index) => {
+                const disconnectData = new Array(FIXED_LABELS.length).fill(0);
 
-            const ctx = document.getElementById('alarmChart').getContext('2d');
+                data.forEach(item => {
+                    const [ipLast, slaveId] = item.device.split('-');
+                    if (ipLast === device.ipLast && FIXED_LABELS.includes(slaveId)) {
+                        const idx = FIXED_LABELS.indexOf(slaveId);
+                        disconnectData[idx] = item.count || 0;
+                    }
+                });
 
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: FIXED_LABELS,
-                    datasets: [
-                        {
-                            label: 'Số lần mất kết nối',
-                            backgroundColor: '#2196F3', // Màu xanh lam
+                const ctx = document.getElementById(chartIds[index]).getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: FIXED_LABELS,
+                        datasets: [{
+                            label: `Số lần mất kết nối (${device.ip})`,
+                            backgroundColor: '#2196F3',
                             data: disconnectData
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' },
-                        title: {
-                            display: true,
-                            text: 'Thống kê số lần mất kết nối theo thiết bị'
-                        }
+                        }]
                     },
-                    scales: {
-                        x: {
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
                             title: {
                                 display: true,
-                                text: '127.0.0.x-x',
-                                font: { size: 14 },
-                                color: '#000'
+                                text: `Thống kê mất kết nối - ${device.ip}`,
+                                font: {
+                                    size: 20 
+                                }
                             }
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Số lần',
-                                font: { size: 14 },
-                                color: '#000'
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Slave ID',
+                                    font: { size: 14 },
+                                    color: '#000'
+                                }
                             },
-                            beginAtZero: true
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Số lần',
+                                    font: { size: 14 },
+                                    color: '#000'
+                                },
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
                         }
                     }
-                }
+                });
+                chartInstances.push(chart);
             });
         }
 
@@ -324,6 +356,7 @@
         document.getElementById('monthButton').onclick = debounce(() => fetchAlarmData('month'), 300);
 
         window.onload = () => fetchAlarmData('filter');
+
         function handleLogout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 logout().then(() => {
@@ -334,6 +367,7 @@
                 });
             }
         }
+
         async function logout() {
             try {
                 const response = await fetch('http://127.0.0.1:3000/logout', {
