@@ -76,12 +76,16 @@
         }
         .filter-container {
             display: flex;
+            justify-content: center;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        select, input {
+        .filter-container label {
+            font-size: 14px;
+        }
+        select, input, button {
             padding: 8px;
             font-size: 14px;
             border: 1px solid #ccc;
@@ -90,21 +94,31 @@
         button {
             background-color: #4CAF50;
             color: white;
-            padding: 8px 16px;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
-        button[type="button"] {
-            background-color: #f44336;
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
         }
         button:hover:not(:disabled) {
             background-color: #45a049;
         }
-        button[type="button"]:hover {
-            background-color: #d32f2f;
+        .filter-container button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .filter-container button:hover:not(.active) {
+            background-color: #45a049;
+        }
+        .filter-container button.active {
+            background-color: white;
+            color: #4CAF50;
+            font-weight: bold;
+            border: 2px solid #ffcc00;
         }
         .report-table {
             width: 100%;
@@ -137,8 +151,17 @@
             font-size: 14px;
             text-align: center;
         }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
         input[type="number"]:focus {
             border-color: #4CAF50;
+        }
+        .unit {
+            font-size: 12px;
+            margin-left: 5px;
+            color: #666;
         }
         .button-container {
             text-align: center;
@@ -147,11 +170,25 @@
             justify-content: center;
             gap: 10px;
         }
+        .button-container button[type="button"] {
+            background-color: #f44336;
+        }
+        .button-container button[type="button"]:hover {
+            background-color: #d32f2f;
+        }
+        .error-message {
+            display: none;
+            font-size: 18px;
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+        }
         #message {
             margin-top: 10px;
             padding: 10px;
             border-radius: 4px;
             font-size: 14px;
+            text-align: center;
             display: none;
         }
         .success {
@@ -183,14 +220,22 @@
             <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
             <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
             <div onclick="window.location.href='Setting-rate-current.html'" class="active">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-            <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>           
+            <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
             <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-            <div onclick="window.location.href='Setting-cpass.html'">7 - THAY ĐỔI MẬT KHẨU</div>  
-            <div onclick="window.location.href='Setting-delete.html'">8 - XÓA TÀI KHOẢN</div>
+            <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
+            <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+            <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
+            <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
         </div>
 
         <div class="content">
             <h2>CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</h2>
+            <div class="filter-container">
+                <button onclick="loadArea('Khu vực 1', '127.0.0.1')" class="area-button active">Khu vực 1</button>
+                <button onclick="loadArea('Khu vực 2', '127.0.0.2')" class="area-button">Khu vực 2</button>
+                <button onclick="loadArea('Khu vực 3', '127.0.0.3')" class="area-button">Khu vực 3</button>
+                <button onclick="loadArea('Khu vực 4', '127.0.0.4')" class="area-button">Khu vực 4</button>
+            </div>
             <form id="deviceConfigForm">
                 <table class="report-table">
                     <thead>
@@ -205,8 +250,8 @@
                     </tbody>
                 </table>
                 <div class="button-container">
-                    <button type="submit">Save</button>
-                    <button type="button" id="resetButton">Reset</button>
+                    <button type="submit">Lưu</button>
+                    <button type="button" id="resetButton">Đặt lại</button>
                 </div>
             </form>
             <div id="message"></div>
@@ -214,25 +259,34 @@
     </div>
 
     <script>
-        async function loadDeviceConfig() {
+        let currentAreaIp = '127.0.0.1';
+
+        async function loadDeviceConfig(ip) {
             try {
                 const response = await fetch('http://127.0.0.1:3000/get-device-config');
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const devices = await response.json();
+                const filteredDevices = devices.filter(device => device.ip === ip);
                 const tbody = document.getElementById('deviceConfigTable');
                 tbody.innerHTML = '';
-                devices.forEach(device => {
+                const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+                slaveIds.forEach(slaveId => {
+                    const device = filteredDevices.find(d => d.slave_id === slaveId) || {
+                        ip: ip,
+                        slave_id: slaveId,
+                        rated_current: 0
+                    };
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${device.ip}</td>
                         <td>${device.slave_id}</td>
                         <td>${device.rated_current} A</td>
                         <td>
-                            <input type="number" step="0.1" name="rated_current_${device.ip}_${device.slave_id}" 
+                            <input type="number" step="0.1" min="0" name="rated_current_${device.ip}_${device.slave_id}" 
                                    value="${device.rated_current}" required>
-                            <span> A</span>
+                            <span class="unit">A</span>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -244,13 +298,26 @@
                 document.getElementById('message').textContent = `Lỗi: ${error.message}`;
             }
         }
+
+        function loadArea(areaName, ip) {
+            currentAreaIp = ip;
+            loadDeviceConfig(ip);
+            const buttons = document.querySelectorAll('.area-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+                if (button.textContent === areaName) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            loadDeviceConfig();
+            loadDeviceConfig(currentAreaIp);
             const form = document.getElementById('deviceConfigForm');
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const confirmed = window.confirm('Confirm edit?');
+                    const confirmed = window.confirm('Xác nhận chỉnh sửa?');
                     if (!confirmed) {
                         return;
                     }
@@ -293,7 +360,7 @@
                         if (result.status === "success") {
                             messageDiv.className = 'success';
                             messageDiv.textContent = `Lưu thành công!`;
-                            loadDeviceConfig();
+                            loadDeviceConfig(currentAreaIp);
                         } else {
                             messageDiv.className = 'error';
                             messageDiv.textContent = `Lỗi: ${result.message}`;
@@ -306,8 +373,9 @@
             } else {
                 console.error("Không tìm thấy form với id='deviceConfigForm'");
             }
+            const resetButton = document.getElementById('resetButton');
             resetButton.addEventListener('click', async () => {
-                const confirmed = window.confirm('Confirm edit?');
+                const confirmed = window.confirm('Xác nhận đặt lại?');
                 if (!confirmed) {
                     return;
                 }
@@ -332,7 +400,7 @@
                     if (result.status === "success") {
                         messageDiv.className = 'success';
                         messageDiv.textContent = `Đặt lại thành công!`;
-                        loadDeviceConfig();
+                        loadDeviceConfig(currentAreaIp);
                     } else {
                         messageDiv.className = 'error';
                         messageDiv.textContent = `Lỗi: ${result.message}`;
@@ -343,6 +411,7 @@
                 }
             });
         });
+
         function handleLogout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 logout().then(() => {
@@ -353,6 +422,7 @@
                 });
             }
         }
+
         async function logout() {
             try {
                 const response = await fetch('http://127.0.0.1:3000/logout', {
