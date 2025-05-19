@@ -211,6 +211,27 @@ async function createWorkScheduleTable() {
   }
 }
 
+// Tạo bảng abnormal_alerts để lưu cảnh báo
+async function createAbnormalAlertsTable() {
+  try {
+    const createTable = `
+      CREATE TABLE IF NOT EXISTS abnormal_alerts (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        ip VARCHAR(50) NOT NULL,
+        slave_id INT NOT NULL,
+        error_time DATETIME NOT NULL,
+        resolved_time DATETIME,
+        UNIQUE KEY unique_alert (ip, slave_id, error_time)
+      );
+    `;
+    await poolManager.execute(createTable);
+    console.log('Bảng abnormal_alerts đã được tạo hoặc đã tồn tại.');
+  } catch (error) {
+    console.error('Lỗi khi tạo bảng abnormal_alerts:', error.message);
+    throw error;
+  }
+}
+
 // Hàm tạo bảng và chèn dữ liệu ban đầu nếu cần
 async function createAbnormalCurrentTable() {
   try {
@@ -235,11 +256,11 @@ async function createAbnormalCurrentTable() {
       const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
       const insertData = [];
 
-      for (const gateway of gateways) {
-        for (const slaveid of slaveIds) {
-          insertData.push([gateway, slaveid, 1.1]);
-        }
-      }
+      // for (const gateway of gateways) {
+      //   for (const slaveid of slaveIds) {
+      //     insertData.push([gateway, slaveid, 1.1]);
+      //   }
+      // }
 
       await poolManager.query('INSERT INTO abnormal_current (gateway, slaveid, current) VALUES ?', [
         insertData
@@ -274,6 +295,145 @@ async function initializeEditHistoryTable() {
     throw error;
   }
 }
+
+// Hàm kiểm tra giờ làm việc dựa trên work_schedule
+async function isWorkingHours() {
+  const now = new Date(); // Thời gian hiện tại: 05:59 PM +07, Thứ Hai, 19/05/2025
+  const dayOfWeek = now.getDay() === 0 ? 8 : now.getDay() + 1; // 0 (CN) -> 8, 1 (T2) -> 2, ..., 6 (T7) -> 7
+  const currentTime = now.toTimeString().split(' ')[0]; // Lấy giờ hiện tại: "17:59:00"
+
+  // Lấy lịch làm việc từ bảng work_schedule
+  const [schedules] = await poolManager.execute(
+    'SELECT start_time, end_time FROM work_schedule WHERE day = ? AND start_time IS NOT NULL AND end_time IS NOT NULL',
+    [dayOfWeek]
+  );
+
+  // Kiểm tra xem thời gian hiện tại có nằm trong ca làm việc nào không
+  for (const schedule of schedules) {
+    const startTime = schedule.start_time.toString(); // "01:02:00"
+    const endTime = schedule.end_time.toString(); // "01:03:00"
+    if (currentTime >= startTime && currentTime <= endTime) {
+      return true; // Đang trong giờ làm việc
+    }
+  }
+  return false; // Ngoài giờ làm việc
+}
+
+// Hàm so sánh dòng trung bình và lưu cảnh báo
+async function checkAbnormalCurrent(modbusData) {
+  // Đảm bảo bảng abnormal_alerts đã được tạo
+  await createAbnormalAlertsTable();
+
+  let results = new Map(); // Sử dụng Map để tránh trùng ip-slaveId
+
+  // Kiểm tra giờ làm việc
+  const workingHours = await isWorkingHours();
+  console.log(
+    `Thời gian hiện tại: ${new Date().toISOString()} - Trong giờ làm việc: ${workingHours}`
+  );
+
+  // Nếu trong giờ làm việc, trả về status 0 cho tất cả
+  if (workingHours) {
+    for (const entry of modbusData) {
+      const { ip, slaveId } = entry;
+      results.set(`${ip}-${slaveId}`, { ip, slaveId, status: 0 });
+    }
+    console.log('Trong giờ làm việc, tất cả status = 0.');
+    return Array.from(results.values());
+  }
+
+  // Ngoài giờ làm việc: Tính dòng trung bình và so sánh
+  const [thresholds] = await poolManager.execute(
+    'SELECT gateway, slaveid, current FROM abnormal_current'
+  );
+  const thresholdMap = new Map();
+  thresholds.forEach((row) => {
+    thresholdMap.set(`${row.gateway}-${row.slaveid}`, row.current);
+  });
+
+  // Lấy danh sách cảnh báo hiện tại để kiểm tra trạng thái trước đó
+  const [existingAlerts] = await poolManager.execute(
+    'SELECT id, ip, slave_id, resolved_time FROM abnormal_alerts WHERE resolved_time IS NULL'
+  );
+  const activeAlerts = new Map();
+  existingAlerts.forEach((alert) => {
+    activeAlerts.set(`${alert.ip}-${alert.slave_id}`, {
+      id: alert.id,
+      resolved_time: alert.resolved_time
+    });
+  });
+
+  for (const entry of modbusData) {
+    const { ip, slaveId, values, error } = entry;
+    let status = 0;
+
+    if (error) {
+      results.set(`${ip}-${slaveId}`, { ip, slaveId, status });
+      continue;
+    }
+
+    // Lấy dòng điện 3 pha (vị trí 7, 8, 9 trong values, tức chỉ số 6, 7, 8)
+    const I_A = values[6] || 0;
+    const I_B = values[7] || 0;
+    const I_C = values[8] || 0;
+
+    // Tính dòng trung bình
+    const I_avg = (I_A + I_B + I_C) / 3;
+
+    // Lấy ngưỡng từ bảng abnormal_current
+    const threshold = thresholdMap.get(`${ip}-${slaveId}`) || 1.1; // Mặc định 1.1 nếu không tìm thấy
+
+    // So sánh: status = 1 nếu vượt ngưỡng, 0 nếu không
+    status = I_avg > threshold ? 1 : 0;
+    results.set(`${ip}-${slaveId}`, { ip, slaveId, status });
+
+    // Xử lý cảnh báo độc lập cho từng cặp ip-slaveId
+    const alertKey = `${ip}-${slaveId}`;
+    const existingAlert = activeAlerts.get(alertKey);
+    const now = new Date().toISOString().slice(0, 19).replace('T', ' '); // Định dạng DATETIME
+
+    if (status === 1) {
+      // Nếu status = 1 (vượt ngưỡng) và chưa có cảnh báo đang hoạt động, thêm mới
+      if (!existingAlert) {
+        await poolManager.execute(
+          'INSERT INTO abnormal_alerts (ip, slave_id, error_time) VALUES (?, ?, ?)',
+          [ip, slaveId, now]
+        );
+        console.log(`Đã lưu cảnh báo cho ${ip} - Slave ${slaveId} tại ${now}`);
+        // Cập nhật activeAlerts để phản ánh bản ghi mới
+        const [newAlert] = await poolManager.execute(
+          'SELECT id FROM abnormal_alerts WHERE ip = ? AND slave_id = ? AND error_time = ?',
+          [ip, slaveId, now]
+        );
+        activeAlerts.set(alertKey, { id: newAlert[0].id, resolved_time: null });
+      }
+    } else if (status === 0 && existingAlert) {
+      // Nếu status = 0 (bình thường) và có cảnh báo đang hoạt động, cập nhật resolved_time
+      await poolManager.execute(
+        'UPDATE abnormal_alerts SET resolved_time = ? WHERE id = ? AND resolved_time IS NULL',
+        [now, existingAlert.id]
+      );
+      console.log(`Đã cập nhật thời gian xử lý hoàn tất cho ${ip} - Slave ${slaveId} tại ${now}`);
+      activeAlerts.delete(alertKey); // Xóa khỏi activeAlerts vì đã xử lý xong
+    }
+  }
+
+  return Array.from(results.values());
+}
+
+// API để gọi hàm checkAbnormalCurrent
+app.get('/check-abnormal', async (req, res) => {
+  try {
+    // Đảm bảo bảng abnormal_alerts đã được tạo trước khi gọi hàm
+    await createAbnormalAlertsTable();
+    const modbusData = await readModbusData(); // Hàm này bạn đã thiết lập
+    const results = await checkAbnormalCurrent(modbusData);
+    res.json(results);
+  } catch (error) {
+    console.error('Lỗi trong API /check-abnormal:', error.message);
+    res.status(500).json({ error: 'Lỗi server khi kiểm tra dòng bất thường' });
+  }
+});
 
 // Hàm đặt lại bảng DeviceConfig về giá trị mặc định
 async function resetDeviceConfig() {
@@ -1507,6 +1667,8 @@ app.get('/status-modbus-device', (req, res) => {
 setInterval(async () => {
   console.log('🔄 Tự động đọc dữ liệu Modbus...');
   await readModbusData();
+  const modbusData = await readModbusData(); // Đọc dữ liệu từ Modbus
+  const results = await checkAbnormalCurrent(modbusData);
 }, FETCH_INTERVAL);
 
 // Lưu dữ liệu vào MySQL
