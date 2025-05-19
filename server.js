@@ -1801,31 +1801,30 @@ app.get('/test_db', (req, res) => {
 
 app.get('/api/getWeeklyEnergy', async (req, res) => {
   try {
-    const deviceIPs = ['127_0_0_1', '127_0_0_2', '127_0_0_3', '127_0_0_4'];
-    let labels = [];
+    const ip = req.query.ip; // Nhận IP từ query parameter
+    if (!ip) {
+      return res.status(400).json({ error: 'Thiếu IP thiết bị' });
+    }
+    const ipFormatted = ip.replace(/\./g, '_'); // Chuyển IP thành định dạng cho tên bảng
+    const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1); // 12 slaveId
+    let labels = slaveIds;
     let data = [];
 
-    for (let ip of deviceIPs) {
-      let totalImport = 0;
-      for (let slaveId of [1, 2, 3]) {
-        const tableName = `modbus_data_${ip}_${slaveId}`;
-        const sql = `
-                    SELECT SUM(kwh_import) AS total_import
-                    FROM ${tableName}
-                    WHERE timestamp >= CURDATE() - INTERVAL 6 DAY;
-                `;
+    for (let slaveId of slaveIds) {
+      const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+      const sql = `
+        SELECT SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE timestamp >= CURDATE() - INTERVAL 6 DAY;
+      `;
 
-        try {
-          const [rows] = await pool.query(sql);
-          if (rows[0] && rows[0].total_import !== null) {
-            totalImport += rows[0].total_import;
-          }
-        } catch (err) {
-          console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
-        }
+      try {
+        const [rows] = await pool.query(sql);
+        data.push(rows[0] && rows[0].total_import !== null ? parseFloat(rows[0].total_import.toFixed(2)) : 0);
+      } catch (err) {
+        console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+        data.push(0); // Nếu lỗi, trả về 0 cho slaveId này
       }
-      labels.push(ip.replace(/_/g, '.')); // Chuyển về dạng IP gốc
-      data.push(totalImport);
     }
 
     res.json({ labels, data });
@@ -1838,35 +1837,31 @@ app.get('/api/getWeeklyEnergy', async (req, res) => {
 app.get('/api/getDayValue', async (req, res) => {
   try {
     const selectedDate = req.query.date; // Nhận ngày từ frontend (YYYY-MM-DD)
-    if (!selectedDate) {
-      return res.status(400).json({ error: 'Thiếu ngày cần truy vấn' });
+    const ip = req.query.ip; // Nhận IP từ query parameter
+    if (!selectedDate || !ip) {
+      return res.status(400).json({ error: 'Thiếu ngày hoặc IP thiết bị' });
     }
 
-    const deviceIPs = ['127_0_0_1', '127_0_0_2', '127_0_0_3', '127_0_0_4'];
-    let labels = [];
+    const ipFormatted = ip.replace(/\./g, '_');
+    const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+    let labels = slaveIds;
     let data = [];
 
-    for (let ip of deviceIPs) {
-      let totalImport = 0;
-      for (let slaveId of [1, 2, 3]) {
-        const tableName = `modbus_data_${ip}_${slaveId}`;
-        const sql = `
-                    SELECT SUM(kwh_import) AS total_import
-                    FROM ${tableName}
-                    WHERE DATE(timestamp) = ?;
-                `;
+    for (let slaveId of slaveIds) {
+      const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+      const sql = `
+        SELECT SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE DATE(timestamp) = ?;
+      `;
 
-        try {
-          const [rows] = await pool.query(sql, [selectedDate]);
-          if (rows[0] && rows[0].total_import !== null) {
-            totalImport += rows[0].total_import;
-          }
-        } catch (err) {
-          console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
-        }
+      try {
+        const [rows] = await pool.query(sql, [selectedDate]);
+        data.push(rows[0] && rows[0].total_import !== null ? parseFloat(rows[0].total_import.toFixed(2)) : 0);
+      } catch (err) {
+        console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+        data.push(0);
       }
-      labels.push(ip.replace(/_/g, '.')); // Chuyển về dạng IP gốc
-      data.push(totalImport);
     }
 
     res.json({ labels, data });
@@ -1879,35 +1874,31 @@ app.get('/api/getDayValue', async (req, res) => {
 app.get('/api/getMonthValue', async (req, res) => {
   try {
     const selectedMonth = req.query.month; // Nhận tháng từ frontend (YYYY-MM)
-    if (!selectedMonth) {
-      return res.status(400).json({ error: 'Thiếu tháng cần truy vấn' });
+    const ip = req.query.ip; // Nhận IP từ query parameter
+    if (!selectedMonth || !ip) {
+      return res.status(400).json({ error: 'Thiếu tháng hoặc IP thiết bị' });
     }
 
-    const deviceIPs = ['127_0_0_1', '127_0_0_2', '127_0_0_3', '127_0_0_4'];
-    let labels = [];
+    const ipFormatted = ip.replace(/\./g, '_');
+    const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+    let labels = slaveIds;
     let data = [];
 
-    for (let ip of deviceIPs) {
-      let totalImport = 0;
-      for (let slaveId of [1, 2, 3]) {
-        const tableName = `modbus_data_${ip}_${slaveId}`;
-        const sql = `
-                    SELECT SUM(kwh_import) AS total_import
-                    FROM ${tableName}
-                    WHERE DATE_FORMAT(timestamp, '%Y-%m') = ?;
-                `;
+    for (let slaveId of slaveIds) {
+      const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+      const sql = `
+        SELECT SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE DATE_FORMAT(timestamp, '%Y-%m') = ?;
+      `;
 
-        try {
-          const [rows] = await pool.query(sql, [selectedMonth]);
-          if (rows[0] && rows[0].total_import !== null) {
-            totalImport += rows[0].total_import;
-          }
-        } catch (err) {
-          console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
-        }
+      try {
+        const [rows] = await pool.query(sql, [selectedMonth]);
+        data.push(rows[0] && rows[0].total_import !== null ? parseFloat(rows[0].total_import.toFixed(2)) : 0);
+      } catch (err) {
+        console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+        data.push(0);
       }
-      labels.push(ip.replace(/_/g, '.')); // Chuyển về dạng IP gốc
-      data.push(totalImport);
     }
 
     res.json({ labels, data });
@@ -1920,46 +1911,204 @@ app.get('/api/getMonthValue', async (req, res) => {
 app.get('/api/getMonthSummary', async (req, res) => {
   try {
     const selectedMonth = req.query.month; // Nhận tháng từ frontend (YYYY-MM)
-    if (!selectedMonth) {
-      return res.status(400).json({ error: 'Thiếu tháng cần truy vấn' });
+    const ip = req.query.ip; // Nhận IP từ query parameter
+    if (!selectedMonth || !ip) {
+      return res.status(400).json({ error: 'Thiếu tháng hoặc IP thiết bị' });
     }
 
-    const deviceIPs = ['127_0_0_1', '127_0_0_2', '127_0_0_3', '127_0_0_4'];
+    const ipFormatted = ip.replace(/\./g, '_');
+    const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
     let dailyTotals = Array(31).fill(0); // Mảng 31 ngày, mặc định là 0
 
-    for (let ip of deviceIPs) {
-      for (let slaveId of [1, 2, 3]) {
-        const tableName = `modbus_data_${ip}_${slaveId}`;
-        const sql = `
-                    SELECT 
-                        DAY(timestamp) AS day, 
-                        SUM(kwh_import) AS total_import
-                    FROM ${tableName}
-                    WHERE DATE_FORMAT(timestamp, '%Y-%m') = ?
-                    GROUP BY day
-                    ORDER BY day;
-                `;
+    for (let slaveId of slaveIds) {
+      const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+      const sql = `
+        SELECT 
+          DAY(timestamp) AS day, 
+          SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE DATE_FORMAT(timestamp, '%Y-%m') = ?
+        GROUP BY day
+        ORDER BY day;
+      `;
 
-        try {
-          const [rows] = await pool.query(sql, [selectedMonth]);
-          rows.forEach((row) => {
-            dailyTotals[row.day - 1] += row.total_import || 0; // Cộng dồn giá trị
-          });
-        } catch (err) {
-          console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
-        }
+      try {
+        const [rows] = await pool.query(sql, [selectedMonth]);
+        rows.forEach((row) => {
+          dailyTotals[row.day - 1] += row.total_import || 0; // Cộng dồn giá trị
+        });
+      } catch (err) {
+        console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
       }
     }
 
     res.json({
       labels: Array.from({ length: 31 }, (_, i) => i + 1), // Tạo mảng từ 1 đến 31
-      data: dailyTotals
+      data: dailyTotals.map(value => parseFloat(value.toFixed(2)))
     });
   } catch (error) {
     console.error('❌ Lỗi server:', error);
     res.status(500).json({ error: 'Lỗi server' });
   }
 });
+
+// API lấy tổng kwh_import theo ngày cho mỗi IP
+app.get('/api/getDailyEnergyByIP', async (req, res) => {
+    const { date } = req.query;
+    if (!date) {
+        return res.status(400).json({ error: 'Vui lòng cung cấp ngày!' });
+    }
+    try {
+        const labels = MODBUS_DEVICES.map(device => `IP ${device.ip}`);
+        const data = [];
+
+        for (const device of MODBUS_DEVICES) {
+            const ipFormatted = device.ip.replace(/\./g, '_');
+            let total = 0;
+
+            for (const slaveId of device.slaveIds) {
+                const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+                const sql = `
+                    SELECT SUM(kwh_import) AS total_import
+                    FROM ${tableName}
+                    WHERE DATE(timestamp) = ?;
+                `;
+                try {
+                    const [rows] = await pool.query(sql, [date]);
+                    total += rows[0] && rows[0].total_import !== null ? parseFloat(rows[0].total_import.toFixed(2)) : 0;
+                } catch (err) {
+                    console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+                }
+            }
+            data.push(total);
+        }
+
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('❌ Lỗi server:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+});
+
+// API lấy tổng kwh_import theo tuần (7 ngày gần nhất) cho mỗi IP
+app.get('/api/getWeeklyEnergyByIP', async (req, res) => {
+    try {
+        const labels = MODBUS_DEVICES.map(device => `IP ${device.ip}`);
+        const data = [];
+
+        for (const device of MODBUS_DEVICES) {
+            const ipFormatted = device.ip.replace(/\./g, '_');
+            let total = 0;
+
+            for (const slaveId of device.slaveIds) {
+                const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+                const sql = `
+                    SELECT SUM(kwh_import) AS total_import
+                    FROM ${tableName}
+                    WHERE timestamp >= CURDATE() - INTERVAL 6 DAY;
+                `;
+                try {
+                    const [rows] = await pool.query(sql);
+                    total += rows[0] && rows[0].total_import !== null ? parseFloat(rows[0].total_import.toFixed(2)) : 0;
+                } catch (err) {
+                    console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+                }
+            }
+            data.push(total);
+        }
+
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('❌ Lỗi server:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+});
+
+// API lấy tổng kwh_import theo tháng cho mỗi IP
+app.get('/api/getMonthlyEnergyByIP', async (req, res) => {
+    const { month } = req.query;
+    if (!month) {
+        return res.status(400).json({ error: 'Vui lòng cung cấp tháng!' });
+    }
+    try {
+        const labels = MODBUS_DEVICES.map(device => `IP ${device.ip}`);
+        const data = [];
+
+        for (const device of MODBUS_DEVICES) {
+            const ipFormatted = device.ip.replace(/\./g, '_');
+            let total = 0;
+
+            for (const slaveId of device.slaveIds) {
+                const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+                const sql = `
+                    SELECT SUM(kwh_import) AS total_import
+                    FROM ${tableName}
+                    WHERE DATE_FORMAT(timestamp, '%Y-%m') = ?;
+                `;
+                try {
+                    const [rows] = await pool.query(sql, [month]);
+                    total += rows[0] && rows[0].total_import !== null ? parseFloat(rows[0].total_import.toFixed(2)) : 0;
+                } catch (err) {
+                    console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+                }
+            }
+            data.push(total);
+        }
+
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('❌ Lỗi server:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+});
+
+// API lấy tổng kwh_import theo ngày trong tháng cho tất cả IP
+app.get('/api/getDailyEnergyChartOfMonth', async (req, res) => {
+    const { month } = req.query;
+    if (!month) {
+        return res.status(400).json({ error: 'Vui lòng cung cấp tháng!' });
+    }
+
+    try {
+        const daysInMonth = new Date(`${month}-01`).getMonth() === 1
+            ? (new Date(`${month}-01`).getFullYear() % 4 === 0 ? 29 : 28)
+            : [3, 5, 8, 10].includes(new Date(`${month}-01`).getMonth()) ? 30 : 31;
+
+        const labels = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
+        const data = Array(daysInMonth).fill(0); // Tổng theo từng ngày
+
+        for (const device of MODBUS_DEVICES) {
+            const ipFormatted = device.ip.replace(/\./g, '_');
+
+            for (const slaveId of device.slaveIds) {
+                const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+                const sql = `
+                    SELECT DAY(timestamp) AS day, SUM(kwh_import) AS total_import
+                    FROM ${tableName}
+                    WHERE DATE_FORMAT(timestamp, '%Y-%m') = ?
+                    GROUP BY DAY(timestamp);
+                `;
+
+                try {
+                    const [rows] = await pool.query(sql, [month]);
+                    for (const row of rows) {
+                        const day = row.day;
+                        const total = row.total_import !== null ? parseFloat(row.total_import.toFixed(2)) : 0;
+                        data[day - 1] += total; // -1 vì mảng bắt đầu từ 0
+                    }
+                } catch (err) {
+                    console.error(`❌ Lỗi truy vấn bảng ${tableName}:`, err.message);
+                }
+            }
+        }
+
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('❌ Lỗi server:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+});
+
 
 async function getModbusTables() {
   const [tables] = await pool.query('SHOW TABLES');
@@ -2401,6 +2550,141 @@ app.get('/api/alarm-stats', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+app.get('/api/compareEnergyByPeriod', async (req, res) => {
+  const { type, from1, to1, from2, to2, ip } = req.query;
+
+  if (!ip || !['month', 'year'].includes(type)) {
+    return res.status(400).json({ error: 'Thiếu IP hoặc type không hợp lệ (month | year)' });
+  }
+
+  const ipFormatted = ip.replace(/\./g, '_');
+  const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  const parseMonthRange = (fromStr, toStr) => {
+    const [fromMonth, fromYear] = fromStr.split('/').map(Number);
+    const [toMonth, toYear] = toStr.split('/').map(Number);
+    const months = [];
+    for (let y = fromYear; y <= toYear; y++) {
+      const start = y === fromYear ? fromMonth : 1;
+      const end = y === toYear ? toMonth : 12;
+      for (let m = start; m <= end; m++) {
+        months.push({ year: y, month: m });
+      }
+    }
+    return months;
+  };
+
+  const getMonthlyData = async (ranges) => {
+    const results = [];
+    for (const { year, month } of ranges) {
+      const start = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endMonth = month === 12 ? 1 : month + 1;
+      const endYear = month === 12 ? year + 1 : year;
+      const end = `${endYear}-${String(endMonth).padStart(2, '0')}-01`;
+
+      let total = 0;
+      const dailyData = Array(31).fill(0);
+      for (let slaveId of slaveIds) {
+        const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+        const sqlMonthly = `
+          SELECT SUM(kwh_import) AS total_import
+          FROM ${tableName}
+          WHERE timestamp >= ? AND timestamp < ?;
+        `;
+        const sqlDaily = `
+          SELECT DAY(timestamp) AS day, SUM(kwh_import) AS total_import
+          FROM ${tableName}
+          WHERE timestamp >= ? AND timestamp < ?
+          GROUP BY DAY(timestamp);
+        `;
+        try {
+          const [monthlyRows] = await pool.query(sqlMonthly, [start, end]);
+          total += monthlyRows[0]?.total_import || 0;
+          const [dailyRows] = await pool.query(sqlDaily, [start, end]);
+          dailyRows.forEach(row => {
+            dailyData[row.day - 1] += row.total_import || 0;
+          });
+        } catch (err) {
+          console.error(`❌ Lỗi khi truy vấn ${tableName}:`, err.message);
+        }
+      }
+
+      results.push({
+        label: `${String(month).padStart(2, '0')}/${year}`,
+        year,
+        month,
+        kwh: parseFloat(total.toFixed(2)),
+        daily: dailyData.map(v => parseFloat(v.toFixed(2)))
+      });
+    }
+    return results;
+  };
+
+  const getYearlyData = async (yearStr) => {
+    const year = Number(yearStr);
+    const start = `${year}-01-01`;
+    const end = `${year + 1}-01-01`;
+    let total = 0;
+    const monthlyData = Array(12).fill(0);
+
+    for (let slaveId of slaveIds) {
+      const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+      const sqlYearly = `
+        SELECT SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE timestamp >= ? AND timestamp < ?;
+      `;
+      const sqlMonthly = `
+        SELECT MONTH(timestamp) AS month, SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE timestamp >= ? AND timestamp < ?
+        GROUP BY MONTH(timestamp);
+      `;
+      try {
+        const [yearlyRows] = await pool.query(sqlYearly, [start, end]);
+        total += yearlyRows[0]?.total_import || 0;
+        const [monthlyRows] = await pool.query(sqlMonthly, [start, end]);
+        monthlyRows.forEach(row => {
+          monthlyData[row.month - 1] += row.total_import || 0;
+        });
+      } catch (err) {
+        console.error(`❌ Lỗi khi truy vấn ${tableName}:`, err.message);
+      }
+    }
+
+    return {
+      label: `${year}`,
+      year,
+      kwh: parseFloat(total.toFixed(2)),
+      monthly: monthlyData.map(v => parseFloat(v.toFixed(2)))
+    };
+  };
+
+  try {
+    let data1 = [], data2 = [];
+
+    if (type === 'month') {
+      const range1 = parseMonthRange(from1, to1);
+      const range2 = parseMonthRange(from2, to2);
+      data1 = await getMonthlyData(range1);
+      data2 = await getMonthlyData(range2);
+    } else if (type === 'year') {
+      data1 = [await getYearlyData(from1)];
+      data2 = [await getYearlyData(from2)];
+    }
+
+    res.json({
+      type,
+      period1: { from: from1, to: to1, data: data1 },
+      period2: { from: from2, to: to2, data: data2 }
+    });
+  } catch (error) {
+    console.error('❌ Lỗi xử lý:', error.message);
+    res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+  }
+});
+
 
 app.listen(3000, () => {
   console.log('🚀 Server đang chạy trên http://localhost:3000');
