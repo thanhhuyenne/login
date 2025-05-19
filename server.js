@@ -527,6 +527,20 @@ app.get('/get-work-schedule', async (req, res) => {
   }
 });
 
+// API lấy danh sách cảnh báo
+app.get('/get-abnormal-alerts', async (req, res) => {
+  try {
+    await createAbnormalAlertsTable(); // Đảm bảo bảng tồn tại
+    const [rows] = await poolManager.execute(
+      'SELECT * FROM abnormal_alerts ORDER BY error_time DESC'
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Lỗi trong API /get-abnormal-alerts:', error.message);
+    res.status(500).json({ error: 'Lỗi server khi lấy danh sách cảnh báo' });
+  }
+});
+
 // Lấy tham số dòng điện bất thường
 app.get('/get-abnormal-current', async (req, res) => {
   try {

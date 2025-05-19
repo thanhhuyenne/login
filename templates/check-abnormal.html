@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modbus Abnormal Current Monitor</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .alert {
+        font-weight: bold;
+        color: red;
+        margin-bottom: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .abnormal {
+        color: red;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Modbus Abnormal Current Monitor</h1>
+    <div id="alertMessage" class="alert" style="display: none">
+      ⚠️ Có dòng bất thường ngoài giờ làm việc!
+    </div>
+    <button onclick="fetchData()">Refresh Data</button>
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Gateway (IP)</th>
+          <th>ID 1</th>
+          <th>ID 2</th>
+          <th>ID 3</th>
+          <th>ID 4</th>
+          <th>ID 5</th>
+          <th>ID 6</th>
+          <th>ID 7</th>
+          <th>ID 8</th>
+          <th>ID 9</th>
+          <th>ID 10</th>
+          <th>ID 11</th>
+          <th>ID 12</th>
+        </tr>
+      </thead>
+      <tbody id="dataBody"></tbody>
+    </table>
+
+    <button onclick="fetchHistory()">Xem lịch sử</button>
+    <h2 id="historyTitle" style="display: none">Lịch sử cảnh báo</h2>
+    <table id="historyTable" style="display: none">
+      <thead>
+        <tr>
+          <th>IP</th>
+          <th>Slave ID</th>
+          <th>Thời gian lỗi</th>
+          <th>Thời gian xử lý</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+
+    <script>
+      async function fetchData() {
+        try {
+          const response = await fetch('http://localhost:3000/check-abnormal');
+          const data = await response.json();
+          updateTable(data);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          document.getElementById('dataBody').innerHTML =
+            '<tr><td colspan="13">Error fetching data</td></tr>';
+        }
+      }
+
+      function updateTable(data) {
+        const tbody = document.getElementById('dataBody');
+        tbody.innerHTML = ''; // Xóa nội dung cũ
+
+        // Tạo map để lưu trạng thái theo ip và slaveId
+        const statusMap = new Map();
+        data.forEach((item) => {
+          statusMap.set(`${item.ip}-${item.slaveId}`, item.status);
+        });
+
+        // Danh sách gateway cố định từ 1 đến 4
+        const gateways = ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4'];
+
+        // Tạo hàng cho mỗi gateway
+        gateways.forEach((gateway) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${gateway}</td>`; // Cột Gateway
+
+          // Thêm cột cho ID 1 đến 12
+          for (let id = 1; id <= 12; id++) {
+            const key = `${gateway}-${id}`;
+            const status = statusMap.get(key);
+            const cell = document.createElement('td');
+            if (status === 1) {
+              cell.innerHTML = '✗'; // Dấu X đỏ cho bất thường
+              cell.className = 'abnormal';
+            } else {
+              cell.innerHTML = ''; // Để trống nếu bình thường hoặc không có dữ liệu
+            }
+            row.appendChild(cell);
+          }
+          tbody.appendChild(row);
+        });
+
+        // Hiển thị thông báo nếu có bất thường ngoài giờ làm việc
+        const hasAbnormal = data.some((item) => item.status === 1);
+        const alertMessage = document.getElementById('alertMessage');
+        if (hasAbnormal) {
+          alertMessage.style.display = 'block';
+        } else {
+          alertMessage.style.display = 'none';
+        }
+      }
+
+      async function fetchHistory() {
+        try {
+          const response = await fetch('http://localhost:3000/get-abnormal-alerts');
+          const data = await response.json();
+          updateHistoryTable(data);
+        } catch (error) {
+          console.error('Error fetching history:', error);
+          document.getElementById('historyBody').innerHTML =
+            '<tr><td colspan="4">Error fetching history</td></tr>';
+        }
+      }
+
+      function updateHistoryTable(data) {
+        const historyTitle = document.getElementById('historyTitle');
+        const historyTable = document.getElementById('historyTable');
+        const historyBody = document.getElementById('historyBody');
+        historyBody.innerHTML = ''; // Xóa nội dung cũ
+
+        // Hiển thị bảng lịch sử
+        historyTitle.style.display = 'block';
+        historyTable.style.display = 'table';
+
+        if (data.length === 0) {
+          historyBody.innerHTML = '<tr><td colspan="4">Không có lịch sử cảnh báo</td></tr>';
+          return;
+        }
+
+        // Thêm các hàng lịch sử
+        data.forEach((item) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+          <td>${item.ip}</td>
+          <td>${item.slave_id}</td>
+          <td>${item.error_time}</td>
+          <td>${item.resolved_time || 'Chưa xử lý'}</td>
+        `;
+          historyBody.appendChild(row);
+        });
+      }
+
+      // 🔥 Tự động gọi API mỗi 10 giây
+      setInterval(fetchData, 10000);
+
+      // Gọi ngay lần đầu khi trang tải
+      window.onload = fetchData;
+    </script>
+  </body>
+</html>
