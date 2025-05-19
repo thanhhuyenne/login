@@ -17,7 +17,7 @@
         flex-direction: column;
       }
       .navbar {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         padding: 10px;
         display: flex;
@@ -84,14 +84,16 @@
       .filter-container label {
         font-size: 14px;
       }
-      select, input, button {
+      select,
+      input,
+      button {
         padding: 8px;
         font-size: 14px;
         border: 1px solid #ccc;
         border-radius: 4px;
       }
       button {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         border: none;
         cursor: pointer;
@@ -111,13 +113,14 @@
         background: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
-      .report-table th, .report-table td {
+      .report-table th,
+      .report-table td {
         border: 1px solid #ddd;
         padding: 12px;
         text-align: center;
       }
       .report-table th {
-        background: #4CAF50;
+        background: #4caf50;
         color: white;
         font-weight: bold;
       }
@@ -190,11 +193,17 @@
         <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
         <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
         <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-        <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
         <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
         <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
-        <div onclick="window.location.href='Setting-shift-over.html'" class="active">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-shift-over.html'" class="active">
+          8 - DÒNG ĐIỆN BẤT THƯỜNG
+        </div>
         <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
         <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
       </div>
@@ -206,10 +215,10 @@
           <thead>
             <tr>
               <th>SlaveID</th>
-              <th>127.0.0.1</th>
-              <th>127.0.0.2</th>
-              <th>127.0.0.3</th>
-              <th>127.0.0.4</th>
+              <th>Khu vực 1</th>
+              <th>Khu vực 2</th>
+              <th>Khu vực 3</th>
+              <th>Khu vực 4</th>
             </tr>
           </thead>
           <tbody id="currentTableBody"></tbody>
@@ -321,7 +330,7 @@
         const current = parseFloat(input.value);
         const item = currentData.find((d) => d.gateway === gateway && d.slaveid === slaveid);
         if (item) {
-          item.current = isNaN(current) ? 1.1 : parseFloat(current.toFixed(2));
+          item.current = parseFloat(current.toFixed(2));
         }
       }
 
