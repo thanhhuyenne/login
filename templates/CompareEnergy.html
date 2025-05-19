@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So sánh điện năng tiêu thụ</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        .navbar span {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .navbar span:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .navbar span.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 250px;
+            background: #f4f4f4;
+            padding: 15px;
+        }
+        .sidebar div {
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            transition: background 0.3s;
+        }
+        .sidebar div:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .sidebar div.active {
+            font-weight: bold;
+            color: rgb(254, 174, 0);
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .filter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group label {
+            font-size: 14px;
+            width: 120px;
+        }
+        select, input {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 150px;
+        }
+        button {
+            padding: 8px 20px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            align-self: center;
+        }
+        button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+        .chart-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .chart-row {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+        }
+        .chart-wrapper {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .chart-row .chart-wrapper {
+            width: 50%;
+        }
+        .error-message {
+            display: none;
+            font-size: 24px;
+            color: red;
+            text-align: center;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+        <span onclick="window.location.href='Report.html'">REPORTS</span>
+        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+        <span onclick="window.location.href='CompareEnergy.html'" class="active">COMPARE</span>
+        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div>TỔNG HỢP</div>
+            <div>VĂN PHÒNG</div>
+            <div>NHÀ KHO</div>
+        </div>
+        <div class="main-content">
+            <h2>SO SÁNH ĐIỆN NĂNG TIÊU THỤ THEO THỜI GIAN</h2>
+            <div class="error-message" id="errorMessage"></div>
+            <div class="chart-container" id="chartContainer">
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <label for="ipSelector">Chọn khu vực (IP):</label>
+                        <select id="ipSelector">
+                            <option value="127.0.0.1">Khu vực 1</option>
+                            <option value="127.0.0.2">Khu vực 2</option>
+                            <option value="127.0.0.3">Khu vực 3</option>
+                            <option value="127.0.0.4">Khu vực 4</option>
+                        </select>
+                        <label for="timeType">Loại thời gian:</label>
+                        <select id="timeType" onchange="updateInputFormats()">
+                            <option value="month">Tháng</option>
+                            <option value="year">Năm</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="from1">Giai đoạn 1 (Từ):</label>
+                        <input type="text" id="from1" placeholder="MM/YYYY">
+                        <label for="to1">Đến:</label>
+                        <input type="text" id="to1" placeholder="MM/YYYY">
+                    </div>
+                    <div class="filter-group">
+                        <label for="from2">Giai đoạn 2 (Từ):</label>
+                        <input type="text" id="from2" placeholder="MM/YYYY">
+                        <label for="to2">Đến:</label>
+                        <input type="text" id="to2" placeholder="MM/YYYY">
+                    </div>
+                    <button onclick="compareEnergy()">So sánh</button>
+                </div>
+                <div id="charts"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let charts = [];
+
+        function updateInputFormats() {
+            const timeType = document.getElementById('timeType').value;
+            const inputs = ['from1', 'to1', 'from2', 'to2'];
+            inputs.forEach(id => {
+                const input = document.getElementById(id);
+                input.value = '';
+                if (timeType === 'month') {
+                    input.placeholder = 'MM/YYYY';
+                    input.oninput = function() {
+                        let value = this.value.replace(/[^0-9/]/g, '');
+                        if (value.length === 2 && !value.includes('/')) {
+                            value += '/';
+                        }
+                        this.value = value;
+                    };
+                } else {
+                    input.placeholder = 'YYYY';
+                    input.oninput = function() {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    };
+                }
+            });
+        }
+
+        function clearCharts() {
+            charts.forEach(chart => chart.destroy());
+            charts = [];
+            document.getElementById('charts').innerHTML = '';
+        }
+
+        function createComparisonData(data1, data2, month1, month2, year1, year2) {
+            const daily1 = data1.daily || Array(31).fill(0);
+            const daily2 = data2.daily || Array(31).fill(0);
+            const daysInMonth = new Date(year2, month2, 0).getDate();
+            const labels = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
+            const data = [];
+            const colors = [];
+
+            for (let i = 0; i < daysInMonth; i++) {
+                const kwh1 = daily1[i] || 0;
+                const kwh2 = daily2[i] || 0;
+                const diff = Math.abs(kwh1 - kwh2);
+                data.push(parseFloat(diff.toFixed(2)));
+                colors.push(kwh1 > kwh2 ? '#4CAF50' : '#FFD700');
+            }
+
+            return { labels, data, colors, month1, month2, year1, year2 };
+        }
+
+        async function compareEnergy() {
+            const ipSelector = document.getElementById('ipSelector');
+            const ip = ipSelector.value;
+            const area = ipSelector.options[ipSelector.selectedIndex].text;
+            const type = document.getElementById('timeType').value;
+            const from1 = document.getElementById('from1').value;
+            const to1 = document.getElementById('to1').value;
+            const from2 = document.getElementById('from2').value;
+            const to2 = document.getElementById('to2').value;
+
+            if (!ip || !type || !from1 || !to1 || !from2 || !to2) {
+                document.getElementById('errorMessage').textContent = 'Vui lòng nhập đầy đủ thông tin!';
+                document.getElementById('errorMessage').style.display = 'flex';
+                document.getElementById('chartContainer').style.display = 'none';
+                return;
+            }
+
+            if (type === 'month') {
+                const monthYearRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
+                if (!monthYearRegex.test(from1) || !monthYearRegex.test(to1) || !monthYearRegex.test(from2) || !monthYearRegex.test(to2)) {
+                    document.getElementById('errorMessage').textContent = 'Vui lòng nhập đúng định dạng MM/YYYY!';
+                    document.getElementById('errorMessage').style.display = 'flex';
+                    document.getElementById('chartContainer').style.display = 'none';
+                    return;
+                }
+            } else {
+                const yearRegex = /^\d{4}$/;
+                if (!yearRegex.test(from1) || !yearRegex.test(to1) || !yearRegex.test(from2) || !yearRegex.test(to2)) {
+                    document.getElementById('errorMessage').textContent = 'Vui lòng nhập đúng định dạng YYYY!';
+                    document.getElementById('errorMessage').style.display = 'flex';
+                    document.getElementById('chartContainer').style.display = 'none';
+                    return;
+                }
+            }
+
+            const url = `http://localhost:3000/api/compareEnergyByPeriod?type=${type}&from1=${from1}&to1=${to1}&from2=${from2}&to2=${to2}&ip=${ip}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Lỗi khi gọi API!');
+                }
+                const result = await response.json();
+
+                if (!result.period1.data.length || !result.period2.data.length) {
+                    document.getElementById('errorMessage').textContent = 'Không có dữ liệu trong khoảng thời gian này!';
+                    document.getElementById('errorMessage').style.display = 'flex';
+                    document.getElementById('chartContainer').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('chartContainer').style.display = 'flex';
+                clearCharts();
+
+                const chartsDiv = document.getElementById('charts');
+                const totalMonths = result.period1.data.length + result.period2.data.length;
+                const isRowLayout = totalMonths <= 10;
+
+                if (type === 'month') {
+                    const topContainer = document.createElement('div');
+                    topContainer.className = isRowLayout ? 'chart-row' : '';
+                    chartsDiv.appendChild(topContainer);
+
+                    const chart1Div = document.createElement('div');
+                    chart1Div.className = 'chart-wrapper';
+                    chart1Div.innerHTML = `<canvas id="chart1"></canvas>`;
+                    topContainer.appendChild(chart1Div);
+                    charts.push(new Chart(document.getElementById('chart1'), {
+                        type: 'bar',
+                        data: {
+                            labels: result.period1.data.map(d => d.label),
+                            datasets: [{
+                                label: `kWh Giai đoạn 1 (${from1} - ${to1})`,
+                                data: result.period1.data.map(d => d.kwh),
+                                backgroundColor: '#4CAF50',
+                                barThickness: 30
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { 
+                                    display: true, 
+                                    text: `Điện năng tiêu thụ (${from1} - ${to1}) - ${area}`, 
+                                    font: { size: 20 } 
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const value = context.parsed.y;
+                                            return `Điện năng: ${value.toFixed(2)} kWh`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: 'Tháng' } },
+                                y: { beginAtZero: true, title: { display: true, text: 'kWh' } }
+                            }
+                        }
+                    }));
+
+                    const chart2Div = document.createElement('div');
+                    chart2Div.className = 'chart-wrapper';
+                    chart2Div.innerHTML = `<canvas id="chart2"></canvas>`;
+                    topContainer.appendChild(chart2Div);
+                    charts.push(new Chart(document.getElementById('chart2'), {
+                        type: 'bar',
+                        data: {
+                            labels: result.period2.data.map(d => d.label),
+                            datasets: [{
+                                label: `kWh Giai đoạn 2 (${from2} - ${to2})`,
+                                data: result.period2.data.map(d => d.kwh),
+                                backgroundColor: '#FFD700',
+                                barThickness: 30
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { 
+                                    display: true, 
+                                    text: `Điện năng tiêu thụ (${from2} - ${to2}) - ${area}`, 
+                                    font: { size: 20 } 
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const value = context.parsed.y;
+                                            return `Điện năng: ${value.toFixed(2)} kWh`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: 'Tháng' } },
+                                y: { beginAtZero: true, title: { display: true, text: 'kWh' } }
+                            }
+                        }
+                    }));
+
+                    const [fromMonth1, fromYear1] = from1.split('/').map(Number);
+                    const [toMonth1, toYear1] = to1.split('/').map(Number);
+                    const [fromMonth2, fromYear2] = from2.split('/').map(Number);
+                    const [toMonth2, toYear2] = to2.split('/').map(Number);
+                    const sameYear = fromYear1 === fromYear2 && toYear1 === toYear2;
+
+                    let comparisonPairs = [];
+                    if (sameYear) {
+                        const maxPairs = Math.min(result.period1.data.length, result.period2.data.length);
+                        for (let i = 0; i < maxPairs; i++) {
+                            const data1 = result.period1.data[i];
+                            const data2 = result.period2.data[i];
+                            comparisonPairs.push({
+                                data1,
+                                data2,
+                                month1: data1.month,
+                                month2: data2.month,
+                                year1: data1.year,
+                                year2: data2.year
+                            });
+                        }
+                    } else {
+                        const months1 = result.period1.data.map(d => d.month);
+                        const months2 = result.period2.data.map(d => d.month);
+                        const commonMonths = months1.filter(m => months2.includes(m)).sort((a, b) => a - b);
+                        comparisonPairs = commonMonths.map(month => {
+                            const data1 = result.period1.data.find(d => d.month === month);
+                            const data2 = result.period2.data.find(d => d.month === month);
+                            return {
+                                data1,
+                                data2,
+                                month1: month,
+                                month2: month,
+                                year1: data1.year,
+                                year2: data2.year
+                            };
+                        });
+                    }
+
+                    comparisonPairs.forEach((pair, index) => {
+                        const comparison = createComparisonData(pair.data1, pair.data2, pair.month1, pair.month2, pair.year1, pair.year2);
+                        const chartDiv = document.createElement('div');
+                        chartDiv.className = 'chart-wrapper';
+                        chartDiv.innerHTML = `<canvas id="chart${index + 3}"></canvas>`;
+                        chartsDiv.appendChild(chartDiv);
+                        charts.push(new Chart(document.getElementById(`chart${index + 3}`), {
+                            type: 'bar',
+                            data: {
+                                labels: comparison.labels,
+                                datasets: [
+                                    {
+                                        label: 'Giai đoạn 1 > Giai đoạn 2',
+                                        data: [],
+                                        backgroundColor: '#4CAF50',
+                                        grouped: false
+                                    },
+                                    {
+                                        label: 'Giai đoạn 2 > Giai đoạn 1',
+                                        data: [],
+                                        backgroundColor: '#FFD700',
+                                        grouped: false
+                                    },
+                                    {
+                                        label: `Chênh lệch kWh Tháng ${String(comparison.month1).padStart(2, '0')}/${comparison.year1} vs Tháng ${String(comparison.month2).padStart(2, '0')}/${comparison.year2}`,
+                                        data: comparison.data,
+                                        backgroundColor: comparison.colors,
+                                        barThickness: 30,
+                                        grouped: false
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: `Chênh lệch điện năng Tháng ${String(comparison.month1).padStart(2, '0')}/${comparison.year1} vs Tháng ${String(comparison.month2).padStart(2, '0')}/${comparison.year2} - ${area}`,
+                                        font: { size: 20 }
+                                    },
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            filter: (legendItem, data) => legendItem.datasetIndex !== 2
+                                        }
+                                    },
+                                    tooltip: {
+                                        enabled: true,
+                                        callbacks: {
+                                            label: function(context) {
+                                                const value = context.parsed.y;
+                                                return `Chênh lệch: ${value.toFixed(2)} kWh`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: { title: { display: true, text: 'Ngày' } },
+                                    y: { beginAtZero: true, title: { display: true, text: '|kWh Giai đoạn 1 - kWh Giai đoạn 2|' } }
+                                }
+                            }
+                        }));
+                    });
+                } else if (type === 'year') {
+                    const chart1Div = document.createElement('div');
+                    chart1Div.className = 'chart-wrapper';
+                    chart1Div.innerHTML = `<canvas id="chart1"></canvas>`;
+                    chartsDiv.appendChild(chart1Div);
+                    charts.push(new Chart(document.getElementById('chart1'), {
+                        type: 'bar',
+                        data: {
+                            labels: [result.period1.data[0].label, result.period2.data[0].label],
+                            datasets: [{
+                                label: 'Tổng kWh',
+                                data: [result.period1.data[0].kwh, result.period2.data[0].kwh],
+                                backgroundColor: ['#4CAF50', '#FFD700'],
+                                barThickness: 30
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { 
+                                    display: true, 
+                                    text: `Tổng điện năng tiêu thụ (${from1} vs ${to1}) - ${area}`, 
+                                    font: { size: 20 } 
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const value = context.parsed.y;
+                                            return `Điện năng: ${value.toFixed(2)} kWh`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: 'Năm' } },
+                                y: { beginAtZero: true, title: { display: true, text: 'kWh' } }
+                            }
+                        }
+                    }));
+
+                    const labels = Array.from({ length: 12 }, (_, i) => String(i + 1));
+                    const data = [];
+                    const colors = [];
+                    for (let i = 0; i < 12; i++) {
+                        const kwh1 = result.period1.data[0].monthly[i] || 0;
+                        const kwh2 = result.period2.data[0].monthly[i] || 0;
+                        const diff = Math.abs(kwh1 - kwh2);
+                        data.push(parseFloat(diff.toFixed(2)));
+                        colors.push(kwh1 > kwh2 ? '#4CAF50' : '#FFD700');
+                    }
+
+                    const chart2Div = document.createElement('div');
+                    chart2Div.className = 'chart-wrapper';
+                    chart2Div.innerHTML = `<canvas id="chart2"></canvas>`;
+                    chartsDiv.appendChild(chart2Div);
+                    charts.push(new Chart(document.getElementById('chart2'), {
+                        type: 'bar',
+                        data: {
+                            labels,
+                            datasets: [
+                                {
+                                    label: 'Năm 1 > Năm 2',
+                                    data: [],
+                                    backgroundColor: '#4CAF50'
+                                },
+                                {
+                                    label: 'Năm 2 > Năm 1',
+                                    data: [],
+                                    backgroundColor: '#FFD700'
+                                },
+                                {
+                                    label: `Chênh lệch kWh (${from1} vs ${to2})`,
+                                    data,
+                                    backgroundColor: colors,
+                                    barThickness: 30
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: `Chênh lệch điện năng theo tháng (${from1} vs ${to2}) - ${area}`,
+                                    font: { size: 20 }
+                                },
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        filter: (legendItem, data) => legendItem.datasetIndex !== 2
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const value = context.parsed.y;
+                                            return `Chênh lệch: ${value.toFixed(2)} kWh`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: 'Tháng' } },
+                                y: { beginAtZero: true, title: { display: true, text: '|kWh Năm 1 - kWh Năm 2|' } }
+                            }
+                        }
+                    }));
+                }
+            } catch (error) {
+                console.error("❌ Lỗi khi gọi API:", error);
+                document.getElementById('errorMessage').textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+                document.getElementById('errorMessage').style.display = 'flex';
+                document.getElementById('chartContainer').style.display = 'none';
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                logout().then(() => {
+                    window.location.href = 'index.html';
+                }).catch(error => {
+                    console.error('Lỗi khi đăng xuất:', error);
+                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                });
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                console.log('Phản hồi từ server:', data.message);
+                localStorage.removeItem('role');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        updateInputFormats();
+    </script>
+</body>
+</html>
