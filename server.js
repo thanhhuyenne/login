@@ -36,23 +36,23 @@ async function readRealDeviceData() {
 
     // Ánh xạ từ file Word: thanh ghi và vị trí trong JSON
     const registerMapping = [
-      { startRegister: 32768, jsonIndex: 0 }, // U12
-      { startRegister: 32770, jsonIndex: 1 }, // U23
-      { startRegister: 32772, jsonIndex: 2 }, // U31
-      { startRegister: 32774, jsonIndex: 3 }, // U1
-      { startRegister: 32776, jsonIndex: 4 }, // U2
-      { startRegister: 32778, jsonIndex: 5 }, // U3
-      { startRegister: 32780, jsonIndex: 17 }, // Frequency
-      { startRegister: 32782, jsonIndex: 6 }, // I1
-      { startRegister: 32784, jsonIndex: 7 }, // I2
-      { startRegister: 32786, jsonIndex: 8 }, // I3
-      { startRegister: 32790, jsonIndex: 18 }, // Total active power
-      { startRegister: 32798, jsonIndex: 9 }, // Active power phase 1
-      { startRegister: 32800, jsonIndex: 10 }, // Active power phase 2
-      { startRegister: 32802, jsonIndex: 11 }, // Active power phase 3
-      { startRegister: 32816, jsonIndex: 19 }, // Power factor phase 1
-      { startRegister: 32818, jsonIndex: 20 }, // Power factor phase 2
-      { startRegister: 32820, jsonIndex: 21 } // Power factor phase 3
+      { startRegister: 32769, jsonIndex: 0 }, // U12
+      { startRegister: 32771, jsonIndex: 1 }, // U23
+      { startRegister: 32773, jsonIndex: 2 }, // U31
+      { startRegister: 32775, jsonIndex: 3 }, // U1
+      { startRegister: 32777, jsonIndex: 4 }, // U2
+      { startRegister: 32779, jsonIndex: 5 }, // U3
+      { startRegister: 32781, jsonIndex: 17 }, // Frequency
+      { startRegister: 32783, jsonIndex: 6 }, // I1
+      { startRegister: 32785, jsonIndex: 7 }, // I2
+      { startRegister: 32787, jsonIndex: 8 }, // I3
+      { startRegister: 32791, jsonIndex: 18 }, // Total active power
+      { startRegister: 32799, jsonIndex: 9 }, // Active power phase 1
+      { startRegister: 32801, jsonIndex: 10 }, // Active power phase 2
+      { startRegister: 32803, jsonIndex: 11 }, // Active power phase 3
+      { startRegister: 32817, jsonIndex: 19 }, // Power factor phase 1
+      { startRegister: 32819, jsonIndex: 20 }, // Power factor phase 2
+      { startRegister: 32821, jsonIndex: 21 } // Power factor phase 3
     ];
 
     // Đọc từng cặp thanh ghi theo ánh xạ
