@@ -66,14 +66,14 @@
         let slaveId = document.getElementById('slaveId').value;
 
         try {
-          let response = await fetch('http://127.0.0.1:3000/test-real-device');
+          let response = await fetch('http://localhost:3000/test-real-device');
           if (!response.ok) throw new Error('Lỗi kết nối: ' + response.status);
 
           let data = await response.json();
           console.log('📡 Dữ liệu nhận được:', data);
 
           // Tìm dữ liệu theo IP + Slave ID
-          let deviceData = data[0];
+          let deviceData = data.find(device => device.ip === "192.168.0.10" && device.slaveId == 1);
 
           if (deviceData) {
             document.getElementById('volts_ii').innerText = deviceData.values[0].toFixed(2) + ' V';
@@ -127,7 +127,6 @@
         window.history.back();
       });
 
-      setInterval(fetchModbusData, 3000);
     </script>
   </body>
 </html>
