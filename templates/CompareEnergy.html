@@ -157,20 +157,22 @@
 </head>
 <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+        <span onclick="window.location.href='GD.html'" class="active">DASHBOARDS</span>
         <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
         <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
         <span onclick="window.location.href='Alarm.html'">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'">SETTING</span>
-        <span onclick="window.location.href='CompareEnergy.html'" class="active">COMPARE</span>
         <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
     </div>
     <div class="container">
         <div class="sidebar">
-            <div>TỔNG HỢP</div>
-            <div>VĂN PHÒNG</div>
-            <div>NHÀ KHO</div>
+            <div onclick="window.location.href='GD.html'">1 - TỔNG HỢP</div>
+            <div onclick="window.location.href='Area_1.html'" class="active">2 - KHU VỰC 1</div>
+            <div onclick="window.location.href='Area_2.html'">3 - KHU VỰC 2</div>
+            <div onclick="window.location.href='Area_3.html'">4 - KHU VỰC 3</div>
+            <div onclick="window.location.href='Area_4.html'">5 - KHU VỰC 4</div>
+            <div onclick="window.location.href='CompareEnergy.html'">6 - SO SÁNH</div>
         </div>
         <div class="main-content">
             <h2>SO SÁNH ĐIỆN NĂNG TIÊU THỤ THEO THỜI GIAN</h2>
