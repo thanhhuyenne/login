@@ -20,8 +20,6 @@ app.get('/test-real-device', async (req, res) => {
   }
 });
 
-const ModbusRTU = require('modbus-serial');
-
 // Hàm đọc dữ liệu từ thiết bị thật với IP 192.168.0.10 và Slave ID 1
 async function readRealDeviceData() {
   const client = new ModbusRTU();
