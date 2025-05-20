@@ -76,7 +76,55 @@
       <tbody id="historyBody"></tbody>
     </table>
 
+    <audio id="alertSound" src="/static/audio/beep-01a.mp3" preload="auto"></audio>
+
     <script>
+      // Đăng ký Service Worker
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker
+          .register('/templates/service-worker.js')
+          .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+            askPermission(registration);
+          })
+          .catch((error) => console.error('Lỗi đăng ký Service Worker:', error));
+      }
+
+      // Yêu cầu quyền thông báo và đăng ký subscription
+      async function askPermission(registration) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(
+              'BIsKCIb4Xa848xk3mYvs5yU_QfmKkuRJgBiZ-zBnqXycc1KThDjQGo5tX0x4LQf3XReugLbEWNaI3NKdBqzNUN8'
+            ) // Thay bằng Public Key
+          });
+          await fetch('http://localhost:3000/subscribe', {
+            method: 'POST',
+            body: JSON.stringify(subscription),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+        return outputArray;
+      }
+
+      // Phát âm thanh khi nhận thông báo
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'push-notification') {
+          const audio = document.getElementById('alertSound');
+          audio.play().catch((error) => console.error('Lỗi phát âm thanh:', error));
+        }
+      });
+
       async function fetchData() {
         try {
           const response = await fetch('http://localhost:3000/check-abnormal');
@@ -173,7 +221,7 @@
         });
       }
 
-      // 🔥 Tự động gọi API mỗi 10 giây
+      // Tự động gọi API mỗi 10 giây
       setInterval(fetchData, 10000);
 
       // Gọi ngay lần đầu khi trang tải

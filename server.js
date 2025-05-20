@@ -6,6 +6,7 @@ const mysql = require('mysql2/promise');
 const ping = require('ping');
 const app = express();
 const bcrypt = require('bcrypt');
+const webpush = require('web-push');
 const os = require('os');
 const MySQLStore = require('express-mysql-session')(session);
 
@@ -16,79 +17,20 @@ app.use(
   })
 );
 
-// API test đọc dữ liệu từ thiết bị thật
-app.get('/test-real-device', async (req, res) => {
-  try {
-    const results = await readRealDeviceData();
-    res.json(results);
-  } catch (error) {
-    console.error('Lỗi trong API /test-real-device:', error.message);
-    res.status(500).json({ error: 'Lỗi server khi test thiết bị thật' });
-  }
-});
+// Cấu hình VAPID
+const vapidKeys = {
+  publicKey:
+    'BIsKCIb4Xa848xk3mYvs5yU_QfmKkuRJgBiZ-zBnqXycc1KThDjQGo5tX0x4LQf3XReugLbEWNaI3NKdBqzNUN8', // Thay bằng Public Key từ bước 1
+  privateKey: 'Ru6QqbDydSy0tz27_CJ4A0iXo5rurI_RMqwQ5HocOeI' // Thay bằng Private Key từ bước 1
+};
+webpush.setVapidDetails(
+  'mailto:tl085583@gmail.com', // Thay bằng email của bạn
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
 
-// Hàm đọc dữ liệu từ thiết bị thật với IP 192.168.0.10 và Slave ID 1
-async function readRealDeviceData() {
-  const client = new ModbusRTU();
-  const realDeviceIp = '192.168.0.10';
-  const slaveId = 1;
-  const results = [];
-
-  try {
-    await client.connectTCP(realDeviceIp, { port: 502 });
-    client.setID(slaveId);
-
-    // Khởi tạo mảng values với 33 phần tử, mặc định là 0
-    const values = new Array(33).fill(0);
-
-    // Ánh xạ từ file Word: thanh ghi và vị trí trong JSON
-    const registerMapping = [
-      { startRegister: 32769, jsonIndex: 0 }, // U12
-      { startRegister: 32771, jsonIndex: 1 }, // U23
-      { startRegister: 32773, jsonIndex: 2 }, // U31
-      { startRegister: 32775, jsonIndex: 3 }, // U1
-      { startRegister: 32777, jsonIndex: 4 }, // U2
-      { startRegister: 32779, jsonIndex: 5 }, // U3
-      { startRegister: 32781, jsonIndex: 17 }, // Frequency
-      { startRegister: 32783, jsonIndex: 6 }, // I1
-      { startRegister: 32785, jsonIndex: 7 }, // I2
-      { startRegister: 32787, jsonIndex: 8 }, // I3
-      { startRegister: 32791, jsonIndex: 18 }, // Total active power
-      { startRegister: 32799, jsonIndex: 9 }, // Active power phase 1
-      { startRegister: 32801, jsonIndex: 10 }, // Active power phase 2
-      { startRegister: 32803, jsonIndex: 11 }, // Active power phase 3
-      { startRegister: 32817, jsonIndex: 19 }, // Power factor phase 1
-      { startRegister: 32819, jsonIndex: 20 }, // Power factor phase 2
-      { startRegister: 32821, jsonIndex: 21 } // Power factor phase 3
-    ];
-
-    // Đọc từng cặp thanh ghi theo ánh xạ
-    for (const { startRegister, jsonIndex } of registerMapping) {
-      try {
-        const { data } = await client.readHoldingRegisters(startRegister, 2); // Đọc 2 thanh ghi
-        if (data && data.length === 2) {
-          const buffer = Buffer.alloc(4);
-          buffer.writeUInt16BE(data[0], 0); // Thanh ghi đầu
-          buffer.writeUInt16BE(data[1], 2); // Thanh ghi tiếp theo
-          const floatValue = buffer.readFloatBE(0);
-          values[jsonIndex] = floatValue; // Gán vào vị trí tương ứng
-        }
-      } catch (error) {
-        console.error(`Lỗi đọc thanh ghi ${startRegister}:`, error.message);
-      }
-    }
-
-    results.push({ ip: realDeviceIp, slaveId, values });
-  } catch (error) {
-    console.error(`Lỗi kết nối tới ${realDeviceIp}:`, error.message);
-    results.push({ ip: realDeviceIp, slaveId, error: error.message });
-  } finally {
-    client.close(() => {});
-  }
-
-  return results;
-}
-
+// Lưu trữ subscription (tạm thời, thực tế nên lưu vào DB)
+let subscriptions = [];
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -214,6 +156,113 @@ const defaultDeviceConfig = [
   { ip: '127.0.0.4', slave_id: 11, rated_current: 14.5 },
   { ip: '127.0.0.4', slave_id: 12, rated_current: 21.0 }
 ];
+
+// API test đọc dữ liệu từ thiết bị thật
+app.get('/test-real-device', async (req, res) => {
+  try {
+    const results = await readRealDeviceData();
+    res.json(results);
+  } catch (error) {
+    console.error('Lỗi trong API /test-real-device:', error.message);
+    res.status(500).json({ error: 'Lỗi server khi test thiết bị thật' });
+  }
+});
+
+// Hàm đọc dữ liệu từ thiết bị thật với IP 192.168.0.10 và Slave ID 1
+async function readRealDeviceData() {
+  const client = new ModbusRTU();
+  const realDeviceIp = '192.168.0.10';
+  const slaveId = 1;
+  const results = [];
+
+  try {
+    await client.connectTCP(realDeviceIp, { port: 502 });
+    client.setID(slaveId);
+
+    // Khởi tạo mảng values với 33 phần tử, mặc định là 0
+    const values = new Array(33).fill(0);
+
+    // Ánh xạ từ file Word: thanh ghi và vị trí trong JSON
+    const registerMapping = [
+      { startRegister: 32769, jsonIndex: 0 }, // U12
+      { startRegister: 32771, jsonIndex: 1 }, // U23
+      { startRegister: 32773, jsonIndex: 2 }, // U31
+      { startRegister: 32775, jsonIndex: 3 }, // U1
+      { startRegister: 32777, jsonIndex: 4 }, // U2
+      { startRegister: 32779, jsonIndex: 5 }, // U3
+      { startRegister: 32781, jsonIndex: 17 }, // Frequency
+      { startRegister: 32783, jsonIndex: 6 }, // I1
+      { startRegister: 32785, jsonIndex: 7 }, // I2
+      { startRegister: 32787, jsonIndex: 8 }, // I3
+      { startRegister: 32791, jsonIndex: 18 }, // Total active power
+      { startRegister: 32799, jsonIndex: 9 }, // Active power phase 1
+      { startRegister: 32801, jsonIndex: 10 }, // Active power phase 2
+      { startRegister: 32803, jsonIndex: 11 }, // Active power phase 3
+      { startRegister: 32817, jsonIndex: 19 }, // Power factor phase 1
+      { startRegister: 32819, jsonIndex: 20 }, // Power factor phase 2
+      { startRegister: 32821, jsonIndex: 21 } // Power factor phase 3
+    ];
+
+    // Đọc từng cặp thanh ghi theo ánh xạ
+    for (const { startRegister, jsonIndex } of registerMapping) {
+      try {
+        const { data } = await client.readHoldingRegisters(startRegister, 2); // Đọc 2 thanh ghi
+        if (data && data.length === 2) {
+          const buffer = Buffer.alloc(4);
+          buffer.writeUInt16BE(data[0], 0); // Thanh ghi đầu
+          buffer.writeUInt16BE(data[1], 2); // Thanh ghi tiếp theo
+          const floatValue = buffer.readFloatBE(0);
+          values[jsonIndex] = floatValue; // Gán vào vị trí tương ứng
+        }
+      } catch (error) {
+        console.error(`Lỗi đọc thanh ghi ${startRegister}:`, error.message);
+      }
+    }
+
+    results.push({ ip: realDeviceIp, slaveId, values });
+  } catch (error) {
+    console.error(`Lỗi kết nối tới ${realDeviceIp}:`, error.message);
+    results.push({ ip: realDeviceIp, slaveId, error: error.message });
+  } finally {
+    client.close(() => {});
+  }
+
+  return results;
+}
+
+// Hàm tự động kiểm tra và gửi thông báo
+async function autoCheckAndNotify() {
+  try {
+    await createAbnormalAlertsTable();
+    const modbusData = await readModbusData();
+    const results = await checkAbnormalCurrent(modbusData);
+
+    // Chỉ gửi thông báo nếu có status = 1 và chưa gửi gần đây
+    if (results.some((item) => item.status === 1)) {
+      const payload = JSON.stringify({
+        title: 'Cảnh báo dòng bất thường',
+        body: `Phát hiện dòng bất thường tại IP ${
+          results.find((item) => item.status === 1).ip
+        }, Slave ${results.find((item) => item.status === 1).slaveId}.`,
+        tag: 'abnormal-alert'
+      });
+      const hasSent = new Set(); // Tránh gửi trùng lặp
+      subscriptions.forEach((subscription) => {
+        if (!hasSent.has(subscription.endpoint)) {
+          webpush.sendNotification(subscription, payload).catch((error) => {
+            console.error('Lỗi gửi thông báo:', error);
+          });
+          hasSent.add(subscription.endpoint);
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Lỗi trong autoCheckAndNotify:', error.message);
+  }
+}
+
+// Chạy tự động mỗi 5 giây
+setInterval(autoCheckAndNotify, 11000);
 
 clearSessionsTable();
 // Xóa bảng sessions khi server khởi động
@@ -503,11 +552,36 @@ app.get('/check-abnormal', async (req, res) => {
     await createAbnormalAlertsTable();
     const modbusData = await readModbusData(); // Hàm này bạn đã thiết lập
     const results = await checkAbnormalCurrent(modbusData);
+
+    // Gửi thông báo đẩy nếu có status = 1 (checkAbnormalCurrent đã kiểm tra thời gian)
+    if (results.some((item) => item.status === 1)) {
+      const payload = JSON.stringify({
+        title: 'Cảnh báo dòng bất thường',
+        body: `Phát hiện dòng bất thường tại IP ${
+          results.find((item) => item.status === 1).ip
+        }, Slave ${results.find((item) => item.status === 1).slaveId}.`,
+        tag: 'abnormal-alert'
+      });
+      subscriptions.forEach((subscription) => {
+        webpush.sendNotification(subscription, payload).catch((error) => {
+          console.error('Lỗi gửi thông báo:', error);
+        });
+      });
+    }
+
     res.json(results);
   } catch (error) {
     console.error('Lỗi trong API /check-abnormal:', error.message);
     res.status(500).json({ error: 'Lỗi server khi kiểm tra dòng bất thường' });
   }
+});
+
+// API để lưu subscription từ client
+app.post('/subscribe', (req, res) => {
+  const subscription = req.body;
+  subscriptions.push(subscription);
+  console.log('Đã đăng ký subscription:', subscription);
+  res.status(201).json({ message: 'Đã đăng ký thành công' });
 });
 
 // Hàm đặt lại bảng DeviceConfig về giá trị mặc định
