@@ -168,11 +168,11 @@
     <div class="container">
         <div class="sidebar">
             <div onclick="window.location.href='GD.html'">1 - TỔNG HỢP</div>
-            <div onclick="window.location.href='Area_1.html'" class="active">2 - KHU VỰC 1</div>
+            <div onclick="window.location.href='Area_1.html'">2 - KHU VỰC 1</div>
             <div onclick="window.location.href='Area_2.html'">3 - KHU VỰC 2</div>
             <div onclick="window.location.href='Area_3.html'">4 - KHU VỰC 3</div>
             <div onclick="window.location.href='Area_4.html'">5 - KHU VỰC 4</div>
-            <div onclick="window.location.href='CompareEnergy.html'">6 - SO SÁNH</div>
+            <div onclick="window.location.href='CompareEnergy.html'" class="active">6 - SO SÁNH CÙNG KHU VỰC</div>
         </div>
         <div class="main-content">
             <h2>SO SÁNH ĐIỆN NĂNG TIÊU THỤ THEO THỜI GIAN</h2>
@@ -461,13 +461,13 @@
                                 labels: comparison.labels,
                                 datasets: [
                                     {
-                                        label: 'Giai đoạn 1 > Giai đoạn 2',
+                                        label: `Tiêu thụ tháng ${String(comparison.month1).padStart(2, '0')}/${comparison.year1} > Tiêu thụ tháng ${String(comparison.month2).padStart(2, '0')}/${comparison.year2}`,
                                         data: [],
                                         backgroundColor: '#4CAF50',
                                         grouped: false
                                     },
                                     {
-                                        label: 'Giai đoạn 2 > Giai đoạn 1',
+                                        label: `Tiêu thụ tháng ${String(comparison.month2).padStart(2, '0')}/${comparison.year2} > Tiêu thụ tháng ${String(comparison.month1).padStart(2, '0')}/${comparison.year1}`,
                                         data: [],
                                         backgroundColor: '#FFD700',
                                         grouped: false
