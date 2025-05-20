@@ -9,6 +9,13 @@ const bcrypt = require('bcrypt');
 const os = require('os');
 const MySQLStore = require('express-mysql-session')(session);
 
+app.use(
+  cors({
+    origin: 'http://127.0.0.1:5501', // ✅ Ghi đúng origin của trình duyệt bạn chạy HTML
+    credentials: true // ✅ Cho phép gửi cookie
+  })
+);
+
 // API test đọc dữ liệu từ thiết bị thật
 app.get('/test-real-device', async (req, res) => {
   try {
@@ -82,12 +89,7 @@ async function readRealDeviceData() {
   return results;
 }
 
-app.use(
-  cors({
-    origin: 'http://127.0.0.1:5501', // ✅ Ghi đúng origin của trình duyệt bạn chạy HTML
-    credentials: true // ✅ Cho phép gửi cookie
-  })
-);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('static'));
