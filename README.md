@@ -1,7 +1,7 @@
 git pull
 
 git add .
-git commit -m "shift"
+git commit -m "real-device"
 git push
 
 git checkout main
