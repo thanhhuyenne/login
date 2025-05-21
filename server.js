@@ -3030,6 +3030,165 @@ app.get('/api/compareEnergyByPeriod', async (req, res) => {
   }
 });
 
+// API so sánh điện năng theo khu vực
+app.get('/api/compareEnergyByAreas', async (req, res) => {
+  const { type, from, to, ips } = req.query;
+
+  // Kiểm tra tham số
+  if (!type || !['month', 'year'].includes(type) || !from || !to || !ips) {
+    return res.status(400).json({ error: 'Thiếu tham số hoặc type không hợp lệ (month | year)' });
+  }
+
+  const ipList = ips.split(',').filter(ip => /^127\.0\.0\.[1-4]$/.test(ip));
+  if (ipList.length === 0) {
+    return res.status(400).json({ error: 'Không có khu vực hợp lệ được chọn' });
+  }
+
+  const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  // Hàm chuyển IP thành định dạng bảng
+  const formatIP = (ip) => ip.replace(/\./g, '_');
+
+  // Hàm lấy danh sách tháng/năm giữa from và to
+  const parseTimeRange = (type, fromStr, toStr) => {
+    if (type === 'month') {
+      const [fromMonth, fromYear] = fromStr.split('/').map(Number);
+      const [toMonth, toYear] = toStr.split('/').map(Number);
+      const months = [];
+      for (let y = fromYear; y <= toYear; y++) {
+        const start = y === fromYear ? fromMonth : 1;
+        const end = y === toYear ? toMonth : 12;
+        for (let m = start; m <= end; m++) {
+          months.push({ year: y, month: m });
+        }
+      }
+      return months;
+    } else {
+      const startYear = parseInt(fromStr);
+      const endYear = parseInt(toStr);
+      return Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
+    }
+  };
+
+  // Hàm lấy dữ liệu tháng cho một khu vực
+  const getMonthlyData = async (ip, ranges) => {
+    const ipFormatted = formatIP(ip);
+    const results = [];
+    for (const { year, month } of ranges) {
+      const start = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endMonth = month === 12 ? 1 : month + 1;
+      const endYear = month === 12 ? year + 1 : year;
+      const end = `${endYear}-${String(endMonth).padStart(2, '0')}-01`;
+
+      let total = 0;
+      const dailyData = Array(31).fill(0);
+      for (let slaveId of slaveIds) {
+        const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+        const sqlMonthly = `
+          SELECT SUM(kwh_import) AS total_import
+          FROM ${tableName}
+          WHERE timestamp >= ? AND timestamp < ?;
+        `;
+        const sqlDaily = `
+          SELECT DAY(timestamp) AS day, SUM(kwh_import) AS total_import
+          FROM ${tableName}
+          WHERE timestamp >= ? AND timestamp < ?
+          GROUP BY DAY(timestamp);
+        `;
+        try {
+          const [monthlyRows] = await pool.query(sqlMonthly, [start, end]);
+          total += monthlyRows[0]?.total_import || 0;
+          const [dailyRows] = await pool.query(sqlDaily, [start, end]);
+          dailyRows.forEach((row) => {
+            dailyData[row.day - 1] += row.total_import || 0;
+          });
+        } catch (err) {
+          console.error(`❌ Lỗi khi truy vấn ${tableName}:`, err.message);
+        }
+      }
+
+      results.push({
+        label: `${String(month).padStart(2, '0')}/${year}`,
+        year,
+        month,
+        kwh: parseFloat(total.toFixed(2)),
+        daily: dailyData.map((v) => parseFloat(v.toFixed(2)))
+      });
+    }
+    return results;
+  };
+
+  // Hàm lấy dữ liệu năm cho một khu vực
+  const getYearlyData = async (ip, year) => {
+    const ipFormatted = formatIP(ip);
+    const start = `${year}-01-01`;
+    const end = `${year + 1}-01-01`;
+    let total = 0;
+    const monthlyData = Array(12).fill(0);
+
+    for (let slaveId of slaveIds) {
+      const tableName = `modbus_data_${ipFormatted}_${slaveId}`;
+      const sqlYearly = `
+        SELECT SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE timestamp >= ? AND timestamp < ?;
+      `;
+      const sqlMonthly = `
+        SELECT MONTH(timestamp) AS month, SUM(kwh_import) AS total_import
+        FROM ${tableName}
+        WHERE timestamp >= ? AND timestamp < ?
+        GROUP BY MONTH(timestamp);
+      `;
+      try {
+        const [yearlyRows] = await pool.query(sqlYearly, [start, end]);
+        total += yearlyRows[0]?.total_import || 0;
+        const [monthlyRows] = await pool.query(sqlMonthly, [start, end]);
+        monthlyRows.forEach((row) => {
+          monthlyData[row.month - 1] += row.total_import || 0;
+        });
+      } catch (err) {
+        console.error(`❌ Lỗi khi truy vấn ${tableName}:`, err.message);
+      }
+    }
+
+    return {
+      label: `${year}`,
+      year,
+      kwh: parseFloat(total.toFixed(2)),
+      monthly: monthlyData.map((v) => parseFloat(v.toFixed(2)))
+    };
+  };
+
+  try {
+    const timeRange = parseTimeRange(type, from, to);
+    const areas = [];
+
+    for (const ip of ipList) {
+      let data = [];
+      if (type === 'month') {
+        data = await getMonthlyData(ip, timeRange);
+      } else {
+        data = await Promise.all(timeRange.map(year => getYearlyData(ip, year)));
+      }
+      areas.push({
+        ip,
+        areaName: `Khu vực ${ip.split('.').pop()}`,
+        data
+      });
+    }
+
+    res.json({ areas });
+  } catch (error) {
+    console.error('❌ Lỗi xử lý:', error.message);
+    res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
+  }
+});
+
+// API đăng xuất
+app.post('/logout', (req, res) => {
+  res.json({ message: 'Đăng xuất thành công' });
+});
+
 app.listen(3000, () => {
   console.log('🚀 Server đang chạy trên http://localhost:3000');
 });
