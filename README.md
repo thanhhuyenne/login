@@ -11,5 +11,5 @@ git checkout feature/my-work
 git merge main
 
 git add .
-git commit -m "Dashboards"
+git commit -m "SO Sánh"
 git push origin feature/my-work
