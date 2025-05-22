@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cảnh Báo Dòng Bất Thường</title>
+    <style>
+      .notification {
+        background-color: #ffcccc;
+        border: 2px solid #ff3333;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      h2 {
+        color: #ff3333;
+        margin: 0 0 10px;
+      }
+
+      p {
+        margin: 0 0 20px;
+      }
+
+      .buttons button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        background-color: #ff3333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .buttons button:hover {
+        background-color: #cc0000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="notification">
+      <h2>Cảnh Báo Dòng Bất Thường</h2>
+      <p id="alert-message">Phát hiện dòng bất thường tại IP: Đang tải...</p>
+      <div class="buttons">
+        <button onclick="require('electron').ipcRenderer.send('open-html')">Chuyển qua HTML</button>
+        <button onclick="require('electron').ipcRenderer.send('close-notification')">Tắt</button>
+      </div>
+    </div>
+    <script>
+      const { ipcRenderer } = require('electron');
+      ipcRenderer.on('update-alert', (event, data) => {
+        document.getElementById(
+          'alert-message'
+        ).textContent = `Phát hiện dòng bất thường tại IP: ${data.ip}, Slave: ${data.slaveId}.`;
+      });
+    </script>
+  </body>
+</html>

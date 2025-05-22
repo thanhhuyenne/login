@@ -12,7 +12,7 @@ const MySQLStore = require('express-mysql-session')(session);
 
 app.use(
   cors({
-    origin: 'http://127.0.0.1:5501', // ✅ Ghi đúng origin của trình duyệt bạn chạy HTML
+    origin: ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://127.0.0.1:5501'], // ✅ Ghi đúng origin của trình duyệt bạn chạy HTML
     credentials: true // ✅ Cho phép gửi cookie
   })
 );
@@ -3030,6 +3030,6 @@ app.get('/api/compareEnergyByPeriod', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
+app.listen(3000, '0.0.0.0', () => {
   console.log('🚀 Server đang chạy trên http://localhost:3000');
 });

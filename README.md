@@ -1,7 +1,8 @@
 git pull
+npm run start-alert
 
 git add .
-git commit -m "real-device"
+git commit -m "noti"
 git push
 
 git checkout main
