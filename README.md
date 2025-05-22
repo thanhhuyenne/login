@@ -1,5 +1,6 @@
 git pull
 npm run start-alert
+npm install
 
 git add .
 git commit -m "noti"
