@@ -3030,9 +3030,6 @@ app.get('/api/compareEnergyByPeriod', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-app.listen(3000, '0.0.0.0', () => {
-=======
 // API so sánh điện năng theo khu vực
 app.get('/api/compareEnergyByAreas', async (req, res) => {
   const { type, from, to, ips } = req.query;
@@ -3042,7 +3039,7 @@ app.get('/api/compareEnergyByAreas', async (req, res) => {
     return res.status(400).json({ error: 'Thiếu tham số hoặc type không hợp lệ (month | year)' });
   }
 
-  const ipList = ips.split(',').filter(ip => /^127\.0\.0\.[1-4]$/.test(ip));
+  const ipList = ips.split(',').filter((ip) => /^127\.0\.0\.[1-4]$/.test(ip));
   if (ipList.length === 0) {
     return res.status(400).json({ error: 'Không có khu vực hợp lệ được chọn' });
   }
@@ -3171,7 +3168,7 @@ app.get('/api/compareEnergyByAreas', async (req, res) => {
       if (type === 'month') {
         data = await getMonthlyData(ip, timeRange);
       } else {
-        data = await Promise.all(timeRange.map(year => getYearlyData(ip, year)));
+        data = await Promise.all(timeRange.map((year) => getYearlyData(ip, year)));
       }
       areas.push({
         ip,
@@ -3187,12 +3184,6 @@ app.get('/api/compareEnergyByAreas', async (req, res) => {
   }
 });
 
-// API đăng xuất
-app.post('/logout', (req, res) => {
-  res.json({ message: 'Đăng xuất thành công' });
-});
-
 app.listen(3000, () => {
->>>>>>> 27a953f0b55cec5748d3764fe5f446d3053a344a
   console.log('🚀 Server đang chạy trên http://localhost:3000');
 });
