@@ -1,9 +1,10 @@
 git pull
+git push --force
 npm run start-alert
 npm install
 
 git add .
-git commit -m "noti"
+git commit -m "để cỡ 80%, to quá ảnh nó đè sidebar"
 git push
 
 git checkout main
