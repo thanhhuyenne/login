@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alarm Report</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .signal-container {
+        position: relative;
+        width: 1511px;
+        height: 768px;
+        margin: 20px auto;
+      }
+      .background {
+        position: absolute;
+        left: 150px;
+        width: 70%;
+        height: 70%;
+        object-fit: contain;
+      }
+      .data-box {
+        position: absolute;
+        width: 80px;
+        height: 30px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid white;
+        text-align: center;
+        line-height: 30px;
+        font-weight: bold;
+        color: black;
+      }
+      #meter1 {
+        top: 200px;
+        left: 400px;
+      }
+      #meter2 {
+        top: 300px;
+        left: 600px;
+      }
+      .navigation {
+        position: absolute;
+        right: 350px;
+        top: 300px;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 10;
+      }
+      .nav-btn,
+      .back-btn {
+        display: block;
+        width: 120px;
+        padding: 12px 15px;
+        background-color: #555;
+        color: white;
+        text-align: center;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.1s;
+      }
+      .nav-btn:hover {
+        background-color: #bbb;
+        transform: scale(1.05);
+      }
+      .back-btn:hover {
+        background-color: #cc0000;
+      }
+      .active {
+        background-color: red;
+        font-weight: bold;
+      }
+      .meter-links {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 5;
+      }
+      .meter-btn {
+        position: absolute;
+        background-color: #007bff00;
+        color: rgba(255, 255, 255, 0);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.1s;
+        padding: 2px 5px;
+        font-size: 12px;
+        min-width: 30px;
+      }
+      #btn-meter1 {
+        top: 123px;
+        left: 325px;
+      }
+      #btn-meter2 {
+        top: 123px;
+        left: 410px;
+      }
+      #btn-meter3 {
+        top: 123px;
+        left: 477px;
+      }
+      .meter-btn:hover {
+        background-color: #0057b300;
+        transform: scale(1.05);
+      }
+      .status-dot {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+    </div>
+
+    <div class="container">
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'" class="active">
+          2 - CÀI ĐẶT SỤT ÁP DÂY
+        </div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
+        <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
+        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      </div>
+
+      <div class="content">
+        <h2 id="area-title">CÀI ĐẶT CẢNH BÁO SỤT ÁP DÂY - Khu vực 1</h2>
+        <div class="signal-container">
+          <img
+            id="background-img"
+            src="/pictures/day_tn.png"
+            class="background"
+            alt="Dãy tín hiệu"
+          />
+
+          <!-- Các ô số hiển thị dữ liệu -->
+          <!-- <div class="data-box" id="meter1">123</div> -->
+          <!-- <div class="data-box" id="meter2">456</div> -->
+
+          <!-- Cột nút chuyển đổi -->
+          <div class="navigation">
+            <button class="nav-btn" id="btn-day1">Dãy 1</button>
+            <button class="nav-btn" id="btn-day2">Dãy 2</button>
+            <button class="nav-btn" id="btn-day3">Dãy 3</button>
+            <button class="nav-btn" id="btn-day4">Dãy 4</button>
+            <button class="nav-btn back-btn" id="btn-back">Quay về</button>
+          </div>
+
+          <!-- Nút vào chi tiết đồng hồ -->
+          <div class="meter-links">
+            <button class="meter-btn" id="btn-meter1" data-id="1">1</button>
+            <button class="meter-btn" id="btn-meter2" data-id="2">2</button>
+            <button class="meter-btn" id="btn-meter3" data-id="3">3</button>
+          </div>
+
+          <!-- Các đèn trạng thái thiết bị -->
+          <img
+            id="device-127_0_0_1-1-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 345px"
+          />
+          <img
+            id="device-127_0_0_1-1-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 345px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-2-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 430px"
+          />
+          <img
+            id="device-127_0_0_1-2-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 430px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-3-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 498px"
+          />
+          <img
+            id="device-127_0_0_1-3-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 498px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-4-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 565px"
+          />
+          <img
+            id="device-127_0_0_1-4-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 565px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-5-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 633px"
+          />
+          <img
+            id="device-127_0_0_1-5-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 633px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-6-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 702px"
+          />
+          <img
+            id="device-127_0_0_1-6-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 702px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-7-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 140px; left: 775px"
+          />
+          <img
+            id="device-127_0_0_1-7-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 140px; left: 775px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-8-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 376px"
+          />
+          <img
+            id="device-127_0_0_1-8-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 376px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-9-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 448px"
+          />
+          <img
+            id="device-127_0_0_1-9-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 448px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-10-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 520px"
+          />
+          <img
+            id="device-127_0_0_1-10-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 520px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-11-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 603px"
+          />
+          <img
+            id="device-127_0_0_1-11-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 603px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-12-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 685px"
+          />
+          <img
+            id="device-127_0_0_1-12-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 685px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-13-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 763px"
+          />
+          <img
+            id="device-127_0_0_1-13-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 763px; display: none"
+          />
+          <img
+            id="device-127_0_0_1-14-green"
+            class="status-dot"
+            src="/pictures/blue-icon.png"
+            style="top: 418px; left: 842px"
+          />
+          <img
+            id="device-127_0_0_1-14-red"
+            class="status-dot"
+            src="/pictures/red-icon.png"
+            style="top: 418px; left: 842px; display: none"
+          />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Đọc tham số từ URL
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+
+      // Cấu hình các dãy
+      const arrayConfigs = {
+        1: { ip: '127.0.0.1', image: '/pictures/day_tn.png', title: 'Khu vực 1' },
+        2: { ip: '127.0.0.2', image: '/pictures/day_tn.png', title: 'Khu vực 2' },
+        3: { ip: '127.0.0.3', image: '/pictures/day_tn.png', title: 'Khu vực 3' },
+        4: { ip: '127.0.0.4', image: '/pictures/day_tn.png', title: 'Khu vực 4' }
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        // Lấy ID dãy từ URL (mặc định là 1 nếu không có)
+        const arrayId = getQueryParam('array') || '1';
+        const config = arrayConfigs[arrayId] || arrayConfigs['1'];
+
+        // Cập nhật tiêu đề
+        document.getElementById(
+          'area-title'
+        ).textContent = `CÀI ĐẶT CẢNH BÁO SỤT ÁP DÂY - ${config.title}`;
+
+        // Cập nhật hình nền
+        document.getElementById('background-img').src = config.image;
+
+        // Cập nhật IP cho các nút meter-btn
+        document.querySelectorAll('.meter-btn').forEach((button) => {
+          button.setAttribute('data-ip', config.ip);
+        });
+
+        // Cập nhật trạng thái nút active
+        document.querySelectorAll('.nav-btn').forEach((button) => {
+          button.classList.remove('active');
+          if (button.id === `btn-day${arrayId}`) {
+            button.classList.add('active');
+          }
+        });
+
+        // Gán sự kiện cho các nút chuyển dãy
+        document.getElementById('btn-day1').addEventListener('click', function () {
+          window.location.href = 'day_tn.html?array=1';
+        });
+        document.getElementById('btn-day2').addEventListener('click', function () {
+          window.location.href = 'day_tn.html?array=2';
+        });
+        document.getElementById('btn-day3').addEventListener('click', function () {
+          window.location.href = 'day_tn.html?array=3';
+        });
+        document.getElementById('btn-day4').addEventListener('click', function () {
+          window.location.href = 'day_tn.html?array=4';
+        });
+        document.getElementById('btn-back').addEventListener('click', function () {
+          window.location.href = 'monitor_main.html';
+        });
+
+        // Gán sự kiện cho nút chi tiết đồng hồ
+        document.querySelectorAll('.meter-btn').forEach((button) => {
+          button.addEventListener('click', function () {
+            let ip = this.getAttribute('data-ip');
+            let id = parseInt(this.getAttribute('data-id'));
+            viewDetails(ip, id);
+          });
+        });
+
+        function viewDetails(ip, id) {
+          window.location.href = `OTT1.html?ip=${ip}&slaveId=${id}`;
+        }
+
+        // Hàm cập nhật trạng thái thiết bị
+        async function updateGatewayStatus() {
+          try {
+            const response = await fetch('http://localhost:3000/status-modbus-device');
+            const statusData = await response.json();
+
+            if (!statusData || statusData.length === 0) {
+              console.warn('Không có dữ liệu thiết bị từ API, giữ trạng thái hiện tại.');
+              return;
+            }
+
+            statusData.forEach((device) => {
+              if (device.ip === config.ip) {
+                // Chỉ xử lý thiết bị thuộc IP hiện tại
+                const deviceId = `device-${device.ip.replace(/\./g, '_')}-${device.slaveId}`;
+                updateIndicator(deviceId, device.status === 1);
+              }
+            });
+          } catch (error) {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+          }
+        }
+
+        function updateIndicator(deviceId, isConnected) {
+          const greenDot = document.getElementById(`${deviceId}-green`);
+          const redDot = document.getElementById(`${deviceId}-red`);
+
+          if (!greenDot || !redDot) {
+            console.warn(`Không tìm thấy đèn tín hiệu cho ${deviceId}`);
+            return;
+          }
+
+          if (isConnected) {
+            greenDot.style.display = 'block';
+            redDot.style.display = 'none';
+          } else {
+            greenDot.style.display = 'none';
+            redDot.style.display = 'block';
+          }
+        }
+
+        // Khởi tạo trạng thái đèn đỏ
+        const allDevices = document.querySelectorAll("[id$='-green']");
+        allDevices.forEach((dot) => {
+          const deviceId = dot.id.replace('-green', '');
+          updateIndicator(deviceId, false);
+        });
+
+        // Gọi API cập nhật ngay và sau đó mỗi 2 giây
+        updateGatewayStatus();
+        setInterval(updateGatewayStatus, 2000);
+      });
+
+      // Hàm đăng xuất
+      function handleLogout() {
+        window.location.href = 'login.html';
+      }
+    </script>
+  </body>
+</html>
