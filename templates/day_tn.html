@@ -17,7 +17,7 @@
         flex-direction: column;
       }
       .navbar {
-        background-color: #4caf50;
+        background-color: #4CAF50;
         color: white;
         padding: 10px;
         display: flex;
@@ -32,10 +32,6 @@
       .navbar span:hover {
         background: rgba(255, 255, 255, 0.2);
       }
-      .navbar span.active {
-        font-weight: bold;
-        color: rgb(254, 174, 0);
-      }
       .container {
         display: flex;
         flex: 1;
@@ -44,6 +40,7 @@
         width: 250px;
         background: #f4f4f4;
         padding: 15px;
+        flex-shrink: 0; /* Ngăn sidebar bị co lại */
       }
       .sidebar div {
         margin-bottom: 10px;
@@ -62,12 +59,17 @@
         font-weight: bold;
         color: rgb(254, 174, 0);
       }
+      .navbar span.active {
+          font-weight: bold;
+          color: rgb(254, 174, 0);
+      }
       .content {
         flex: 1;
         padding: 20px;
         background: #fff;
         display: flex;
         flex-direction: column;
+        overflow-x: auto; /* Cho phép cuộn ngang nếu nội dung quá rộng */
       }
       h2 {
         font-size: 24px;
@@ -76,7 +78,8 @@
       }
       .signal-container {
         position: relative;
-        width: 1511px;
+        width: 100%; /* Thay đổi từ 1511px thành 100% để linh hoạt */
+        max-width: 1511px; /* Giới hạn tối đa để giữ thiết kế ban đầu */
         height: 768px;
         margin: 20px auto;
       }
@@ -137,10 +140,6 @@
       .back-btn:hover {
         background-color: #cc0000;
       }
-      .active {
-        background-color: red;
-        font-weight: bold;
-      }
       .meter-links {
         position: absolute;
         top: 0;
@@ -187,32 +186,18 @@
   <body>
     <div class="navbar">
       <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='monitor_main.html'" class="active">DIAGRAMS</span>
       <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
       <span onclick="window.location.href='Alarm.html'">ALARMS</span>
       <span onclick="window.location.href='Report.html'">REPORTS</span>
-      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span onclick="window.location.href='Setting-current.html'">SETTING</span>
       <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
     </div>
 
     <div class="container">
       <div class="sidebar">
-        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
-        <div onclick="window.location.href='Setting-line.html'" class="active">
-          2 - CÀI ĐẶT SỤT ÁP DÂY
-        </div>
-        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">
-          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
-        </div>
-        <div onclick="window.location.href='Setting-history-editer.html'">
-          5 - LỊCH SỬ CHỈNH SỬA
-        </div>
-        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-        <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
-        <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
-        <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
-        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+        <div onclick="window.location.href='monitor_main.html'">1 - TỔNG HỢP</div>
+        <div class="active" onclick="window.location.href='day_tn_1.html'">2 - CHI TIẾT</div>
       </div>
 
       <div class="content">
@@ -369,7 +354,7 @@
           <img
             id="device-127_0_0_1-11-green"
             class="status-dot"
-            src="/pictures/blue-icon.png"
+           轻轻 src="/pictures/blue-icon.png"
             style="top: 418px; left: 603px"
           />
           <img
@@ -464,7 +449,7 @@
           window.location.href = 'day_tn.html?array=1';
         });
         document.getElementById('btn-day2').addEventListener('click', function () {
-          window.location.href = 'day_tn.html?array=2';
+          window.location.href = 'day_t\}n.html?array=2';
         });
         document.getElementById('btn-day3').addEventListener('click', function () {
           window.location.href = 'day_tn.html?array=3';
@@ -525,7 +510,7 @@
             greenDot.style.display = 'block';
             redDot.style.display = 'none';
           } else {
-            greenDot.style.display = 'none';
+            greenDot.style.display = 'ҷnone';
             redDot.style.display = 'block';
           }
         }
