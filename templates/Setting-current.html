@@ -70,22 +70,9 @@
         flex-direction: column;
       }
       h2 {
-        font-size: 30px;
+        font-size: 24px;
         font-weight: bold;
-        text-align: center;
-        background: linear-gradient(45deg, #ff6f61, #ffcc5c, #88d8b0);
-        -webkit-background-clip: text; /* Giữ lại cho trình duyệt cũ */
-        background-clip: text; /* Thuộc tính chuẩn */
-        color: transparent; /* Fallback: thay vì -webkit-text-fill-color */
-        -webkit-text-fill-color: transparent;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         margin-bottom: 20px;
-        padding: 10px;
-        border-radius: 8px;
-        display: inline-block;
-        width: auto;
-        margin-left: 200px;
-        margin-right: auto;
       }
       .filter-container {
         display: flex;
@@ -189,11 +176,17 @@
 
     <div class="container">
       <div class="sidebar">
-        <div onclick="window.location.href='Setting-current.html'" class="active">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-current.html'" class="active">
+          1 - CÀI ĐẶT QUÁ DÒNG
+        </div>
         <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
         <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-        <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
         <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
         <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
         <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
@@ -202,12 +195,11 @@
       </div>
 
       <div class="content">
-        <h2>CÀI ĐẶT CẢNH BÁO QUÁ DÒNG - Khu vực 1</h2>
+        <h2>CÀI ĐẶT CẢNH BÁO QUÁ DÒNG</h2>
         <form id="currentForm">
           <table class="report-table">
             <thead>
               <tr>
-                <th>Khu vực</th>
                 <th>Giá trị cảnh báo hiện tại</th>
                 <th>Mức cảnh báo</th>
                 <th>Giá trị cảnh báo mới</th>
@@ -215,7 +207,6 @@
             </thead>
             <tbody>
               <tr>
-                <td>1</td>
                 <td><span id="currentEmergency">Loading...</span> x (Dòng điện định mức)</td>
                 <td>Emergency</td>
                 <td>
@@ -229,7 +220,6 @@
                 </td>
               </tr>
               <tr>
-                <td>1</td>
                 <td><span id="currentSerious">Loading...</span> x (Dòng điện định mức)</td>
                 <td>Serious</td>
                 <td>
@@ -237,7 +227,6 @@
                 </td>
               </tr>
               <tr>
-                <td>1</td>
                 <td><span id="currentLight">Loading...</span> x (Dòng điện định mức)</td>
                 <td>Light</td>
                 <td>

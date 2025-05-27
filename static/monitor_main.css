@@ -1,88 +1,92 @@
 /* Reset mặc định */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: url('/pictures/monitor_main.png') no-repeat;
-    background-size: 858px 551px; /* Đúng kích thước ảnh */
-    background-position: 290px 30px; /* Dịch phải 150px, xuống 50px */
+  font-family: Arial, sans-serif;
+  background: url('/pictures/monitor_main.png') no-repeat;
+  background-size: 858px 551px; /* Đúng kích thước ảnh */
+  background-position: 290px 30px; /* Dịch phải 150px, xuống 50px */
 }
 
 .main-content {
-    width: 1920px; /* Hoặc 100vw nếu muốn full màn */
-    height: 1080px; /* Hoặc 100vh */
-    
+  width: 100%;
+  max-width: 1020px; /* Giới hạn tối đa */
+  height: 1080px;
 }
-
 
 .device-status {
-    position: absolute;
-    width: 15px;
-    height: 15px;
+  position: absolute;
+  width: 15px;
+  height: 15px;
 }
 .status-dot {
-    position: absolute;  /* Quan trọng! */
-    width: 15px;   /* Kích thước dấu tick */
-    height: 15px;
+  position: absolute; /* Quan trọng! */
+  width: 15px; /* Kích thước dấu tick */
+  height: 15px;
 }
 
 /* Thanh điều hướng */
 .navbar {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px;
-    text-align: left;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  display: flex;
+  gap: 15px;
 }
-
 .navbar span {
-    margin: 0 10px;
-    cursor: pointer;
-    padding: 5px;
-    transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    border-radius: 4px;
+  padding: 5px 10px; /* Đồng bộ padding */
+  margin: 0; /* Xóa margin để dùng gap */
+  cursor: pointer;
+  transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  border-radius: 4px;
 }
 .navbar span.active {
-    font-weight: bold; /* Làm đậm chữ */
-    color: rgb(254, 174, 0); /* Đổi màu chữ */
+  font-weight: bold; /* Làm đậm chữ */
+  color: rgb(254, 174, 0); /* Đổi màu chữ */
 }
 
 .navbar span:hover {
-    background: rgba(255, 255, 255, 0.2);
-    opacity: 0.7;
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 0.7;
 }
 
 /* Bố cục chính */
 .container {
-    display: flex;
-    height: calc(100vh - 40px);
-    overflow: hidden;
+  display: flex;
+  height: calc(100vh - 40px);
+  overflow: hidden;
+}
+.signal-container {
+  position: relative;
+  width: 701px;
+  height: 600px;
+  margin: 20px auto;
 }
 
 /* Thanh bên */
 .sidebar {
-    width: 10%;
-    background: #f4f4f4;
-    padding: 10px;
-    text-align: center; /* Đảm bảo chữ luôn nằm giữa */
+  width: 250px;
+  background: #f4f4f4;
+  padding: 15px; /* Đồng bộ padding */
+  text-align: left;
 }
 
 .sidebar div {
-    margin-bottom: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 10px;
-    transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 10px;
+  transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
 }
 
 .sidebar div:hover {
-    background: rgba(0, 0, 0, 0.1);
-    opacity: 0.7;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0.7;
 }
-

@@ -6,77 +6,7 @@
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        .status-dot {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/monitor_main.css">
 </head>
 <body>
     <div class="navbar">
@@ -90,18 +20,47 @@
     </div>
     <div class="container">
         <div class="sidebar">
-            <div class="active">1 - TỔNG HỢP</div>
-            <div onclick="window.location.href='day_tn_1.html'">2 - CHI TIẾT</div>
+            <div>1 - TỔNG HỢP</div>
+            <div onclick="window.location.href='day_tn.html'">2 - CHI TIẾT</div>
         </div>
         <div class="main-content">
-            <img id="device1-green" class="status-dot" src="/pictures/blue-icon.png" style="top: 335px; left: 355px;">
-            <img id="device1-red" class="status-dot" src="/pictures/red-icon.png" style="top: 335px; left: 355px; display: none;">
-            <img id="device2-green" class="status-dot" src="/pictures/blue-icon.png" style="top: 335px; left: 468px;">
-            <img id="device2-red" class="status-dot" src="/pictures/red-icon.png" style="top: 335px; left: 468px; display: none;">
-            <img id="device3-green" class="status-dot" src="/pictures/blue-icon.png" style="top: 335px; left: 678px;">
-            <img id="device3-red" class="status-dot" src="/pictures/red-icon.png" style="top: 335px; left: 678px; display: none;">
-            <img id="device4-green" class="status-dot" src="/pictures/blue-icon.png" style="top: 335px; left: 790px;">
-            <img id="device4-red" class="status-dot" src="/pictures/red-icon.png" style="top: 335px; left: 790px; display: none;">
+            <img    id="device1-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 355px;">
+            <img    id="device1-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 355px; display: none;">
+
+            <img    id="device2-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 468px;">
+            <img    id="device2-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 468px; display: none;">
+
+            <img    id="device3-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 678px;">
+            <img    id="device3-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 678px; display: none;">
+
+            <img    id="device4-green" 
+                    class="status-dot" 
+                     src="/pictures/blue-icon.png" 
+                    style="top: 335px; left: 790px;">
+            <img    id="device4-red" 
+                    class="status-dot" 
+                    src="/pictures/red-icon.png" 
+                    style="top: 335px; left: 790px; display: none;">
+        
+            </div>
         </div>
     </div>
     <script>
@@ -147,14 +106,16 @@ async function logout() {
         const response = await fetch('http://127.0.0.1:3000/logout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            credentials: 'include',  // ⚠️ Quan trọng: gửi cookie (sessionID)
         });
         const data = await response.json();
         console.log('Phản hồi từ server:', data.message);
+
+        // Xóa role khỏi localStorage
         localStorage.removeItem('role');
-        return data;
+        return data; // Trả về để xử lý trong then
     } catch (error) {
-        throw error;
+        throw error; // Ném lỗi để catch bên ngoài xử lý
     }
 }
 

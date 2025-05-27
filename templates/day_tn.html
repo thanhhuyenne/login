@@ -17,7 +17,7 @@
         flex-direction: column;
       }
       .navbar {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         padding: 10px;
         display: flex;
@@ -32,6 +32,10 @@
       .navbar span:hover {
         background: rgba(255, 255, 255, 0.2);
       }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
       .container {
         display: flex;
         flex: 1;
@@ -40,7 +44,6 @@
         width: 250px;
         background: #f4f4f4;
         padding: 15px;
-        flex-shrink: 0; /* Ngăn sidebar bị co lại */
       }
       .sidebar div {
         margin-bottom: 10px;
@@ -59,17 +62,12 @@
         font-weight: bold;
         color: rgb(254, 174, 0);
       }
-      .navbar span.active {
-          font-weight: bold;
-          color: rgb(254, 174, 0);
-      }
       .content {
         flex: 1;
         padding: 20px;
         background: #fff;
         display: flex;
         flex-direction: column;
-        overflow-x: auto; /* Cho phép cuộn ngang nếu nội dung quá rộng */
       }
       h2 {
         font-size: 24px;
@@ -78,8 +76,7 @@
       }
       .signal-container {
         position: relative;
-        width: 100%; /* Thay đổi từ 1511px thành 100% để linh hoạt */
-        max-width: 1511px; /* Giới hạn tối đa để giữ thiết kế ban đầu */
+        width: 1231px;
         height: 768px;
         margin: 20px auto;
       }
@@ -111,8 +108,8 @@
       }
       .navigation {
         position: absolute;
-        right: 350px;
-        top: 300px;
+        right: 220px;
+        top: 230px;
         transform: translateY(-50%);
         display: flex;
         flex-direction: column;
@@ -140,6 +137,10 @@
       .back-btn:hover {
         background-color: #cc0000;
       }
+      .active {
+        background-color: #4caf50;
+        font-weight: bold;
+      }
       .meter-links {
         position: absolute;
         top: 0;
@@ -150,27 +151,63 @@
       }
       .meter-btn {
         position: absolute;
-        background-color: #007bff00;
+        background-color: #c50a7a00;
         color: rgba(255, 255, 255, 0);
         border: none;
         border-radius: 4px;
         cursor: pointer;
         transition: background 0.3s, transform 0.1s;
-        padding: 2px 5px;
+        padding: 4px 5px;
         font-size: 12px;
         min-width: 30px;
       }
       #btn-meter1 {
-        top: 123px;
-        left: 325px;
+        top: 143px;
+        left: 260px;
       }
       #btn-meter2 {
-        top: 123px;
-        left: 410px;
+        top: 143px;
+        left: 345px;
       }
       #btn-meter3 {
-        top: 123px;
-        left: 477px;
+        top: 143px;
+        left: 415px;
+      }
+      #btn-meter4 {
+        top: 143px;
+        left: 485px;
+      }
+      #btn-meter5 {
+        top: 143px;
+        left: 555px;
+      }
+      #btn-meter6 {
+        top: 143px;
+        left: 630px;
+      }
+      #btn-meter7 {
+        top: 143px;
+        left: 705px;
+      }
+      #btn-meter8 {
+        top: 343px;
+        left: 610px;
+      }
+      #btn-meter9 {
+        top: 343px;
+        left: 520px;
+      }
+      #btn-meter10 {
+        top: 343px;
+        left: 435px;
+      }
+      #btn-meter11 {
+        top: 343px;
+        left: 360px;
+      }
+      #btn-meter12 {
+        top: 343px;
+        left: 285px;
       }
       .meter-btn:hover {
         background-color: #0057b300;
@@ -197,11 +234,11 @@
     <div class="container">
       <div class="sidebar">
         <div onclick="window.location.href='monitor_main.html'">1 - TỔNG HỢP</div>
-        <div class="active" onclick="window.location.href='day_tn_1.html'">2 - CHI TIẾT</div>
+        <div onclick="window.location.href='day_tn.html'" class="active">2 - CHI TIẾT</div>
       </div>
 
       <div class="content">
-        <h2 id="area-title">CÀI ĐẶT CẢNH BÁO SỤT ÁP DÂY - Khu vực 1</h2>
+        <h2 id="area-title">TÌNH TRẠNG KẾT NỐI DÃY TÍN HIỆU - Khu vực 1</h2>
         <div class="signal-container">
           <img
             id="background-img"
@@ -228,6 +265,15 @@
             <button class="meter-btn" id="btn-meter1" data-id="1">1</button>
             <button class="meter-btn" id="btn-meter2" data-id="2">2</button>
             <button class="meter-btn" id="btn-meter3" data-id="3">3</button>
+            <button class="meter-btn" id="btn-meter4" data-id="4">3</button>
+            <button class="meter-btn" id="btn-meter5" data-id="5">3</button>
+            <button class="meter-btn" id="btn-meter6" data-id="6">3</button>
+            <button class="meter-btn" id="btn-meter7" data-id="7">3</button>
+            <button class="meter-btn" id="btn-meter8" data-id="8">3</button>
+            <button class="meter-btn" id="btn-meter9" data-id="9">3</button>
+            <button class="meter-btn" id="btn-meter10" data-id="10">3</button>
+            <button class="meter-btn" id="btn-meter11" data-id="11">3</button>
+            <button class="meter-btn" id="btn-meter12" data-id="12">3</button>
           </div>
 
           <!-- Các đèn trạng thái thiết bị -->
@@ -235,169 +281,145 @@
             id="device-127_0_0_1-1-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 345px"
+            style="top: 170px; left: 250px"
           />
           <img
             id="device-127_0_0_1-1-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 345px; display: none"
+            style="top: 170px; left: 250px; display: none"
           />
           <img
             id="device-127_0_0_1-2-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 430px"
+            style="top: 170px; left: 341px"
           />
           <img
             id="device-127_0_0_1-2-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 430px; display: none"
+            style="top: 170px; left: 341px; display: none"
           />
           <img
             id="device-127_0_0_1-3-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 498px"
+            style="top: 170px; left: 410px"
           />
           <img
             id="device-127_0_0_1-3-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 498px; display: none"
+            style="top: 170px; left: 410px; display: none"
           />
           <img
             id="device-127_0_0_1-4-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 565px"
+            style="top: 170px; left: 480px"
           />
           <img
             id="device-127_0_0_1-4-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 565px; display: none"
+            style="top: 170px; left: 480px; display: none"
           />
           <img
             id="device-127_0_0_1-5-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 633px"
+            style="top: 170px; left: 548px"
           />
           <img
             id="device-127_0_0_1-5-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 633px; display: none"
+            style="top: 170px; left: 548px; display: none"
           />
           <img
             id="device-127_0_0_1-6-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 702px"
+            style="top: 170px; left: 623px"
           />
           <img
             id="device-127_0_0_1-6-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 702px; display: none"
+            style="top: 170px; left: 623px; display: none"
           />
           <img
             id="device-127_0_0_1-7-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 140px; left: 775px"
+            style="top: 170px; left: 700px"
           />
           <img
             id="device-127_0_0_1-7-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 140px; left: 775px; display: none"
+            style="top: 170px; left: 700px; display: none"
           />
           <img
             id="device-127_0_0_1-8-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 418px; left: 376px"
+            style="top: 365px; left: 600px"
           />
           <img
             id="device-127_0_0_1-8-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 418px; left: 376px; display: none"
+            style="top: 365px; left: 600px; display: none"
           />
           <img
             id="device-127_0_0_1-9-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 418px; left: 448px"
+            style="top: 365px; left: 512px"
           />
           <img
             id="device-127_0_0_1-9-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 418px; left: 448px; display: none"
+            style="top: 365px; left: 512px; display: none"
           />
           <img
             id="device-127_0_0_1-10-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 418px; left: 520px"
+            style="top: 365px; left: 424px"
           />
           <img
             id="device-127_0_0_1-10-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 418px; left: 520px; display: none"
+            style="top: 365px; left: 424px; display: none"
           />
           <img
             id="device-127_0_0_1-11-green"
             class="status-dot"
-           轻轻 src="/pictures/blue-icon.png"
-            style="top: 418px; left: 603px"
+            src="/pictures/blue-icon.png"
+            style="top: 365px; left: 350px"
           />
           <img
             id="device-127_0_0_1-11-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 418px; left: 603px; display: none"
+            style="top: 365px; left: 350px; display: none"
           />
           <img
             id="device-127_0_0_1-12-green"
             class="status-dot"
             src="/pictures/blue-icon.png"
-            style="top: 418px; left: 685px"
+            style="top: 365px; left: 275px"
           />
           <img
             id="device-127_0_0_1-12-red"
             class="status-dot"
             src="/pictures/red-icon.png"
-            style="top: 418px; left: 685px; display: none"
-          />
-          <img
-            id="device-127_0_0_1-13-green"
-            class="status-dot"
-            src="/pictures/blue-icon.png"
-            style="top: 418px; left: 763px"
-          />
-          <img
-            id="device-127_0_0_1-13-red"
-            class="status-dot"
-            src="/pictures/red-icon.png"
-            style="top: 418px; left: 763px; display: none"
-          />
-          <img
-            id="device-127_0_0_1-14-green"
-            class="status-dot"
-            src="/pictures/blue-icon.png"
-            style="top: 418px; left: 842px"
-          />
-          <img
-            id="device-127_0_0_1-14-red"
-            class="status-dot"
-            src="/pictures/red-icon.png"
-            style="top: 418px; left: 842px; display: none"
+            style="top: 365px; left: 275px; display: none"
           />
         </div>
       </div>
@@ -449,7 +471,7 @@
           window.location.href = 'day_tn.html?array=1';
         });
         document.getElementById('btn-day2').addEventListener('click', function () {
-          window.location.href = 'day_t\}n.html?array=2';
+          window.location.href = 'day_tn.html?array=2';
         });
         document.getElementById('btn-day3').addEventListener('click', function () {
           window.location.href = 'day_tn.html?array=3';
@@ -510,7 +532,7 @@
             greenDot.style.display = 'block';
             redDot.style.display = 'none';
           } else {
-            greenDot.style.display = 'ҷnone';
+            greenDot.style.display = 'none';
             redDot.style.display = 'block';
           }
         }
@@ -529,7 +551,31 @@
 
       // Hàm đăng xuất
       function handleLogout() {
-        window.location.href = 'login.html';
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
+            });
+        }
+      }
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
+        }
       }
     </script>
   </body>

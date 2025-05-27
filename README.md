@@ -16,7 +16,7 @@ git add .
 git commit -m "SO Sánh"
 git push origin feature/my-work
 
-git checkout main                
-git add .                       
+git checkout main  
+git add .  
 git commit -m "Nội dung cập nhật"  
-git push origin main            
+git push origin main

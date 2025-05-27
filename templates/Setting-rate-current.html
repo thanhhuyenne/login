@@ -1,285 +1,299 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alarm Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .filter-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .filter-container label {
-            font-size: 14px;
-        }
-        select, input, button {
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-        }
-        button:disabled {
-            background-color: #a0a0a0;
-            cursor: not-allowed;
-        }
-        button:hover:not(:disabled) {
-            background-color: #45a049;
-        }
-        .filter-container button {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .filter-container button:hover:not(.active) {
-            background-color: #45a049;
-        }
-        .filter-container button.active {
-            background-color: white;
-            color: #4CAF50;
-            font-weight: bold;
-            border: 2px solid #ffcc00;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        .report-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .report-table tr:hover {
-            background: #f1f1f1;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
-        }
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            opacity: 1;
-        }
-        input[type="number"]:focus {
-            border-color: #4CAF50;
-        }
-        .unit {
-            font-size: 12px;
-            margin-left: 5px;
-            color: #666;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .button-container button[type="button"] {
-            background-color: #f44336;
-        }
-        .button-container button[type="button"]:hover {
-            background-color: #d32f2f;
-        }
-        .error-message {
-            display: none;
-            font-size: 18px;
-            color: red;
-            text-align: center;
-            margin: 20px 0;
-        }
-        #message {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
-            display: none;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .filter-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .filter-container label {
+        font-size: 14px;
+      }
+      select,
+      input,
+      button {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+      }
+      button:disabled {
+        background-color: #a0a0a0;
+        cursor: not-allowed;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .filter-container button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      .filter-container button:hover:not(.active) {
+        background-color: #45a049;
+      }
+      .filter-container button.active {
+        background-color: white;
+        color: #4caf50;
+        font-weight: bold;
+        border: 2px solid #ffcc00;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .report-table th,
+      .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+      }
+      .report-table th {
+        background: #4caf50;
+        color: white;
+        font-weight: bold;
+      }
+      .report-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .report-table tr:hover {
+        background: #f1f1f1;
+      }
+      input[type='number'] {
+        width: 80px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+      }
+      input[type='number']::-webkit-inner-spin-button,
+      input[type='number']::-webkit-outer-spin-button {
+        opacity: 1;
+      }
+      input[type='number']:focus {
+        border-color: #4caf50;
+      }
+      .unit {
+        font-size: 12px;
+        margin-left: 5px;
+        color: #666;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      .button-container button[type='button'] {
+        background-color: #f44336;
+      }
+      .button-container button[type='button']:hover {
+        background-color: #d32f2f;
+      }
+      .error-message {
+        display: none;
+        font-size: 18px;
+        color: red;
+        text-align: center;
+        margin: 20px 0;
+      }
+      #message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+        display: none;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-        <span onclick="window.location.href='Report.html'">REPORTS</span>
-        <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
-        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
     </div>
 
     <div class="container">
-        <div class="sidebar">
-            <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
-            <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
-            <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-            <div onclick="window.location.href='Setting-rate-current.html'" class="active">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-            <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
-            <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-            <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
-            <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
-            <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
-            <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'" class="active">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
         </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
+        <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
+        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      </div>
 
-        <div class="content">
-            <h2>CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</h2>
-            <div class="filter-container">
-                <button onclick="loadArea('Khu vực 1', '127.0.0.1')" class="area-button active">Khu vực 1</button>
-                <button onclick="loadArea('Khu vực 2', '127.0.0.2')" class="area-button">Khu vực 2</button>
-                <button onclick="loadArea('Khu vực 3', '127.0.0.3')" class="area-button">Khu vực 3</button>
-                <button onclick="loadArea('Khu vực 4', '127.0.0.4')" class="area-button">Khu vực 4</button>
-            </div>
-            <form id="deviceConfigForm">
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>IP</th>
-                            <th>Slave ID</th>
-                            <th>Giá trị hiện tại</th>
-                            <th>Dòng điện định mức</th>
-                        </tr>
-                    </thead>
-                    <tbody id="deviceConfigTable">
-                    </tbody>
-                </table>
-                <div class="button-container">
-                    <button type="submit">Lưu</button>
-                    <button type="button" id="resetButton">Đặt lại</button>
-                </div>
-            </form>
-            <div id="message"></div>
+      <div class="content">
+        <h2>CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</h2>
+        <div class="filter-container">
+          <button onclick="loadArea('Khu vực 1', '127.0.0.1')" class="area-button active">
+            Khu vực 1
+          </button>
+          <button onclick="loadArea('Khu vực 2', '127.0.0.2')" class="area-button">
+            Khu vực 2
+          </button>
+          <button onclick="loadArea('Khu vực 3', '127.0.0.3')" class="area-button">
+            Khu vực 3
+          </button>
+          <button onclick="loadArea('Khu vực 4', '127.0.0.4')" class="area-button">
+            Khu vực 4
+          </button>
         </div>
+        <form id="deviceConfigForm">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>IP</th>
+                <th>Slave ID</th>
+                <th>Giá trị hiện tại</th>
+                <th>Dòng điện định mức</th>
+              </tr>
+            </thead>
+            <tbody id="deviceConfigTable"></tbody>
+          </table>
+          <div class="button-container">
+            <button type="submit">Lưu</button>
+            <button type="button" id="resetButton">Đặt lại</button>
+          </div>
+        </form>
+        <div id="message"></div>
+      </div>
     </div>
 
     <script>
-        let currentAreaIp = '127.0.0.1';
+      let currentAreaIp = '127.0.0.1';
 
-        async function loadDeviceConfig(ip) {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/get-device-config');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const devices = await response.json();
-                const filteredDevices = devices.filter(device => device.ip === ip);
-                const tbody = document.getElementById('deviceConfigTable');
-                tbody.innerHTML = '';
-                const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
-                slaveIds.forEach(slaveId => {
-                    const device = filteredDevices.find(d => d.slave_id === slaveId) || {
-                        ip: ip,
-                        slave_id: slaveId,
-                        rated_current: 0
-                    };
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+      async function loadDeviceConfig(ip) {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-device-config');
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const devices = await response.json();
+          const filteredDevices = devices.filter((device) => device.ip === ip);
+          const tbody = document.getElementById('deviceConfigTable');
+          tbody.innerHTML = '';
+          const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+          slaveIds.forEach((slaveId) => {
+            const device = filteredDevices.find((d) => d.slave_id === slaveId) || {
+              ip: ip,
+              slave_id: slaveId,
+              rated_current: 0
+            };
+            const row = document.createElement('tr');
+            row.innerHTML = `
                         <td>${device.ip}</td>
                         <td>${device.slave_id}</td>
                         <td>${device.rated_current} A</td>
@@ -289,155 +303,157 @@
                             <span class="unit">A</span>
                         </td>
                     `;
-                    tbody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu từ server:', error);
-                document.getElementById('message').style.display = 'block';
-                document.getElementById('message').className = 'error';
-                document.getElementById('message').textContent = `Lỗi: ${error.message}`;
-            }
+            tbody.appendChild(row);
+          });
+        } catch (error) {
+          console.error('Lỗi khi lấy dữ liệu từ server:', error);
+          document.getElementById('message').style.display = 'block';
+          document.getElementById('message').className = 'error';
+          document.getElementById('message').textContent = `Lỗi: ${error.message}`;
         }
+      }
 
-        function loadArea(areaName, ip) {
-            currentAreaIp = ip;
-            loadDeviceConfig(ip);
-            const buttons = document.querySelectorAll('.area-button');
-            buttons.forEach(button => {
-                button.classList.remove('active');
-                if (button.textContent === areaName) {
-                    button.classList.add('active');
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDeviceConfig(currentAreaIp);
-            const form = document.getElementById('deviceConfigForm');
-            if (form) {
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const confirmed = window.confirm('Xác nhận chỉnh sửa?');
-                    if (!confirmed) {
-                        return;
-                    }
-                    const formData = new FormData(e.target);
-                    const data = [];
-                    formData.forEach((value, key) => {
-                        if (key.startsWith('rated_current_')) {
-                            const parts = key.split('_');
-                            if (parts.length >= 3) {
-                                const ip = key.split('_').slice(2, -1).join('.');
-                                const slave_id = parts[parts.length - 1];
-                                data.push({
-                                    ip: ip,
-                                    slave_id: parseInt(slave_id),
-                                    rated_current: parseFloat(value)
-                                });
-                            }
-                        }
-                    });
-                    console.log('Dữ liệu gửi lên server:', data);
-                    const messageDiv = document.getElementById('message');
-                    messageDiv.style.display = 'block';
-                    try {
-                        const response = await fetch('http://127.0.0.1:3000/save-device-config', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            credentials: 'include',
-                            body: JSON.stringify(data)
-                        });
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        const contentType = response.headers.get('content-type');
-                        if (!contentType || !contentType.includes('application/json')) {
-                            throw new Error('Phản hồi từ server không phải JSON');
-                        }
-                        const result = await response.json();
-                        if (result.status === "success") {
-                            messageDiv.className = 'success';
-                            messageDiv.textContent = `Lưu thành công!`;
-                            loadDeviceConfig(currentAreaIp);
-                        } else {
-                            messageDiv.className = 'error';
-                            messageDiv.textContent = `Lỗi: ${result.message}`;
-                        }
-                    } catch (error) {
-                        messageDiv.className = 'error';
-                        messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /save-device-config hoạt động đúng.`;
-                    }
-                });
-            } else {
-                console.error("Không tìm thấy form với id='deviceConfigForm'");
-            }
-            const resetButton = document.getElementById('resetButton');
-            resetButton.addEventListener('click', async () => {
-                const confirmed = window.confirm('Xác nhận đặt lại?');
-                if (!confirmed) {
-                    return;
-                }
-                const messageDiv = document.getElementById('message');
-                messageDiv.style.display = 'block';
-                try {
-                    const response = await fetch('http://127.0.0.1:3000/reset-device-config', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include',
-                    });
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Phản hồi từ server không phải JSON');
-                    }
-                    const result = await response.json();
-                    if (result.status === "success") {
-                        messageDiv.className = 'success';
-                        messageDiv.textContent = `Đặt lại thành công!`;
-                        loadDeviceConfig(currentAreaIp);
-                    } else {
-                        messageDiv.className = 'error';
-                        messageDiv.textContent = `Lỗi: ${result.message}`;
-                    }
-                } catch (error) {
-                    messageDiv.className = 'error';
-                    messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /reset-device-config hoạt động đúng.`;
-                }
-            });
+      function loadArea(areaName, ip) {
+        currentAreaIp = ip;
+        loadDeviceConfig(ip);
+        const buttons = document.querySelectorAll('.area-button');
+        buttons.forEach((button) => {
+          button.classList.remove('active');
+          if (button.textContent === areaName) {
+            button.classList.add('active');
+          }
         });
+      }
 
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                logout().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Lỗi khi đăng xuất:', error);
-                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
-                });
+      document.addEventListener('DOMContentLoaded', () => {
+        loadDeviceConfig(currentAreaIp);
+        const form = document.getElementById('deviceConfigForm');
+        if (form) {
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const confirmed = window.confirm('Xác nhận chỉnh sửa?');
+            if (!confirmed) {
+              return;
             }
-        }
-
-        async function logout() {
+            const formData = new FormData(e.target);
+            const data = [];
+            formData.forEach((value, key) => {
+              if (key.startsWith('rated_current_')) {
+                const parts = key.split('_');
+                if (parts.length >= 3) {
+                  const ip = key.split('_').slice(2, -1).join('.');
+                  const slave_id = parts[parts.length - 1];
+                  data.push({
+                    ip: ip,
+                    slave_id: parseInt(slave_id),
+                    rated_current: parseFloat(value)
+                  });
+                }
+              }
+            });
+            console.log('Dữ liệu gửi lên server:', data);
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
             try {
-                const response = await fetch('http://127.0.0.1:3000/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                console.log('Phản hồi từ server:', data.message);
-                localStorage.removeItem('role');
-                return data;
+              const response = await fetch('http://127.0.0.1:3000/save-device-config', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(data)
+              });
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              const contentType = response.headers.get('content-type');
+              if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Phản hồi từ server không phải JSON');
+              }
+              const result = await response.json();
+              if (result.status === 'success') {
+                messageDiv.className = 'success';
+                messageDiv.textContent = `Lưu thành công!`;
+                loadDeviceConfig(currentAreaIp);
+              } else {
+                messageDiv.className = 'error';
+                messageDiv.textContent = `Lỗi: ${result.message}`;
+              }
             } catch (error) {
-                throw error;
+              messageDiv.className = 'error';
+              messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /save-device-config hoạt động đúng.`;
             }
+          });
+        } else {
+          console.error("Không tìm thấy form với id='deviceConfigForm'");
         }
+        const resetButton = document.getElementById('resetButton');
+        resetButton.addEventListener('click', async () => {
+          const confirmed = window.confirm('Xác nhận đặt lại?');
+          if (!confirmed) {
+            return;
+          }
+          const messageDiv = document.getElementById('message');
+          messageDiv.style.display = 'block';
+          try {
+            const response = await fetch('http://127.0.0.1:3000/reset-device-config', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              throw new Error('Phản hồi từ server không phải JSON');
+            }
+            const result = await response.json();
+            if (result.status === 'success') {
+              messageDiv.className = 'success';
+              messageDiv.textContent = `Đặt lại thành công!`;
+              loadDeviceConfig(currentAreaIp);
+            } else {
+              messageDiv.className = 'error';
+              messageDiv.textContent = `Lỗi: ${result.message}`;
+            }
+          } catch (error) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /reset-device-config hoạt động đúng.`;
+          }
+        });
+      });
+
+      function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
+            });
+        }
+      }
+
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
+        }
+      }
     </script>
-</body>
+  </body>
 </html>
