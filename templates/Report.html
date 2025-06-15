@@ -1,193 +1,197 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alarm Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        .report-header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .filter-container label {
-            font-size: 14px;
-        }
-        select, input, button {
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:disabled {
-            background-color: #a0a0a0;
-            cursor: not-allowed;
-        }
-        button:hover:not(:disabled) {
-            background-color: #45a049;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        .report-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .report-table tr:hover {
-            background: #f1f1f1;
-        }
-        .error-message {
-            display: none;
-            font-size: 18px;
-            color: red;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      .report-header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .filter-container label {
+        font-size: 14px;
+      }
+      select,
+      input,
+      button {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:disabled {
+        background-color: #a0a0a0;
+        cursor: not-allowed;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .report-table th,
+      .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+      }
+      .report-table th {
+        background: #4caf50;
+        color: white;
+        font-weight: bold;
+      }
+      .report-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .report-table tr:hover {
+        background: #f1f1f1;
+      }
+      .error-message {
+        display: none;
+        font-size: 18px;
+        color: red;
+        text-align: center;
+        margin: 20px 0;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-        <span onclick="window.location.href='Report.html'" class="active">REPORTS</span>
-        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
-        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'" class="active">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span id="userInfo" style="margin-left: auto"></span>
     </div>
     <div class="container">
-        <div class="sidebar">
-            <div class="active">1 - ĐIỆN NĂNG THEO NGÀY</div>
-            <div>2 - ĐIỆN NĂNG THEO TUẦN</div>
-            <div>3 - ĐIỆN NĂNG THEO THÁNG</div>
-            <div>4 - DỮ LIỆU ĐỒNG HỒ</div>
+      <div class="sidebar">
+        <div class="active">1 - ĐIỆN NĂNG THEO NGÀY</div>
+        <div>2 - ĐIỆN NĂNG THEO TUẦN</div>
+        <div>3 - ĐIỆN NĂNG THEO THÁNG</div>
+        <div>4 - DỮ LIỆU ĐỒNG HỒ</div>
+      </div>
+      <div class="content">
+        <h2>ĐIỆN NĂNG TIÊU THỤ THEO NGÀY</h2>
+        <div class="filter-container">
+          <label for="month">Chọn tháng:</label>
+          <input type="month" id="month" value="2025-03" />
+          <button onclick="fetchReport()">Xem báo cáo</button>
         </div>
-        <div class="content">
-            <h2>ĐIỆN NĂNG TIÊU THỤ THEO NGÀY</h2>
-            <div class="filter-container">
-                <label for="month">Chọn tháng:</label>
-                <input type="month" id="month" value="2025-03">
-                <button onclick="fetchReport()">Xem báo cáo</button>
-            </div>
-            <table class="report-table" id="reportTable">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Period</th>
-                        <th>Total (kWh)</th>
-                        <th>Start Value</th>
-                        <th>End Value</th>
-                    </tr>
-                </thead>
-                <tbody id="report-data">
-                    <tr>
-                        <td colspan="5" style="text-align: center;">Chọn tháng để hiển thị dữ liệu</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="button-container">
-                <button onclick="exportToExcel()">Xuất Excel</button>
-                <button onclick="exportToPDF()">Xuất PDF</button>
-            </div>
+        <table class="report-table" id="reportTable">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Period</th>
+              <th>Total (kWh)</th>
+              <th>Start Value</th>
+              <th>End Value</th>
+            </tr>
+          </thead>
+          <tbody id="report-data">
+            <tr>
+              <td colspan="5" style="text-align: center">Chọn tháng để hiển thị dữ liệu</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="button-container">
+          <button onclick="exportToExcel()">Xuất Excel</button>
+          <button onclick="exportToPDF()">Xuất PDF</button>
         </div>
+      </div>
     </div>
 
     <script src="/static/lib-js/exceljs.min.js"></script>
@@ -195,148 +199,206 @@
     <script src="/static/lib-js/html2canvas.min.js"></script>
     <script src="/static/lib-js/jspdf.umd.min.js"></script>
     <script>
-        async function fetchReport() {
-            const dateValue = document.getElementById("month").value;
-            if (!dateValue) return;
+      async function fetchReport() {
+        const dateValue = document.getElementById('month').value;
+        if (!dateValue) return;
 
-            const [year, month] = dateValue.split("-");
+        const [year, month] = dateValue.split('-');
 
-            try {
-                const response = await fetch(`http://localhost:3000/api/getMonthlyData?month=${month}&year=${year}`);
-                const data = await response.json();
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/getMonthlyData?month=${month}&year=${year}`
+          );
+          const data = await response.json();
 
-                let tableRows = "";
-                if (data.length > 0) {
-                    data.forEach(row => {
-                        tableRows += `<tr>
+          let tableRows = '';
+          if (data.length > 0) {
+            data.forEach((row) => {
+              tableRows += `<tr>
                             <td>${row.source}</td>
                             <td>${row.period}</td>
                             <td>${row.total.toFixed(2)}</td>
                             <td>${row.start_value.toFixed(2)}</td>
                             <td>${row.end_value.toFixed(2)}</td>
                         </tr>`;
-                    });
-                } else {
-                    tableRows = `<tr><td colspan="5" style="text-align: center;">Không có dữ liệu</td></tr>`;
-                }
-
-                document.getElementById("report-data").innerHTML = tableRows;
-            } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu:", error);
-                document.getElementById("report-data").innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Lỗi khi lấy dữ liệu</td></tr>`;
-            }
-        }
-
-        function getFileNameSuffix() {
-            const dateValue = document.getElementById("month").value;
-            if (!dateValue) return "KhongXacDinh";
-            const [year, month] = dateValue.split("-");
-            const monthNames = [
-                "Mot", "Hai", "Ba", "Tu", "Nam", "Sau",
-                "Bay", "Tam", "Chin", "Muoi", "MuoiMot", "MuoiHai"
-            ];
-            return `Thang${monthNames[parseInt(month) - 1]}-${year}`;
-        }
-
-        async function exportToExcel() {
-            const table = document.getElementById('reportTable');
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Báo cáo điện năng');
-            const title = document.querySelector('h2').textContent;
-            worksheet.mergeCells('A1:E1');
-            const titleCell = worksheet.getCell('A1');
-            titleCell.value = title;
-            titleCell.font = { bold: true, size: 16 };
-            titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-            worksheet.addRow([]);
-            const headerRow = table.querySelector('thead tr');
-            const headerCells = Array.from(headerRow.cells).map(cell => cell.textContent);
-            const excelHeaderRow = worksheet.addRow(headerCells);
-            excelHeaderRow.eachCell(cell => {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } };
-                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                cell.font = { bold: true, color: { argb: 'FF333333' } };
-                cell.alignment = { horizontal: 'center' };
             });
-            const bodyRows = table.querySelectorAll('tbody tr');
-            bodyRows.forEach(row => {
-                const cells = Array.from(row.cells).map(cell => cell.textContent);
-                const excelRow = worksheet.addRow(cells);
-                excelRow.eachCell(cell => {
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                    cell.font = { color: { argb: 'FF555555' } };
-                    cell.alignment = { horizontal: 'center' };
-                });
-            });
-            worksheet.columns.forEach(column => {
-                let maxLength = 10;
-                column.eachCell({ includeEmpty: true }, cell => {
-                    const length = cell.value ? cell.value.toString().length : 0;
-                    if (length > maxLength) maxLength = length;
-                });
-                column.width = maxLength + 2;
-            });
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, `BaoCaoDienNang-${getFileNameSuffix()}.xlsx`);
-        }
+          } else {
+            tableRows = `<tr><td colspan="5" style="text-align: center;">Không có dữ liệu</td></tr>`;
+          }
 
-        async function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const table = document.getElementById('reportTable');
-            const title = 'ELECTRICITY CONSUMPTION REPORT';
-            const canvas = await html2canvas(table, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
+          document.getElementById('report-data').innerHTML = tableRows;
+        } catch (error) {
+          console.error('Lỗi khi lấy dữ liệu:', error);
+          document.getElementById(
+            'report-data'
+          ).innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Lỗi khi lấy dữ liệu</td></tr>`;
+        }
+      }
+
+      function getFileNameSuffix() {
+        const dateValue = document.getElementById('month').value;
+        if (!dateValue) return 'KhongXacDinh';
+        const [year, month] = dateValue.split('-');
+        const monthNames = [
+          'Mot',
+          'Hai',
+          'Ba',
+          'Tu',
+          'Nam',
+          'Sau',
+          'Bay',
+          'Tam',
+          'Chin',
+          'Muoi',
+          'MuoiMot',
+          'MuoiHai'
+        ];
+        return `Thang${monthNames[parseInt(month) - 1]}-${year}`;
+      }
+
+      async function exportToExcel() {
+        const table = document.getElementById('reportTable');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Báo cáo điện năng');
+        const title = document.querySelector('h2').textContent;
+        worksheet.mergeCells('A1:E1');
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = title;
+        titleCell.font = { bold: true, size: 16 };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+        worksheet.addRow([]);
+        const headerRow = table.querySelector('thead tr');
+        const headerCells = Array.from(headerRow.cells).map((cell) => cell.textContent);
+        const excelHeaderRow = worksheet.addRow(headerCells);
+        excelHeaderRow.eachCell((cell) => {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } };
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          cell.font = { bold: true, color: { argb: 'FF333333' } };
+          cell.alignment = { horizontal: 'center' };
+        });
+        const bodyRows = table.querySelectorAll('tbody tr');
+        bodyRows.forEach((row) => {
+          const cells = Array.from(row.cells).map((cell) => cell.textContent);
+          const excelRow = worksheet.addRow(cells);
+          excelRow.eachCell((cell) => {
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+            cell.font = { color: { argb: 'FF555555' } };
+            cell.alignment = { horizontal: 'center' };
+          });
+        });
+        worksheet.columns.forEach((column) => {
+          let maxLength = 10;
+          column.eachCell({ includeEmpty: true }, (cell) => {
+            const length = cell.value ? cell.value.toString().length : 0;
+            if (length > maxLength) maxLength = length;
+          });
+          column.width = maxLength + 2;
+        });
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        saveAs(blob, `BaoCaoDienNang-${getFileNameSuffix()}.xlsx`);
+      }
+
+      async function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const table = document.getElementById('reportTable');
+        const title = 'ELECTRICITY CONSUMPTION REPORT';
+        const canvas = await html2canvas(table, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+        pdf.setFont('times', 'normal');
+        pdf.setFontSize(16);
+        pdf.text(title, 148.5, 15, { align: 'center' });
+        const imgWidth = 277;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pageHeight = pdf.internal.pageSize.height;
+        let heightLeft = imgHeight;
+        let position = 25;
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight - 30;
+        while (heightLeft > 0) {
+          pdf.addPage();
+          position = heightLeft - imgHeight;
+          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        pdf.save(`BaoCaoDienNang-${getFileNameSuffix()}.pdf`);
+      }
+
+      function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
             });
-            pdf.setFont('times', 'normal');
-            pdf.setFontSize(16);
-            pdf.text(title, 148.5, 15, { align: 'center' });
-            const imgWidth = 277;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const pageHeight = pdf.internal.pageSize.height;
-            let heightLeft = imgHeight;
-            let position = 25;
-            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - 30);
-            while (heightLeft > 0) {
-                pdf.addPage();
-                position = heightLeft - imgHeight;
-                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-            pdf.save(`BaoCaoDienNang-${getFileNameSuffix()}.pdf`);
         }
+      }
 
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                logout().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Lỗi khi đăng xuất:', error);
-                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
-                });
-            }
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
         }
-
-        async function logout() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                console.log('Phản hồi từ server:', data.message);
-                localStorage.removeItem('role');
-                return data;
-            } catch (error) {
-                throw error;
-            }
+      }
+      getSessionInfo();
+      // Cập nhật hiển thị thông tin người dùng khi trang load
+      document.addEventListener('DOMContentLoaded', async function () {
+        const userInfoSpan = document.getElementById('userInfo');
+        if (userInfoSpan) {
+          const userDisplay = await getSessionInfo();
+          userInfoSpan.textContent = 'Xin chào, ' + userDisplay;
         }
+      });
+      async function getSessionInfo() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-session', {
+            method: 'GET',
+            credentials: 'include' // Bao gồm cookie/session
+          });
+          const data = await response.json();
+          if (response.ok) {
+            let userDisplay = data.email;
+            if (data.role === 'admin') {
+              userDisplay += ' 🔑';
+            }
+            return userDisplay;
+          } else {
+            return 'Guest'; // Nếu chưa đăng nhập
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy session:', error);
+          return 'Guest';
+        }
+      }
     </script>
-</body>
+  </body>
 </html>

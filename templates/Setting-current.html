@@ -172,6 +172,7 @@
       <span onclick="window.location.href='Report.html'">REPORTS</span>
       <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
       <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span id="userInfo" style="margin-left: auto"></span>
     </div>
 
     <div class="container">
@@ -360,6 +361,36 @@
           return data;
         } catch (error) {
           throw error;
+        }
+      }
+      getSessionInfo();
+      // Cập nhật hiển thị thông tin người dùng khi trang load
+      document.addEventListener('DOMContentLoaded', async function () {
+        const userInfoSpan = document.getElementById('userInfo');
+        if (userInfoSpan) {
+          const userDisplay = await getSessionInfo();
+          userInfoSpan.textContent = 'Xin chào, ' + userDisplay;
+        }
+      });
+      async function getSessionInfo() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-session', {
+            method: 'GET',
+            credentials: 'include' // Bao gồm cookie/session
+          });
+          const data = await response.json();
+          if (response.ok) {
+            let userDisplay = data.email;
+            if (data.role === 'admin') {
+              userDisplay += ' 🔑';
+            }
+            return userDisplay;
+          } else {
+            return 'Guest'; // Nếu chưa đăng nhập
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy session:', error);
+          return 'Guest';
         }
       }
     </script>

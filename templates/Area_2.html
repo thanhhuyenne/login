@@ -1,560 +1,613 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Khu vực 2 - Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-        }
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .filter-container label {
-            font-size: 14px;
-        }
-        select, input, button {
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:disabled {
-            background-color: #a0a0a0;
-            cursor: not-allowed;
-        }
-        button:hover:not(:disabled) {
-            background-color: #45a049;
-        }
-        .chart-container {
-            flex: 1;
-            position: relative;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-        .chart-wrapper {
-            width: 100%;
-            height: 400px;
-            position: relative;
-        }
-        .chart-wrapper canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .chart-header h3 {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
-        .chart-header .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .chart-header .filter-group label {
-            font-size: 14px;
-        }
-        .chart-header .filter-group input {
-            border: 1px solid #ccc;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .error-message {
-            display: none;
-            font-size: 24px;
-            color: red;
-            text-align: center;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
+      }
+      .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .filter-container label {
+        font-size: 14px;
+      }
+      select,
+      input,
+      button {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:disabled {
+        background-color: #a0a0a0;
+        cursor: not-allowed;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .chart-container {
+        flex: 1;
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+      .chart-wrapper {
+        width: 100%;
+        height: 400px;
+        position: relative;
+      }
+      .chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .chart-header h3 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+      }
+      .chart-header .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .chart-header .filter-group label {
+        font-size: 14px;
+      }
+      .chart-header .filter-group input {
+        border: 1px solid #ccc;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .error-message {
+        display: none;
+        font-size: 24px;
+        color: red;
+        text-align: center;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'" class="active">DASHBOARDS</span>
-        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-        <span onclick="window.location.href='Report.html'">REPORTS</span>
-        <span onclick="window.location.href='Setting-current.html'">SETTING</span>
-        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span onclick="window.location.href='GD.html'" class="active">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span id="userInfo" style="margin-left: auto"></span>
     </div>
     <div class="container">
-        <div class="sidebar">
-            <div onclick="window.location.href='GD.html'">1 - TỔNG HỢP</div>
-            <div onclick="window.location.href='Area_1.html'">2 - KHU VỰC 1</div>
-            <div onclick="window.location.href='Area_2.html'" class="active">3 - KHU VỰC 2</div>
-            <div onclick="window.location.href='Area_3.html'">4 - KHU VỰC 3</div>
-            <div onclick="window.location.href='Area_4.html'">5 - KHU VỰC 4</div>
-            <div onclick="window.location.href='CompareEnergy.html'">6 - SO SÁNH</div>
-        </div>
-        <div class="content">
-            <h2>BIỂU ĐỒ TỔNG QUAN ĐIỆN NĂNG TIÊU THỤ - KHU VỰC 2</h2>
-            <div class="error-message" id="errorMessage"></div>
-            <div class="chart-container" id="chartContainer">
-                <div class="chart-wrapper">
-                    <div class="chart-header">
-                        <h3>ĐIỆN NĂNG SỬ DỤNG</h3>
-                        <div class="filter-group">
-                            <label for="datePicker1">Chọn ngày:</label>
-                            <input type="date" id="datePicker1">
-                        </div>
-                    </div>
-                    <canvas id="chart1"></canvas>
-                </div>
-                <div class="chart-wrapper">
-                    <div class="chart-header">
-                        <h3>ĐIỆN NĂNG TUẦN NÀY</h3>
-                    </div>
-                    <canvas id="chart2"></canvas>
-                </div>
-                <div class="chart-wrapper">
-                    <div class="chart-header">
-                        <h3>ĐIỆN NĂNG THÁNG NÀY</h3>
-                        <div class="filter-group">
-                            <label for="monthPicker">Chọn tháng:</label>
-                            <input type="month" id="monthPicker">
-                        </div>
-                    </div>
-                    <canvas id="chart3"></canvas>
-                </div>
-                <div class="chart-wrapper">
-                    <div class="chart-header">
-                        <h3>TỔNG ĐIỆN NĂNG SỬ DỤNG</h3>
-                        <div class="filter-group">
-                            <label for="monthPickerBar">Chọn tháng (Tổng):</label>
-                            <input type="month" id="monthPickerBar">
-                        </div>
-                    </div>
-                    <canvas id="chart4"></canvas>
-                </div>
+      <div class="sidebar">
+        <div onclick="window.location.href='GD.html'">1 - TỔNG HỢP</div>
+        <div onclick="window.location.href='Area_1.html'">2 - KHU VỰC 1</div>
+        <div onclick="window.location.href='Area_2.html'" class="active">3 - KHU VỰC 2</div>
+        <div onclick="window.location.href='Area_3.html'">4 - KHU VỰC 3</div>
+        <div onclick="window.location.href='Area_4.html'">5 - KHU VỰC 4</div>
+        <div onclick="window.location.href='CompareEnergy.html'">6 - SO SÁNH</div>
+      </div>
+      <div class="content">
+        <h2>BIỂU ĐỒ TỔNG QUAN ĐIỆN NĂNG TIÊU THỤ - KHU VỰC 2</h2>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="chart-container" id="chartContainer">
+          <div class="chart-wrapper">
+            <div class="chart-header">
+              <h3>ĐIỆN NĂNG SỬ DỤNG</h3>
+              <div class="filter-group">
+                <label for="datePicker1">Chọn ngày:</label>
+                <input type="date" id="datePicker1" />
+              </div>
             </div>
+            <canvas id="chart1"></canvas>
+          </div>
+          <div class="chart-wrapper">
+            <div class="chart-header">
+              <h3>ĐIỆN NĂNG TUẦN NÀY</h3>
+            </div>
+            <canvas id="chart2"></canvas>
+          </div>
+          <div class="chart-wrapper">
+            <div class="chart-header">
+              <h3>ĐIỆN NĂNG THÁNG NÀY</h3>
+              <div class="filter-group">
+                <label for="monthPicker">Chọn tháng:</label>
+                <input type="month" id="monthPicker" />
+              </div>
+            </div>
+            <canvas id="chart3"></canvas>
+          </div>
+          <div class="chart-wrapper">
+            <div class="chart-header">
+              <h3>TỔNG ĐIỆN NĂNG SỬ DỤNG</h3>
+              <div class="filter-group">
+                <label for="monthPickerBar">Chọn tháng (Tổng):</label>
+                <input type="month" id="monthPickerBar" />
+              </div>
+            </div>
+            <canvas id="chart4"></canvas>
+          </div>
         </div>
+      </div>
     </div>
     <script>
-        const IP = '127.0.0.2';
-        let chartDay = null;
-        let chartWeek = null;
-        let chartMonth = null;
-        let chartSummary = null;
+      const IP = '127.0.0.2';
+      let chartDay = null;
+      let chartWeek = null;
+      let chartMonth = null;
+      let chartSummary = null;
 
-        // Hàm định dạng ngày từ YYYY-MM-DD sang DD-MM-YYYY
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const [year, month, day] = dateStr.split('-');
-            return `${day}-${month}-${year}`;
+      // Hàm định dạng ngày từ YYYY-MM-DD sang DD-MM-YYYY
+      function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        return `${day}-${month}-${year}`;
+      }
+
+      // Hàm định dạng tháng từ YYYY-MM sang MM-YYYY
+      function formatMonth(monthStr) {
+        if (!monthStr) return '';
+        const [year, month] = monthStr.split('-');
+        return `${month}-${year}`;
+      }
+
+      async function fetchDayBarChartData(chartId, date) {
+        if (!date) {
+          document.getElementById('errorMessage').textContent = 'Vui lòng chọn ngày!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
+          return;
         }
-
-        // Hàm định dạng tháng từ YYYY-MM sang MM-YYYY
-        function formatMonth(monthStr) {
-            if (!monthStr) return '';
-            const [year, month] = monthStr.split('-');
-            return `${month}-${year}`;
-        }
-
-        async function fetchDayBarChartData(chartId, date) {
-            if (!date) {
-                document.getElementById('errorMessage').textContent = 'Vui lòng chọn ngày!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
-                return;
-            }
-            try {
-                const response = await fetch(`http://localhost:3000/api/getDayValue?date=${date}&ip=${IP}`);
-                if (!response.ok) throw new Error("Lỗi khi gọi API!");
-                const chartData = await response.json();
-                if (!chartData || !chartData.data || chartData.data.length === 0) {
-                    document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho ngày này!';
-                    document.getElementById('errorMessage').style.display = 'flex';
-                    document.getElementById('chartContainer').style.display = 'none';
-                    return;
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/getDayValue?date=${date}&ip=${IP}`
+          );
+          if (!response.ok) throw new Error('Lỗi khi gọi API!');
+          const chartData = await response.json();
+          if (!chartData || !chartData.data || chartData.data.length === 0) {
+            document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho ngày này!';
+            document.getElementById('errorMessage').style.display = 'flex';
+            document.getElementById('chartContainer').style.display = 'none';
+            return;
+          }
+          document.getElementById('errorMessage').style.display = 'none';
+          document.getElementById('chartContainer').style.display = 'flex';
+          if (chartDay) chartDay.destroy();
+          chartDay = new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: 'Điện năng (kWh)',
+                  data: chartData.data,
+                  backgroundColor: '#FFD700' // Vàng sáng
                 }
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('chartContainer').style.display = 'flex';
-                if (chartDay) chartDay.destroy();
-                chartDay = new Chart(document.getElementById(chartId), {
-                    type: 'bar',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: 'Điện năng (kWh)',
-                            data: chartData.data,
-                            backgroundColor: '#FFD700' // Vàng sáng
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: `Điện năng sử dụng ngày ${formatDate(date)} - ${IP}`,
-                                font: { size: 20 }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.parsed.y;
-                                        return `Điện năng: ${value.toFixed(2)} kWh`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { title: { display: true, text: 'Slave ID' } },
-                            y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
-                        }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: `Điện năng sử dụng ngày ${formatDate(date)} - ${IP}`,
+                  font: { size: 20 }
+                },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: function (context) {
+                      const value = context.parsed.y;
+                      return `Điện năng: ${value.toFixed(2)} kWh`;
                     }
-                });
-            } catch (error) {
-                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
-                document.getElementById('errorMessage').textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
-            }
-        }
-
-        async function fetchWeekBarChartData(chartId) {
-            try {
-                const response = await fetch(`http://localhost:3000/api/getWeeklyEnergy?ip=${IP}`);
-                if (!response.ok) throw new Error("Lỗi khi gọi API!");
-                const chartData = await response.json();
-                if (!chartData || !chartData.data || chartData.data.length === 0) {
-                    document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho tuần này!';
-                    document.getElementById('errorMessage').style.display = 'flex';
-                    document.getElementById('chartContainer').style.display = 'none';
-                    return;
+                  }
                 }
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('chartContainer').style.display = 'flex';
-                if (chartWeek) chartWeek.destroy();
-                chartWeek = new Chart(document.getElementById(chartId), {
-                    type: 'bar',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: 'Điện năng (kWh)',
-                            data: chartData.data,
-                            backgroundColor: '#4CAF50' // Xanh lá
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: `Điện năng tuần này - ${IP}`,
-                                font: { size: 20 }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.parsed.y;
-                                        return `Điện năng: ${value.toFixed(2)} kWh`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { title: { display: true, text: 'Slave ID' } },
-                            y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
-                        }
+              },
+              scales: {
+                x: { title: { display: true, text: 'Slave ID' } },
+                y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('🚨 Lỗi khi lấy dữ liệu biểu đồ:', error);
+          document.getElementById('errorMessage').textContent =
+            error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
+        }
+      }
+
+      async function fetchWeekBarChartData(chartId) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/getWeeklyEnergy?ip=${IP}`);
+          if (!response.ok) throw new Error('Lỗi khi gọi API!');
+          const chartData = await response.json();
+          if (!chartData || !chartData.data || chartData.data.length === 0) {
+            document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho tuần này!';
+            document.getElementById('errorMessage').style.display = 'flex';
+            document.getElementById('chartContainer').style.display = 'none';
+            return;
+          }
+          document.getElementById('errorMessage').style.display = 'none';
+          document.getElementById('chartContainer').style.display = 'flex';
+          if (chartWeek) chartWeek.destroy();
+          chartWeek = new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: 'Điện năng (kWh)',
+                  data: chartData.data,
+                  backgroundColor: '#4CAF50' // Xanh lá
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: `Điện năng tuần này - ${IP}`,
+                  font: { size: 20 }
+                },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: function (context) {
+                      const value = context.parsed.y;
+                      return `Điện năng: ${value.toFixed(2)} kWh`;
                     }
-                });
-            } catch (error) {
-                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
-                document.getElementById('errorMessage').textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
-            }
-        }
-
-        async function fetchMonthBarChartData(chartId, month) {
-            if (!month) {
-                document.getElementById('errorMessage').textContent = 'Vui lòng chọn tháng!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
-                return;
-            }
-            try {
-                const response = await fetch(`http://localhost:3000/api/getMonthValue?month=${month}&ip=${IP}`);
-                if (!response.ok) throw new Error("Lỗi khi gọi API!");
-                const chartData = await response.json();
-                if (!chartData || !chartData.data || chartData.data.length === 0) {
-                    document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho tháng này!';
-                    document.getElementById('errorMessage').style.display = 'flex';
-                    document.getElementById('chartContainer').style.display = 'none';
-                    return;
+                  }
                 }
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('chartContainer').style.display = 'flex';
-                if (chartMonth) chartMonth.destroy();
-                chartMonth = new Chart(document.getElementById(chartId), {
-                    type: 'bar',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: 'Điện năng (kWh)',
-                            data: chartData.data,
-                            backgroundColor: '#00FF00' // Xanh lá sáng
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: `Điện năng tháng ${formatMonth(month)} - ${IP}`,
-                                font: { size: 20 }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.parsed.y;
-                                        return `Điện năng: ${value.toFixed(2)} kWh`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { title: { display: true, text: 'Slave ID' } },
-                            y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
-                        }
+              },
+              scales: {
+                x: { title: { display: true, text: 'Slave ID' } },
+                y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('🚨 Lỗi khi lấy dữ liệu biểu đồ:', error);
+          document.getElementById('errorMessage').textContent =
+            error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
+        }
+      }
+
+      async function fetchMonthBarChartData(chartId, month) {
+        if (!month) {
+          document.getElementById('errorMessage').textContent = 'Vui lòng chọn tháng!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
+          return;
+        }
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/getMonthValue?month=${month}&ip=${IP}`
+          );
+          if (!response.ok) throw new Error('Lỗi khi gọi API!');
+          const chartData = await response.json();
+          if (!chartData || !chartData.data || chartData.data.length === 0) {
+            document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho tháng này!';
+            document.getElementById('errorMessage').style.display = 'flex';
+            document.getElementById('chartContainer').style.display = 'none';
+            return;
+          }
+          document.getElementById('errorMessage').style.display = 'none';
+          document.getElementById('chartContainer').style.display = 'flex';
+          if (chartMonth) chartMonth.destroy();
+          chartMonth = new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: 'Điện năng (kWh)',
+                  data: chartData.data,
+                  backgroundColor: '#00FF00' // Xanh lá sáng
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: `Điện năng tháng ${formatMonth(month)} - ${IP}`,
+                  font: { size: 20 }
+                },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: function (context) {
+                      const value = context.parsed.y;
+                      return `Điện năng: ${value.toFixed(2)} kWh`;
                     }
-                });
-            } catch (error) {
-                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
-                document.getElementById('errorMessage').textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
+                  }
+                }
+              },
+              scales: {
+                x: { title: { display: true, text: 'Slave ID' } },
+                y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
+              }
             }
+          });
+        } catch (error) {
+          console.error('🚨 Lỗi khi lấy dữ liệu biểu đồ:', error);
+          document.getElementById('errorMessage').textContent =
+            error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
         }
+      }
 
-        async function fetchMonthSummaryBarChartData(chartId, month) {
-            if (!month) {
-                document.getElementById('errorMessage').textContent = 'Vui lòng chọn tháng!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
-                return;
-            }
-            try {
-                console.log(`Fetching data for month: ${month}, IP: ${IP}`);
-                const response = await fetch(`http://localhost:3000/api/getMonthSummary?month=${month}&ip=${IP}`);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Lỗi khi gọi API!');
+      async function fetchMonthSummaryBarChartData(chartId, month) {
+        if (!month) {
+          document.getElementById('errorMessage').textContent = 'Vui lòng chọn tháng!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
+          return;
+        }
+        try {
+          console.log(`Fetching data for month: ${month}, IP: ${IP}`);
+          const response = await fetch(
+            `http://localhost:3000/api/getMonthSummary?month=${month}&ip=${IP}`
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Lỗi khi gọi API!');
+          }
+          const chartData = await response.json();
+          console.log('API Response:', chartData);
+
+          if (!chartData || !Array.isArray(chartData.labels) || !Array.isArray(chartData.data)) {
+            console.error('Invalid data format:', chartData);
+            document.getElementById('errorMessage').textContent = 'Dữ liệu không hợp lệ từ API!';
+            document.getElementById('errorMessage').style.display = 'flex';
+            document.getElementById('chartContainer').style.display = 'none';
+            return;
+          }
+
+          if (chartData.labels.length === 0 || chartData.data.length === 0) {
+            document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho tháng này!';
+            document.getElementById('errorMessage').style.display = 'flex';
+            document.getElementById('chartContainer').style.display = 'none';
+            return;
+          }
+
+          document.getElementById('errorMessage').style.display = 'none';
+          document.getElementById('chartContainer').style.display = 'flex';
+          if (chartSummary) chartSummary.destroy();
+          chartSummary = new Chart(document.getElementById(chartId), {
+            type: 'bar',
+            data: {
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: 'Tổng điện năng (kWh)',
+                  data: chartData.data,
+                  backgroundColor: '#40C4FF' // Xanh dương sáng
                 }
-                const chartData = await response.json();
-                console.log('API Response:', chartData);
-
-                if (!chartData || !Array.isArray(chartData.labels) || !Array.isArray(chartData.data)) {
-                    console.error('Invalid data format:', chartData);
-                    document.getElementById('errorMessage').textContent = 'Dữ liệu không hợp lệ từ API!';
-                    document.getElementById('errorMessage').style.display = 'flex';
-                    document.getElementById('chartContainer').style.display = 'none';
-                    return;
-                }
-
-                if (chartData.labels.length === 0 || chartData.data.length === 0) {
-                    document.getElementById('errorMessage').textContent = 'Không có dữ liệu cho tháng này!';
-                    document.getElementById('errorMessage').style.display = 'flex';
-                    document.getElementById('chartContainer').style.display = 'none';
-                    return;
-                }
-
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('chartContainer').style.display = 'flex';
-                if (chartSummary) chartSummary.destroy();
-                chartSummary = new Chart(document.getElementById(chartId), {
-                    type: 'bar',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: 'Tổng điện năng (kWh)',
-                            data: chartData.data,
-                            backgroundColor: '#40C4FF' // Xanh dương sáng
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: `Tổng điện năng tháng ${formatMonth(month)} - ${IP}`,
-                                font: { size: 20 }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.parsed.y;
-                                        return `Tổng: ${value.toFixed(2)} kWh`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: { display: true, text: 'Ngày' }
-                            },
-                            y: {
-                                title: { display: true, text: 'kWh' },
-                                beginAtZero: true
-                            }
-                        }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: `Tổng điện năng tháng ${formatMonth(month)} - ${IP}`,
+                  font: { size: 20 }
+                },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: function (context) {
+                      const value = context.parsed.y;
+                      return `Tổng: ${value.toFixed(2)} kWh`;
                     }
-                });
-            } catch (error) {
-                console.error("🚨 Lỗi khi lấy dữ liệu biểu đồ:", error);
-                document.getElementById('errorMessage').textContent = error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
-                document.getElementById('errorMessage').style.display = 'flex';
-                document.getElementById('chartContainer').style.display = 'none';
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  title: { display: true, text: 'Ngày' }
+                },
+                y: {
+                  title: { display: true, text: 'kWh' },
+                  beginAtZero: true
+                }
+              }
             }
+          });
+        } catch (error) {
+          console.error('🚨 Lỗi khi lấy dữ liệu biểu đồ:', error);
+          document.getElementById('errorMessage').textContent =
+            error.message || 'Đã xảy ra lỗi khi tải dữ liệu!';
+          document.getElementById('errorMessage').style.display = 'flex';
+          document.getElementById('chartContainer').style.display = 'none';
         }
+      }
 
-        document.getElementById("datePicker1").addEventListener("change", function() {
-            const selectedDate = this.value;
-            fetchDayBarChartData("chart1", selectedDate);
-        });
+      document.getElementById('datePicker1').addEventListener('change', function () {
+        const selectedDate = this.value;
+        fetchDayBarChartData('chart1', selectedDate);
+      });
 
-        document.getElementById("monthPicker").addEventListener("change", function() {
-            const selectedMonth = this.value;
-            fetchMonthBarChartData("chart3", selectedMonth);
-        });
+      document.getElementById('monthPicker').addEventListener('change', function () {
+        const selectedMonth = this.value;
+        fetchMonthBarChartData('chart3', selectedMonth);
+      });
 
-        document.getElementById("monthPickerBar").addEventListener("change", function() {
-            const selectedMonth = this.value;
-            fetchMonthSummaryBarChartData("chart4", selectedMonth);
-        });
+      document.getElementById('monthPickerBar').addEventListener('change', function () {
+        const selectedMonth = this.value;
+        fetchMonthSummaryBarChartData('chart4', selectedMonth);
+      });
 
-        fetchWeekBarChartData('chart2');
+      fetchWeekBarChartData('chart2');
 
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                logout().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Lỗi khi đăng xuất:', error);
-                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
-                });
+      function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
+            });
+        }
+      }
+
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
+        }
+      }
+      getSessionInfo();
+      // Cập nhật hiển thị thông tin người dùng khi trang load
+      document.addEventListener('DOMContentLoaded', async function () {
+        const userInfoSpan = document.getElementById('userInfo');
+        if (userInfoSpan) {
+          const userDisplay = await getSessionInfo();
+          userInfoSpan.textContent = 'Xin chào, ' + userDisplay;
+        }
+      });
+      async function getSessionInfo() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-session', {
+            method: 'GET',
+            credentials: 'include' // Bao gồm cookie/session
+          });
+          const data = await response.json();
+          if (response.ok) {
+            let userDisplay = data.email;
+            if (data.role === 'admin') {
+              userDisplay += ' 🔑';
             }
+            return userDisplay;
+          } else {
+            return 'Guest'; // Nếu chưa đăng nhập
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy session:', error);
+          return 'Guest';
         }
-
-        async function logout() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                console.log('Phản hồi từ server:', data.message);
-                localStorage.removeItem('role');
-                return data;
-            } catch (error) {
-                throw error;
-            }
-        }
+      }
     </script>
-</body>
+  </body>
 </html>

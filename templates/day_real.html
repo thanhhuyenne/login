@@ -234,8 +234,8 @@
 
     <div class="container">
       <div class="sidebar">
-        <div onclick="window.location.href='monitor_main.html'">1 - TỔNG HỢP</div>
-        <div onclick="window.location.href='day_tn.html'" class="active">2 - CHI TIẾT</div>
+        <div onclick="window.location.href='monitor_real.html'">1 - TỔNG HỢP</div>
+        <div onclick="window.location.href='day_real.html'" class="active">2 - CHI TIẾT</div>
       </div>
 
       <div class="content">
@@ -291,7 +291,7 @@
 
       // Cấu hình các dãy
       const arrayConfigs = {
-        1: { ip: '127.0.0.1', image: '/pictures/day_tn.png', title: 'Khu vực 1' },
+        1: { ip: '192.168.0.10', image: '/pictures/day_tn.png', title: 'Khu vực 1' },
         2: { ip: '127.0.0.2', image: '/pictures/day_tn.png', title: 'Khu vực 2' },
         3: { ip: '127.0.0.3', image: '/pictures/day_tn.png', title: 'Khu vực 3' },
         4: { ip: '127.0.0.4', image: '/pictures/day_tn.png', title: 'Khu vực 4' }
@@ -378,16 +378,16 @@
 
         // Gán sự kiện cho các nút chuyển dãy
         document.getElementById('btn-day1').addEventListener('click', function () {
-          window.location.href = 'day_tn.html?array=1';
+          window.location.href = 'day_real.html?array=1';
         });
         document.getElementById('btn-day2').addEventListener('click', function () {
-          window.location.href = 'day_tn.html?array=2';
+          window.location.href = 'day_real.html?array=2';
         });
         document.getElementById('btn-day3').addEventListener('click', function () {
-          window.location.href = 'day_tn.html?array=3';
+          window.location.href = 'day_real.html?array=3';
         });
         document.getElementById('btn-day4').addEventListener('click', function () {
-          window.location.href = 'day_tn.html?array=4';
+          window.location.href = 'day_real.html?array=4';
         });
         document.getElementById('btn-back').addEventListener('click', function () {
           window.location.href = 'monitor_main.html';
@@ -403,27 +403,47 @@
         });
 
         function viewDetails(ip, id) {
-          window.location.href = `OTT1.html?ip=${ip}&slaveId=${id}`;
+          window.location.href = `OTT1_real_device.html?ip=${ip}&slaveId=${id}`;
         }
 
         // Hàm cập nhật trạng thái thiết bị
         async function updateGatewayStatus() {
           try {
-            const response = await fetch('http://localhost:3000/status-modbus-device');
+            const response = await fetch('http://localhost:3000/api/gataway-status-real');
             const statusData = await response.json();
 
-            if (!statusData || statusData.length === 0) {
+            if (!statusData || Object.keys(statusData).length === 0) {
               console.warn('Không có dữ liệu thiết bị từ API, giữ trạng thái hiện tại.');
               return;
             }
 
-            statusData.forEach((device) => {
-              if (device.ip === config.ip) {
-                // Chỉ xử lý thiết bị thuộc IP hiện tại
-                const deviceId = `device-${device.ip.replace(/\./g, '_')}-${device.slaveId}`;
-                updateIndicator(deviceId, device.status === 1);
-              }
-            });
+            // Lấy IP hiện tại từ config
+            const currentIp = config.ip;
+            const baseIp = currentIp.replace(/\./g, '_');
+
+            // Kiểm tra trạng thái của gateway có IP 192.168.0.1
+            if (statusData['192.168.0.10']) {
+              // Chỉ cập nhật đèn 1 (Slave ID 1) của dãy hiện tại
+              const deviceId = `device-${baseIp}-1`;
+              updateIndicator(deviceId, statusData['192.168.0.10']);
+            } else {
+              console.warn('Không tìm thấy trạng thái cho IP 192.168.0.10');
+            }
+
+            // Mặc định các đèn khác (Slave ID 2-12) trong dãy hiện tại là mất kết nối
+            for (let slaveId = 2; slaveId <= 12; slaveId++) {
+              const deviceId = `device-${baseIp}-${slaveId}`;
+              updateIndicator(deviceId, false);
+            }
+
+            // Mặc định các dãy khác (2, 3, 4) mất kết nối (nếu không phải dãy 1)
+            if (arrayId !== '1') {
+              const slaveIds = Array.from({ length: 12 }, (_, i) => i + 1);
+              slaveIds.forEach((slaveId) => {
+                const deviceId = `device-${baseIp}-${slaveId}`;
+                updateIndicator(deviceId, false);
+              });
+            }
           } catch (error) {
             console.error('Lỗi khi cập nhật trạng thái:', error);
           }
@@ -501,7 +521,7 @@
         try {
           const response = await fetch('http://127.0.0.1:3000/get-session', {
             method: 'GET',
-            credentials: 'include' // Bao gồm cookie/session
+            credentials: 'include'
           });
           const data = await response.json();
           if (response.ok) {
@@ -511,7 +531,7 @@
             }
             return userDisplay;
           } else {
-            return 'Guest'; // Nếu chưa đăng nhập
+            return 'Guest';
           }
         } catch (error) {
           console.error('Lỗi khi lấy session:', error);

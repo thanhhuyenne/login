@@ -1,189 +1,195 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alarm Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        .report-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .report-table tr:hover {
-            background: #f1f1f1;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 0 10px;
-            transition: background 0.3s;
-        }
-        button:hover:not(:disabled) {
-            background-color: #45a049;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        #message {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            display: none;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .report-table th,
+      .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+      }
+      .report-table th {
+        background: #4caf50;
+        color: white;
+        font-weight: bold;
+      }
+      .report-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .report-table tr:hover {
+        background: #f1f1f1;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 0 10px;
+        transition: background 0.3s;
+      }
+      button:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .button-container {
+        text-align: center;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      #message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: none;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-        <span onclick="window.location.href='Report.html'">REPORTS</span>
-        <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
-        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span id="userInfo" style="margin-left: auto"></span>
     </div>
 
     <div class="container">
-        <div class="sidebar">
-            <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
-            <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
-            <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-            <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-            <div onclick="window.location.href='Setting-history-editer.html'" class="active">5 - LỊCH SỬ CHỈNH SỬA</div>
-            <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-            <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
-            <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
-            <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
-            <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
         </div>
+        <div onclick="window.location.href='Setting-history-editer.html'" class="active">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
+        <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
+        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      </div>
 
-        <div class="content">
-            <h2>LỊCH SỬ CHỈNH SỬA</h2>
-            <table id="historyTable" class="report-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Thời gian chỉnh sửa</th>
-                        <th>Biến chỉnh sửa</th>
-                        <th>Giá trị ban đầu</th>
-                        <th>Giá trị chỉnh sửa</th>
-                        <th>Người sửa</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTableBody"></tbody>
-            </table>
-            <div class="button-container">
-                <button onclick="loadEditHistory()">UpdateTable</button>
-                <button onclick="exportToExcel()">Xuất Excel</button>
-                <button onclick="exportToPDF()">Xuất PDF</button>
-            </div>
-            <div id="message"></div>
+      <div class="content">
+        <h2>LỊCH SỬ CHỈNH SỬA</h2>
+        <table id="historyTable" class="report-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Thời gian chỉnh sửa</th>
+              <th>Biến chỉnh sửa</th>
+              <th>Giá trị ban đầu</th>
+              <th>Giá trị chỉnh sửa</th>
+              <th>Người sửa</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+        <div class="button-container">
+          <button onclick="loadEditHistory()">UpdateTable</button>
+          <button onclick="exportToExcel()">Xuất Excel</button>
+          <button onclick="exportToPDF()">Xuất PDF</button>
         </div>
+        <div id="message"></div>
+      </div>
     </div>
 
     <script src="/static/lib-js/exceljs.min.js"></script>
@@ -191,46 +197,46 @@
     <script src="/static/lib-js/html2canvas.min.js"></script>
     <script src="/static/lib-js/jspdf.umd.min.js"></script>
     <script>
-        function formatDateTime(dateTime) {
-            const date = new Date(dateTime);
-            return date.toLocaleString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
-        async function loadEditHistory() {
-            const tableBody = document.getElementById('historyTableBody');
-            const messageDiv = document.getElementById('message');
-            tableBody.innerHTML = '';
-            messageDiv.style.display = 'none';
-            try {
-                const response = await fetch('http://127.0.0.1:3000/get-edit-history', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('Phản hồi từ server không phải JSON');
-                }
-                const historyData = await response.json();
-                if (historyData.length === 0) {
-                    messageDiv.style.display = 'block';
-                    messageDiv.className = 'error';
-                    messageDiv.textContent = 'Không có lịch sử chỉnh sửa nào.';
-                    return;
-                }
-                historyData.forEach(entry => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+      function formatDateTime(dateTime) {
+        const date = new Date(dateTime);
+        return date.toLocaleString('vi-VN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      }
+      async function loadEditHistory() {
+        const tableBody = document.getElementById('historyTableBody');
+        const messageDiv = document.getElementById('message');
+        tableBody.innerHTML = '';
+        messageDiv.style.display = 'none';
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-edit-history', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Phản hồi từ server không phải JSON');
+          }
+          const historyData = await response.json();
+          if (historyData.length === 0) {
+            messageDiv.style.display = 'block';
+            messageDiv.className = 'error';
+            messageDiv.textContent = 'Không có lịch sử chỉnh sửa nào.';
+            return;
+          }
+          historyData.forEach((entry) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
                         <td>${entry.id}</td>
                         <td>${formatDateTime(entry.edit_time)}</td>
                         <td>${entry.variable}</td>
@@ -238,129 +244,173 @@
                         <td>${entry.edited_value}</td>
                         <td>${entry.editor}</td>
                     `;
-                    tableBody.appendChild(row);
-                });
-            } catch (error) {
-                messageDiv.style.display = 'block';
-                messageDiv.className = 'error';
-                messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /get-edit-history hoạt động đúng.`;
-            }
+            tableBody.appendChild(row);
+          });
+        } catch (error) {
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /get-edit-history hoạt động đúng.`;
         }
-        async function exportToExcel() {
-            const table = document.getElementById('historyTable');
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Lịch sử chỉnh sửa');
-            const title = document.querySelector('h2').textContent;
-            worksheet.mergeCells('A1:F1');
-            const titleCell = worksheet.getCell('A1');
-            titleCell.value = title;
-            titleCell.font = { bold: true, size: 16 };
-            titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-            worksheet.addRow([]);
-            const headerRow = table.querySelector('thead tr');
-            const headerCells = Array.from(headerRow.cells).map(cell => cell.textContent);
-            const excelHeaderRow = worksheet.addRow(headerCells);
-            excelHeaderRow.eachCell(cell => {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } };
-                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                cell.font = { bold: true, color: { argb: 'FF333333' } };
-                cell.alignment = { horizontal: 'center' };
+      }
+      async function exportToExcel() {
+        const table = document.getElementById('historyTable');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Lịch sử chỉnh sửa');
+        const title = document.querySelector('h2').textContent;
+        worksheet.mergeCells('A1:F1');
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = title;
+        titleCell.font = { bold: true, size: 16 };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+        worksheet.addRow([]);
+        const headerRow = table.querySelector('thead tr');
+        const headerCells = Array.from(headerRow.cells).map((cell) => cell.textContent);
+        const excelHeaderRow = worksheet.addRow(headerCells);
+        excelHeaderRow.eachCell((cell) => {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } };
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          cell.font = { bold: true, color: { argb: 'FF333333' } };
+          cell.alignment = { horizontal: 'center' };
+        });
+        const bodyRows = table.querySelectorAll('tbody tr');
+        bodyRows.forEach((row) => {
+          const cells = Array.from(row.cells).map((cell) => cell.textContent);
+          const excelRow = worksheet.addRow(cells);
+          excelRow.eachCell((cell) => {
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+            cell.font = { color: { argb: 'FF555555' } };
+            cell.alignment = { horizontal: 'center' };
+          });
+        });
+        worksheet.columns.forEach((column) => {
+          let maxLength = 10;
+          column.eachCell({ includeEmpty: true }, (cell) => {
+            const length = cell.value ? cell.value.toString().length : 0;
+            if (length > maxLength) maxLength = length;
+          });
+          column.width = maxLength + 2;
+        });
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        saveAs(blob, 'LichSuChinhSua.xlsx');
+      }
+      async function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const table = document.getElementById('historyTable');
+        const title = 'HISTORY EDITOR';
+        const canvas = await html2canvas(table, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+        pdf.setFont('times', 'normal');
+        pdf.setFontSize(16);
+        pdf.text(title, 148.5, 15, { align: 'center' });
+        const imgWidth = 277;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pageHeight = pdf.internal.pageSize.height;
+        let heightLeft = imgHeight;
+        let position = 25;
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight - 30;
+        while (heightLeft > 0) {
+          pdf.addPage();
+          position = heightLeft - imgHeight;
+          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        pdf.save('LichSuChinhSua.pdf');
+      }
+      window.onload = function () {
+        loadEditHistory();
+      };
+      async function isLoggedIn() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/is-logged-in', {
+            credentials: 'include'
+          });
+          const data = await response.json();
+          if (!data.loggedIn) {
+            window.location.href = 'index.html';
+          }
+          return data;
+        } catch (error) {
+          console.error('Lỗi kiểm tra đăng nhập:', error);
+          window.location.href = 'index.html';
+        }
+      }
+      function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
             });
-            const bodyRows = table.querySelectorAll('tbody tr');
-            bodyRows.forEach(row => {
-                const cells = Array.from(row.cells).map(cell => cell.textContent);
-                const excelRow = worksheet.addRow(cells);
-                excelRow.eachCell(cell => {
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                    cell.font = { color: { argb: 'FF555555' } };
-                    cell.alignment = { horizontal: 'center' };
-                });
-            });
-            worksheet.columns.forEach(column => {
-                let maxLength = 10;
-                column.eachCell({ includeEmpty: true }, cell => {
-                    const length = cell.value ? cell.value.toString().length : 0;
-                    if (length > maxLength) maxLength = length;
-                });
-                column.width = maxLength + 2;
-            });
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            saveAs(blob, 'LichSuChinhSua.xlsx');
         }
-        async function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const table = document.getElementById('historyTable');
-            const title = 'HISTORY EDITOR';
-            const canvas = await html2canvas(table, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
-            });
-            pdf.setFont('times', 'normal');
-            pdf.setFontSize(16);
-            pdf.text(title, 148.5, 15, { align: 'center' });
-            const imgWidth = 277;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const pageHeight = pdf.internal.pageSize.height;
-            let heightLeft = imgHeight;
-            let position = 25;
-            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - 30);
-            while (heightLeft > 0) {
-                pdf.addPage();
-                position = heightLeft - imgHeight;
-                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
+      }
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
+        }
+      }
+      //isLoggedIn();
+      getSessionInfo();
+      // Cập nhật hiển thị thông tin người dùng khi trang load
+      document.addEventListener('DOMContentLoaded', async function () {
+        const userInfoSpan = document.getElementById('userInfo');
+        if (userInfoSpan) {
+          const userDisplay = await getSessionInfo();
+          userInfoSpan.textContent = 'Xin chào, ' + userDisplay;
+        }
+      });
+      async function getSessionInfo() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-session', {
+            method: 'GET',
+            credentials: 'include' // Bao gồm cookie/session
+          });
+          const data = await response.json();
+          if (response.ok) {
+            let userDisplay = data.email;
+            if (data.role === 'admin') {
+              userDisplay += ' 🔑';
             }
-            pdf.save('LichSuChinhSua.pdf');
+            return userDisplay;
+          } else {
+            return 'Guest'; // Nếu chưa đăng nhập
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy session:', error);
+          return 'Guest';
         }
-        window.onload = function() {
-            loadEditHistory();
-        };
-        async function isLoggedIn() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/is-logged-in', {
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (!data.loggedIn) {
-                    window.location.href = 'index.html';
-                }
-                return data;
-            } catch (error) {
-                console.error('Lỗi kiểm tra đăng nhập:', error);
-                window.location.href = 'index.html';
-            }
-        }
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                logout().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Lỗi khi đăng xuất:', error);
-                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
-                });
-            }
-        }
-        async function logout() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                console.log('Phản hồi từ server:', data.message);
-                localStorage.removeItem('role');
-                return data;
-            } catch (error) {
-                throw error;
-            }
-        }
-        //isLoggedIn();
+      }
     </script>
-</body>
+  </body>
 </html>

@@ -1,277 +1,326 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alarm Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-        }
-        .navbar span {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .navbar span:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .navbar span.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f4f4f4;
-            padding: 15px;
-        }
-        .sidebar div {
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            transition: background 0.3s;
-        }
-        .sidebar div:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .sidebar div.active {
-            font-weight: bold;
-            color: rgb(254, 174, 0);
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        #changePasswordForm {
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto 40px;
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        #changePasswordForm label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
-        }
-        #changePasswordForm input[type="password"],
-        #changePasswordForm input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        .password-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .password-container input[type="password"],
-        .password-container input[type="text"] {
-            flex: 1;
-        }
-        .password-container input[type="checkbox"] {
-            margin-left: 10px;
-            width: auto;
-        }
-        .password-container label {
-            margin-left: 5px;
-            font-weight: normal;
-            font-size: 14px;
-        }
-        #changePasswordForm button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-        #changePasswordForm button:hover {
-            background-color: #45a049;
-        }
-        #message {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            display: none;
-            text-align: center;
-            width: 100%;
-            max-width: 600px;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        gap: 15px;
+      }
+      .navbar span {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+      }
+      .navbar span:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .navbar span.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        background: #f4f4f4;
+        padding: 15px;
+      }
+      .sidebar div {
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        transition: background 0.3s;
+      }
+      .sidebar div:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .sidebar div.active {
+        font-weight: bold;
+        color: rgb(254, 174, 0);
+      }
+      .content {
+        flex: 1;
+        padding: 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      #changePasswordForm {
+        max-width: 600px;
+        width: 100%;
+        margin: 0 auto 40px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      #changePasswordForm label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+        font-size: 16px;
+      }
+      #changePasswordForm input[type='password'],
+      #changePasswordForm input[type='text'] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+      .password-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .password-container input[type='password'],
+      .password-container input[type='text'] {
+        flex: 1;
+      }
+      .password-container input[type='checkbox'] {
+        margin-left: 10px;
+        width: auto;
+      }
+      .password-container label {
+        margin-left: 5px;
+        font-weight: normal;
+        font-size: 14px;
+      }
+      #changePasswordForm button {
+        width: 100%;
+        padding: 12px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+      }
+      #changePasswordForm button:hover {
+        background-color: #45a049;
+      }
+      #message {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: none;
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="navbar">
-        <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-        <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
-        <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-        <span onclick="window.location.href='Report.html'">REPORTS</span>
-        <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
-        <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
+      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
+      <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
+      <span id="userInfo" style="margin-left: auto"></span>
     </div>
 
     <div class="container">
-        <div class="sidebar">
-            <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
-            <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
-            <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-            <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-            <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
-            <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-            <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
-            <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
-            <div onclick="window.location.href='Setting-cpass.html'" class="active">9 - THAY ĐỔI MẬT KHẨU</div>
-            <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      <div class="sidebar">
+        <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
+        <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
+        <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
         </div>
-        <div class="content">
-            <h2>THAY ĐỔI MẬT KHẨU</h2>
-            <form id="changePasswordForm">
-                <label>Mật khẩu cũ:</label>
-                <div class="password-container">
-                    <input type="password" id="oldPassword" required>
-                    <input type="checkbox" id="showOldPassword" onchange="togglePassword('oldPassword')">
-                    <label for="showOldPassword">Show</label>
-                </div>
-                <label>Mật khẩu mới:</label>
-                <div class="password-container">
-                    <input type="password" id="newPassword" required>
-                    <input type="checkbox" id="showNewPassword" onchange="togglePassword('newPassword')">
-                    <label for="showNewPassword">Show</label>
-                </div>
-                <label>Nhập lại mật khẩu mới:</label>
-                <div class="password-container">
-                    <input type="password" id="confirmNewPassword" required>
-                    <input type="checkbox" id="showConfirmNewPassword" onchange="togglePassword('confirmNewPassword')">
-                    <label for="showConfirmNewPassword">Show</label>
-                </div>
-                <button type="submit">Đổi mật khẩu</button>
-            </form>
-            <div id="message"></div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
         </div>
+        <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
+        <div onclick="window.location.href='Setting-shift-time.html'">7 - LỊCH LÀM VIỆC</div>
+        <div onclick="window.location.href='Setting-shift-over.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-cpass.html'" class="active">
+          9 - THAY ĐỔI MẬT KHẨU
+        </div>
+        <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
+      </div>
+      <div class="content">
+        <h2>THAY ĐỔI MẬT KHẨU</h2>
+        <form id="changePasswordForm">
+          <label>Mật khẩu cũ:</label>
+          <div class="password-container">
+            <input type="password" id="oldPassword" required />
+            <input type="checkbox" id="showOldPassword" onchange="togglePassword('oldPassword')" />
+            <label for="showOldPassword">Show</label>
+          </div>
+          <label>Mật khẩu mới:</label>
+          <div class="password-container">
+            <input type="password" id="newPassword" required />
+            <input type="checkbox" id="showNewPassword" onchange="togglePassword('newPassword')" />
+            <label for="showNewPassword">Show</label>
+          </div>
+          <label>Nhập lại mật khẩu mới:</label>
+          <div class="password-container">
+            <input type="password" id="confirmNewPassword" required />
+            <input
+              type="checkbox"
+              id="showConfirmNewPassword"
+              onchange="togglePassword('confirmNewPassword')"
+            />
+            <label for="showConfirmNewPassword">Show</label>
+          </div>
+          <button type="submit">Đổi mật khẩu</button>
+        </form>
+        <div id="message"></div>
+      </div>
     </div>
 
     <script>
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const checkbox = document.getElementById(inputId === 'oldPassword' ? 'showOldPassword' : inputId === 'newPassword' ? 'showNewPassword' : 'showConfirmNewPassword');
-            input.type = checkbox.checked ? 'text' : 'password';
+      function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const checkbox = document.getElementById(
+          inputId === 'oldPassword'
+            ? 'showOldPassword'
+            : inputId === 'newPassword'
+            ? 'showNewPassword'
+            : 'showConfirmNewPassword'
+        );
+        input.type = checkbox.checked ? 'text' : 'password';
+      }
+      document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const oldPassword = document.getElementById('oldPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        const messageDiv = document.getElementById('message');
+        const confirmed = confirm('Bạn có chắc chắn muốn đổi mật khẩu không?');
+        if (!confirmed) {
+          return;
         }
-        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const oldPassword = document.getElementById('oldPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            const messageDiv = document.getElementById('message');
-            const confirmed = confirm('Bạn có chắc chắn muốn đổi mật khẩu không?');
-            if (!confirmed) {
-                return;
-            }
-            messageDiv.style.display = 'none';
-            messageDiv.className = '';
-            try {
-                const response = await fetch('http://127.0.0.1:3000/change-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ oldPassword, newPassword, confirmNewPassword })
-                });
-                const result = await response.json();
-                messageDiv.style.display = 'block';
-                if (response.ok) {
-                    messageDiv.className = 'success';
-                    messageDiv.textContent = result.message;
-                    document.getElementById('changePasswordForm').reset();
-                } else {
-                    messageDiv.className = 'error';
-                    messageDiv.textContent = result.message;
-                }
-            } catch (error) {
-                messageDiv.style.display = 'block';
-                messageDiv.className = 'error';
-                messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /change-password hoạt động đúng.`;
-            }
-        });
-        function handleLogout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                logout().then(() => {
-                    window.location.href = 'index.html';
-                }).catch(error => {
-                    console.error('Lỗi khi đăng xuất:', error);
-                    alert('Đăng xuất thất bại. Vui lòng thử lại.');
-                });
-            }
+        messageDiv.style.display = 'none';
+        messageDiv.className = '';
+        try {
+          const response = await fetch('http://127.0.0.1:3000/change-password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ oldPassword, newPassword, confirmNewPassword })
+          });
+          const result = await response.json();
+          messageDiv.style.display = 'block';
+          if (response.ok) {
+            messageDiv.className = 'success';
+            messageDiv.textContent = result.message;
+            document.getElementById('changePasswordForm').reset();
+          } else {
+            messageDiv.className = 'error';
+            messageDiv.textContent = result.message;
+          }
+        } catch (error) {
+          messageDiv.style.display = 'block';
+          messageDiv.className = 'error';
+          messageDiv.textContent = `Lỗi: ${error.message}. Hãy đảm bảo server đang chạy tại http://127.0.0.1:3000 và endpoint /change-password hoạt động đúng.`;
         }
-        async function logout() {
-            try {
-                const response = await fetch('http://127.0.0.1:3000/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                console.log('Phản hồi từ server:', data.message);
-                localStorage.removeItem('role');
-                return data;
-            } catch (error) {
-                throw error;
-            }
+      });
+      function handleLogout() {
+        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+          logout()
+            .then(() => {
+              window.location.href = 'index.html';
+            })
+            .catch((error) => {
+              console.error('Lỗi khi đăng xuất:', error);
+              alert('Đăng xuất thất bại. Vui lòng thử lại.');
+            });
         }
+      }
+      async function logout() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const data = await response.json();
+          console.log('Phản hồi từ server:', data.message);
+          localStorage.removeItem('role');
+          return data;
+        } catch (error) {
+          throw error;
+        }
+      }
+      getSessionInfo();
+      // Cập nhật hiển thị thông tin người dùng khi trang load
+      document.addEventListener('DOMContentLoaded', async function () {
+        const userInfoSpan = document.getElementById('userInfo');
+        if (userInfoSpan) {
+          const userDisplay = await getSessionInfo();
+          userInfoSpan.textContent = 'Xin chào, ' + userDisplay;
+        }
+      });
+      async function getSessionInfo() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-session', {
+            method: 'GET',
+            credentials: 'include' // Bao gồm cookie/session
+          });
+          const data = await response.json();
+          if (response.ok) {
+            let userDisplay = data.email;
+            if (data.role === 'admin') {
+              userDisplay += ' 🔑';
+            }
+            return userDisplay;
+          } else {
+            return 'Guest'; // Nếu chưa đăng nhập
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy session:', error);
+          return 'Guest';
+        }
+      }
     </script>
-</body>
+  </body>
 </html>

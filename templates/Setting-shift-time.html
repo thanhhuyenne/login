@@ -17,7 +17,7 @@
         flex-direction: column;
       }
       .navbar {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         padding: 10px;
         display: flex;
@@ -84,14 +84,16 @@
       .filter-container label {
         font-size: 14px;
       }
-      select, input, button {
+      select,
+      input,
+      button {
         padding: 8px;
         font-size: 14px;
         border: 1px solid #ccc;
         border-radius: 4px;
       }
       button {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         border: none;
         cursor: pointer;
@@ -111,13 +113,14 @@
         background: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
-      .report-table th, .report-table td {
+      .report-table th,
+      .report-table td {
         border: 1px solid #ddd;
         padding: 12px;
         text-align: center;
       }
       .report-table th {
-        background: #4CAF50;
+        background: #4caf50;
         color: white;
         font-weight: bold;
       }
@@ -181,6 +184,7 @@
       <span onclick="window.location.href='Report.html'">REPORTS</span>
       <span onclick="window.location.href='Setting-current.html'" class="active">SETTING</span>
       <span onclick="window.location.href='index.html'">LOG OUT</span>
+      <span id="userInfo" style="margin-left: auto"></span>
     </div>
 
     <div class="container">
@@ -188,11 +192,19 @@
         <div onclick="window.location.href='Setting-current.html'">1 - CÀI ĐẶT QUÁ DÒNG</div>
         <div onclick="window.location.href='Setting-line.html'">2 - CÀI ĐẶT SỤT ÁP DÂY</div>
         <div onclick="window.location.href='Setting-phase.html'">3 - CÀI ĐẶT SỤT ÁP PHA</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC</div>
-        <div onclick="window.location.href='Setting-history-editer.html'">5 - LỊCH SỬ CHỈNH SỬA</div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          4 - CÀI ĐẶT DÒNG ĐIỆN ĐỊNH MỨC
+        </div>
+        <div onclick="window.location.href='Setting-history-editer.html'">
+          5 - LỊCH SỬ CHỈNH SỬA
+        </div>
         <div onclick="window.location.href='Setting-users.html'">6 - THÊM TÀI KHOẢN MỚI</div>
-        <div onclick="window.location.href='Setting-shift-time.html'" class="active">7 - LỊCH LÀM VIỆC</div>
-        <div onclick="window.location.href='Setting-rate-current.html'">8 - DÒNG ĐIỆN BẤT THƯỜNG</div>
+        <div onclick="window.location.href='Setting-shift-time.html'" class="active">
+          7 - LỊCH LÀM VIỆC
+        </div>
+        <div onclick="window.location.href='Setting-rate-current.html'">
+          8 - DÒNG ĐIỆN BẤT THƯỜNG
+        </div>
         <div onclick="window.location.href='Setting-cpass.html'">9 - THAY ĐỔI MẬT KHẨU</div>
         <div onclick="window.location.href='Setting-delete.html'">10 - XÓA TÀI KHOẢN</div>
       </div>
@@ -412,6 +424,36 @@
       window.onload = function () {
         loadSchedule();
       };
+      getSessionInfo();
+      // Cập nhật hiển thị thông tin người dùng khi trang load
+      document.addEventListener('DOMContentLoaded', async function () {
+        const userInfoSpan = document.getElementById('userInfo');
+        if (userInfoSpan) {
+          const userDisplay = await getSessionInfo();
+          userInfoSpan.textContent = 'Xin chào, ' + userDisplay;
+        }
+      });
+      async function getSessionInfo() {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/get-session', {
+            method: 'GET',
+            credentials: 'include' // Bao gồm cookie/session
+          });
+          const data = await response.json();
+          if (response.ok) {
+            let userDisplay = data.email;
+            if (data.role === 'admin') {
+              userDisplay += ' 🔑';
+            }
+            return userDisplay;
+          } else {
+            return 'Guest'; // Nếu chưa đăng nhập
+          }
+        } catch (error) {
+          console.error('Lỗi khi lấy session:', error);
+          return 'Guest';
+        }
+      }
     </script>
   </body>
 </html>

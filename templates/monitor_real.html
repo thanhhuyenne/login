@@ -12,12 +12,11 @@
     <div class="navbar">
         <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
         <span onclick="window.location.href='monitor_main.html'" class="active">DIAGRAMS</span>
-        <span onclick="window.location.href='dashboard_linechart.html'">TRENDS</span>
+        <span onclick="window.location.href='dashboard_real'">TRENDS</span>
         <span onclick="window.location.href='Alarm.html'">ALARMS</span>
         <span onclick="window.location.href='Report.html'">REPORTS</span>
         <span onclick="window.location.href='Setting-current.html'">SETTING</span>
         <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
-        <span onclick="window.location.href='monitor_real.html'"></span>
         <span id="userInfo" style="margin-left: auto"></span>
     </div>
     <div class="container">
@@ -68,7 +67,7 @@
     <script>
         async function updateGatawayStatus() {
         try {
-            const response = await fetch("http://localhost:3000/api/gataway-status");
+            const response = await fetch("http://localhost:3000/api/gataway-status-real");
             const statusData = await response.json();
 
             updateIndicator("device1", statusData.device1);

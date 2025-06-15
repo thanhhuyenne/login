@@ -17,38 +17,15 @@ async function fetchData() {
   const range = document.getElementById('timeRange').value;
 
   try {
-    const response = await fetch(`http://localhost:3000/get_data?ip=${ip}&id=${id}&range=${range}`);
+    const response = await fetch(
+      `http://localhost:3000/get_data_real?ip=${ip}&id=${id}&range=${range}`
+    );
     const data = await response.json();
 
     if (!data || data.length === 0) {
       console.warn('⚠️ Không có dữ liệu để hiển thị!');
       return;
     }
-
-    // Thêm biến động ngẫu nhiên vào dữ liệu
-    data.forEach((row) => {
-      // Điện áp (volts_4, volts_5, volts_6) ±10V
-      row.volts_4 = row.volts_4 + (Math.random() * 20 - 10); // ±10V
-      row.volts_5 = row.volts_5 + (Math.random() * 20 - 10); // ±10V
-      row.volts_6 = row.volts_6 + (Math.random() * 20 - 10); // ±10V
-      // Dòng điện (current1, current2, current3) ±1A
-      row.current1 = row.current1 + (Math.random() * 2 - 1); // ±1A
-      row.current2 = row.current2 + (Math.random() * 2 - 1); // ±1A
-      row.current3 = row.current3 + (Math.random() * 2 - 1); // ±1A
-      // Công suất (power1, power2, power3) ±100W (tùy chỉnh nếu cần)
-      row.power1 = row.power1 + (Math.random() * 200 - 100); // ±100W
-      row.power2 = row.power2 + (Math.random() * 200 - 100); // ±100W
-      row.power3 = row.power3 + (Math.random() * 200 - 100); // ±100W
-      // Sóng hài (hdia, hdib, hdic) ±5% (tùy chỉnh nếu cần)
-      row.hdia = row.hdia + (Math.random() * 10 - 5); // ±5%
-      row.hdib = row.hdib + (Math.random() * 10 - 5); // ±5%
-      row.hdic = row.hdic + (Math.random() * 10 - 5); // ±5%
-      // Hệ số công suất (power_factor_total) ±0.1 (tùy chỉnh nếu cần)
-      row.power_factor_total = Math.max(
-        0,
-        Math.min(1, row.power_factor_total + (Math.random() * 0.4 - 0.2))
-      ); // Tăng biên độ ngẫu nhiên ±0.2
-    });
 
     // Kiểm tra dữ liệu để tìm nguyên nhân các đường thẳng
     console.log(

@@ -184,42 +184,168 @@ async function readRealDeviceData() {
 
     // Ánh xạ từ file Word: thanh ghi và vị trí trong JSON
     const registerMapping = [
-      { startRegister: 32769, jsonIndex: 0 }, // U12
-      { startRegister: 32771, jsonIndex: 1 }, // U23
-      { startRegister: 32773, jsonIndex: 2 }, // U31
-      { startRegister: 32775, jsonIndex: 3 }, // U1
-      { startRegister: 32777, jsonIndex: 4 }, // U2
-      { startRegister: 32779, jsonIndex: 5 }, // U3
-      { startRegister: 32781, jsonIndex: 17 }, // Frequency
-      { startRegister: 32783, jsonIndex: 6 }, // I1
-      { startRegister: 32785, jsonIndex: 7 }, // I2
-      { startRegister: 32787, jsonIndex: 8 }, // I3
-      { startRegister: 32791, jsonIndex: 18 }, // Total active power
-      { startRegister: 32799, jsonIndex: 9 }, // Active power phase 1
-      { startRegister: 32801, jsonIndex: 10 }, // Active power phase 2
-      { startRegister: 32803, jsonIndex: 11 }, // Active power phase 3
-      { startRegister: 32817, jsonIndex: 19 }, // Power factor phase 1
-      { startRegister: 32819, jsonIndex: 20 }, // Power factor phase 2
-      { startRegister: 32821, jsonIndex: 21 } // Power factor phase 3
+      { startRegister: 32769, jsonIndex: 0, dataType: 'float' }, // U12
+      { startRegister: 32771, jsonIndex: 1, dataType: 'float' }, // U23
+      { startRegister: 32773, jsonIndex: 2, dataType: 'float' }, // U31
+      { startRegister: 32775, jsonIndex: 3, dataType: 'float' }, // U1
+      { startRegister: 32777, jsonIndex: 4, dataType: 'float' }, // U2
+      { startRegister: 32779, jsonIndex: 5, dataType: 'float' }, // U3
+      { startRegister: 32781, jsonIndex: 17, dataType: 'float' }, // Frequency
+      { startRegister: 32783, jsonIndex: 6, dataType: 'float' }, // I1
+      { startRegister: 32785, jsonIndex: 7, dataType: 'float' }, // I2
+      { startRegister: 32787, jsonIndex: 8, dataType: 'float' }, // I3
+      { startRegister: 32799, jsonIndex: 9, dataType: 'float' }, // Active power phase 1
+      { startRegister: 32801, jsonIndex: 10, dataType: 'float' }, // Active power phase 2
+      { startRegister: 32803, jsonIndex: 11, dataType: 'float' }, // Active power phase 3
+      { startRegister: 32791, jsonIndex: 14, dataType: 'float' }, // Total active power
+      { startRegister: 32793, jsonIndex: 15, dataType: 'float' }, // Total active power
+      { startRegister: 32795, jsonIndex: 16, dataType: 'float' }, // Total active power
+      { startRegister: 32797, jsonIndex: 18, dataType: 'float' }, // Power factor
+      { startRegister: 32817, jsonIndex: 19, dataType: 'float' }, // Power factor phase 2
+      { startRegister: 32819, jsonIndex: 20, dataType: 'float' }, // Power factor phase 3
+      { startRegister: 32821, jsonIndex: 21, dataType: 'float' }, // Power factor phase 3
+      { startRegister: 37639, jsonIndex: 22, dataType: 'float' }, // kwh import
+      { startRegister: 37647, jsonIndex: 23, dataType: 'float' }, // kwh export
+      { startRegister: 37687, jsonIndex: 24, dataType: 'float' }, // kvarh
+      { startRegister: 37655, jsonIndex: 25, dataType: 'float' } // kvah
     ];
 
+    // Thêm ánh xạ cho các thanh ghi Sint16 từ hình ảnh (34816 - 34825)
+    const sint16Mapping = [
+      { startRegister: 34817, jsonIndex: 29, dataType: 'sint16' }, // THD phase voltage U12
+      { startRegister: 34818, jsonIndex: 30, dataType: 'sint16' }, // THD phase voltage U23
+      { startRegister: 34819, jsonIndex: 31, dataType: 'sint16' }, // THD phase voltage U31
+      { startRegister: 34823, jsonIndex: 26, dataType: 'sint16' }, // THD current I1
+      { startRegister: 34824, jsonIndex: 27, dataType: 'sint16' }, // THD current I2
+      { startRegister: 34825, jsonIndex: 28, dataType: 'sint16' } // THD current I3
+    ];
+
+    // Kết hợp cả hai ánh xạ
+    const combinedMapping = [...registerMapping, ...sint16Mapping];
+
     // Đọc từng cặp thanh ghi theo ánh xạ
-    for (const { startRegister, jsonIndex } of registerMapping) {
+    for (const { startRegister, jsonIndex, dataType } of combinedMapping) {
       try {
         const { data } = await client.readHoldingRegisters(startRegister, 2); // Đọc 2 thanh ghi
         if (data && data.length === 2) {
           const buffer = Buffer.alloc(4);
           buffer.writeUInt16BE(data[0], 0); // Thanh ghi đầu
           buffer.writeUInt16BE(data[1], 2); // Thanh ghi tiếp theo
-          const floatValue = buffer.readFloatBE(0);
-          values[jsonIndex] = floatValue; // Gán vào vị trí tương ứng
+          if (dataType === 'float') {
+            const floatValue = buffer.readFloatBE(0);
+            values[jsonIndex] = floatValue; // Gán giá trị float
+          } else if (dataType === 'sint16') {
+            // Giả định chỉ cần đọc 1 thanh ghi cho Sint16, lấy data[0] và chuyển đổi
+            const sint16Value = data[0]; // Lấy giá trị thô
+            // Chuyển đổi từ uint16 sang sint16 (dải -32768 đến 32767)
+            values[jsonIndex] = sint16Value > 32767 ? sint16Value - 65536 : sint16Value;
+          }
         }
       } catch (error) {
         console.error(`Lỗi đọc thanh ghi ${startRegister}:`, error.message);
       }
     }
 
+    // Tính trung bình cộng cho jsonIndex 12 (v2ave) từ jsonIndex 0, 1, 2
+    const v2aveIndex = 12; // v2ave
+    const v2aveIndices = [0, 1, 2]; // U12, U23, U31
+    const validV2aveValues = v2aveIndices
+      .map((index) => values[index])
+      .filter((value) => value !== 0 && !isNaN(value));
+    if (validV2aveValues.length > 0) {
+      values[v2aveIndex] =
+        validV2aveValues.reduce((sum, value) => sum + value, 0) / validV2aveValues.length;
+    } else {
+      values[v2aveIndex] = 0;
+    }
+
+    // Tính trung bình cộng cho jsonIndex 13 (iave) từ jsonIndex 6, 7, 8
+    const iaveIndex = 13; // iave
+    const iaveIndices = [6, 7, 8]; // I1, I2, I3
+    const validIaveValues = iaveIndices
+      .map((index) => values[index])
+      .filter((value) => value !== 0 && !isNaN(value));
+    if (validIaveValues.length > 0) {
+      values[iaveIndex] =
+        validIaveValues.reduce((sum, value) => sum + value, 0) / validIaveValues.length;
+    } else {
+      values[iaveIndex] = 0;
+    }
+    // Tính trung bình cộng cho jsonIndex 32 (vinave) từ jsonIndex 3, 4, 5
+    const avgIndex = 32; // vinave
+    const indicesToAverage = [3, 4, 5]; // U1, U2, U3
+    const validValues = indicesToAverage
+      .map((index) => values[index])
+      .filter((value) => value !== 0 && !isNaN(value)); // Lọc các giá trị hợp lệ
+    if (validValues.length > 0) {
+      values[avgIndex] = validValues.reduce((sum, value) => sum + value, 0) / validValues.length;
+    } else {
+      values[avgIndex] = 0; // Nếu không có giá trị hợp lệ, giữ 0
+    }
+
     results.push({ ip: realDeviceIp, slaveId, values });
+    // Tạo bảng real_modbus_data nếu chưa có, giữ nguyên 33 cột của bạn
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS real_modbus_data (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        volts_ii FLOAT,
+        volts_2 FLOAT,
+        volts_3 FLOAT,
+        volts_4 FLOAT,
+        volts_5 FLOAT,
+        volts_6 FLOAT,
+        current1 FLOAT,
+        current2 FLOAT,
+        current3 FLOAT,
+        power1 FLOAT,
+        power2 FLOAT,
+        power3 FLOAT,
+        v2ave FLOAT,
+        iave FLOAT,
+        kWtotal FLOAT,
+        kVArtotal FLOAT,
+        kVAtotal FLOAT,
+        frequency FLOAT,
+        power_factor_total FLOAT,
+        power_factor_1 FLOAT,
+        power_factor_2 FLOAT,
+        power_factor_3 FLOAT,
+        kwh_import FLOAT,
+        kwh_export FLOAT,
+        kvarh FLOAT,
+        kvah FLOAT,
+        hdia FLOAT,
+        hdib FLOAT,
+        hdic FLOAT,
+        hdvab FLOAT,
+        hdvbc FLOAT,
+        hdvca FLOAT,
+        vinave FLOAT
+      )
+    `);
+
+    // Xây dựng câu lệnh INSERT với 33 giá trị từ mảng values
+    const sql = `
+      INSERT INTO real_modbus_data (
+        volts_ii, volts_2, volts_3, volts_4, volts_5, volts_6,
+        current1, current2, current3, power1, power2, power3,
+        v2ave, iave, kWtotal, kVArtotal, kVAtotal, frequency,
+        power_factor_total, power_factor_1, power_factor_2, power_factor_3,
+        kwh_import, kwh_export, kvarh, kvah, hdia, hdib, hdic,
+        hdvab, hdvbc, hdvca, vinave
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    try {
+      await pool.query(sql, values); // Gán toàn bộ mảng values (33 giá trị)
+      console.log('✅ Dữ liệu đã lưu vào bảng real_modbus_data');
+    } catch (err) {
+      console.error('❌ Lỗi SQL:', err.message);
+    } finally {
+      await pool.end();
+    }
   } catch (error) {
     console.error(`Lỗi kết nối tới ${realDeviceIp}:`, error.message);
     results.push({ ip: realDeviceIp, slaveId, error: error.message });
@@ -229,6 +355,8 @@ async function readRealDeviceData() {
 
   return results;
 }
+
+setInterval(readRealDeviceData, 10000);
 
 // Hàm tự động kiểm tra và gửi thông báo
 async function autoCheckAndNotify() {
@@ -646,6 +774,16 @@ app.get('/check-session', (req, res) => {
     return res.status(200).json({
       loggedIn: false
     });
+  }
+});
+
+// API lấy thông tin session
+app.get('/get-session', (req, res) => {
+  if (req.session.user) {
+    console.log('Trả về session:', req.session.user);
+    return res.status(200).json({ email: req.session.user.email, role: req.session.user.role });
+  } else {
+    return res.status(401).json({ message: 'Chưa đăng nhập' });
   }
 });
 
@@ -2097,6 +2235,34 @@ app.get('/get_data', async (req, res) => {
   }
 });
 
+// API lấy dữ liệu từ MySQL cho biểu đồ
+app.get('/get_data_real', async (req, res) => {
+  const { ip, id, range } = req.query;
+  if (!ip || !id) {
+    return res.status(400).json({ error: 'Thiếu IP hoặc ID thiết bị!' });
+  }
+
+  const timeMap = { '5p': 5, '10p': 10, '15p': 15 };
+  const minutes = timeMap[range] || 5;
+  const tableName = `real_modbus_data`;
+
+  const query = `
+        SELECT timestamp, volts_4, volts_5, volts_6, current1, current2, current3, power1, power2, power3, power_factor_total, hdia, hdib, hdic
+        FROM ${tableName}
+        WHERE timestamp >= NOW() - INTERVAL ${minutes} MINUTE
+        ORDER BY timestamp ASC
+    `;
+
+  try {
+    console.log('📝 SQL Query:', query);
+    const [results] = await pool.query(query, [minutes]); // 🟢 Dùng await
+    res.json(results);
+  } catch (err) {
+    console.error('❌ Lỗi MySQL:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const gata_way = [
   { ip: '127.0.0.1', id: 'device1' },
   { ip: '127.0.0.2', id: 'device2' },
@@ -2107,6 +2273,22 @@ const gata_way = [
 app.get('/api/gataway-status', async (req, res) => {
   let results = {};
   for (let gateway of gata_way) {
+    const isAlive = await ping.promise.probe(gateway.ip, { timeout: 2 });
+    results[gateway.id] = isAlive.alive;
+  }
+  res.json(results);
+});
+
+const gate_way = [
+  { ip: '192.168.0.10', id: 'device1' },
+  { ip: '192.168.0.11', id: 'device2' },
+  { ip: '192.168.0.12', id: 'device3' },
+  { ip: '192.168.0.13', id: 'device4' }
+];
+
+app.get('/api/gataway-status-real', async (req, res) => {
+  let results = {};
+  for (let gateway of gate_way) {
     const isAlive = await ping.promise.probe(gateway.ip, { timeout: 2 });
     results[gateway.id] = isAlive.alive;
   }

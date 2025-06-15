@@ -10,17 +10,17 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
       rel="stylesheet"
     />
-    <script defer src="/plot.js"></script>
+    <script defer src="/plot_real.js"></script>
     <link rel="stylesheet" href="/static/dashboard_linechart.css" />
   </head>
   <body>
     <!-- Navbar -->
     <div class="navbar">
-      <span onclick="window.location.href='GD.html'">DASHBOARDS</span>
-      <span onclick="window.location.href='monitor_main.html'">DIAGRAMS</span>
+      <span>DASHBOARDS</span>
+      <span onclick="window.location.href='monitor_real.html'">DIAGRAMS</span>
       <span onclick="window.location.href='dashboard_linechart.html'" class="active">TRENDS</span>
-      <span onclick="window.location.href='Alarm.html'">ALARMS</span>
-      <span onclick="window.location.href='Report.html'">REPORTS</span>
+      <span>ALARMS</span>
+      <span>REPORTS</span>
       <span onclick="window.location.href='Setting-current.html'">SETTING</span>
       <span id="logoutSpan" onclick="handleLogout()">LOG OUT</span>
       <span id="userInfo" style="margin-left: auto"></span>
@@ -59,10 +59,10 @@
           <div class="control-group">
             <label for="deviceIp">Chọn IP thiết bị:</label>
             <select id="deviceIp">
-              <option value="127.0.0.1">127.0.0.1</option>
-              <option value="127.0.0.2">127.0.0.2</option>
-              <option value="127.0.0.3">127.0.0.3</option>
-              <option value="127.0.0.4">127.0.0.4</option>
+              <option value="192.168.0.10">192.168.0.10</option>
+              <option value="192.168.0.10">127.0.0.2</option>
+              <option value="192.168.0.10">127.0.0.3</option>
+              <option value="192.168.0.10">127.0.0.4</option>
             </select>
           </div>
           <div class="control-group">

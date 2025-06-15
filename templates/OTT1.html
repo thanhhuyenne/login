@@ -21,7 +21,7 @@
         z-index: 10;
       "
     >
-      IP: <span id="displayIp"></span> | Slave ID: <span id="displaySlaveId"></span>
+      <span id="displayIp"></span> | Slave ID: <span id="displaySlaveId"></span>
     </div>
     <div class="container">
       <!-- Ảnh nền -->
@@ -138,6 +138,14 @@
           document.getElementById('modbus-data').innerText = 'Lỗi khi đọc dữ liệu từ Modbus.';
         }
       }
+      // Ánh xạ từ IP sang tên khu vực
+      const ipToAreaMap = {
+        '127.0.0.1': 'Khu vực 1',
+        '127.0.0.2': 'Khu vực 2',
+        '127.0.0.3': 'Khu vực 3',
+        '127.0.0.4': 'Khu vực 4'
+      };
+
       function updateIpSlaveDisplay() {
         const ip = document.getElementById('deviceIp').value;
         const slaveId = document.getElementById('slaveId').value;
@@ -145,7 +153,8 @@
         const displaySlaveId = document.getElementById('displaySlaveId');
 
         if (displayIp && displaySlaveId) {
-          displayIp.textContent = ip || 'N/A';
+          // Hiển thị tên khu vực thay vì IP, nếu IP không có trong ánh xạ thì hiển thị 'N/A'
+          displayIp.textContent = ipToAreaMap[ip] || 'N/A';
           displaySlaveId.textContent = slaveId || 'N/A';
         } else {
           console.error('Phần tử displayIp hoặc displaySlaveId không tồn tại');

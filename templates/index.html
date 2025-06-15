@@ -425,7 +425,7 @@
 
         if (response.ok && data.message === 'success') {
           console.log('Đăng nhập thành công, chuyển hướng đến dashboard.html');
-          window.location.href = 'Setting-users.html';
+          window.location.href = 'monitor_main.html';
         } else {
           errorMessage.textContent = data.message || 'Sai tài khoản hoặc mật khẩu';
           errorMessage.style.display = 'block';
